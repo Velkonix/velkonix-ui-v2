@@ -1,0 +1,7 @@
+.container {
+  width: min(1100px, 100%);
+  margin: 0 auto;
+  padding: var(--space-9) var(--space-6);
+  display: grid;
+  gap: var(--space-7);
+}

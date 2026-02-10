@@ -1,0 +1,15 @@
+.menu {
+  display: inline-flex;
+  gap: var(--space-4);
+}
+
+.item {
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.active {
+  color: var(--accent-primary);
+  text-shadow: var(--glow-soft);
+}

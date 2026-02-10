@@ -1,0 +1,5 @@
+.button {
+  padding: 0 var(--space-4);
+  min-height: 36px;
+  box-shadow: var(--glow-medium);
+}

@@ -1,0 +1,29 @@
+.button {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.12s ease, box-shadow 0.12s ease, color 0.12s ease;
+}
+
+.button:hover:not(:disabled) {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 170, 60, 0.12),
+    rgba(255, 170, 60, 0.06)
+  );
+  box-shadow: var(--glow-soft);
+  color: var(--text-primary);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  color: var(--text-disabled);
+  box-shadow: none;
+}

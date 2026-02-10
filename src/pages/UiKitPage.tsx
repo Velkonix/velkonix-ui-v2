@@ -1,0 +1,289 @@
+import { useState } from "react";
+
+import {
+  ActionButton,
+  ApyCell,
+  ApproveButton,
+  AssetCell,
+  BackButton,
+  Badge,
+  Button,
+  Card,
+  Checkbox,
+  ClaimButton,
+  Divider,
+  EmptyState,
+  ErrorState,
+  Footer,
+  Header,
+  Icon,
+  IconButton,
+  Input,
+  InputGroup,
+  Link,
+  Modal,
+  NavMenu,
+  NumberInput,
+  PageContainer,
+  PageHeader,
+  Section,
+  Select,
+  Skeleton,
+  Spacer,
+  Spinner,
+  Switch,
+  Table,
+  Tabs,
+  Toast,
+  Tooltip,
+  TxStatus,
+  Typography,
+  ValueCell,
+  WalletConnectButton,
+  WalletMenu,
+} from "../shared/ui";
+import styles from "./UiKitPage.module.css";
+
+type MarketRow = {
+  asset: string;
+  name: string;
+  supplied: string;
+  apy: string;
+};
+
+const markets: MarketRow[] = [
+  { asset: "ETH", name: "Ethereum", supplied: "$12.4M", apy: "3.2%" },
+  { asset: "USDC", name: "USD Coin", supplied: "$8.1M", apy: "2.1%" },
+];
+
+export function UiKitPage() {
+  const [activeTab, setActiveTab] = useState("convert");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  return (
+    <PageContainer className={styles.page}>
+      <PageHeader
+        title="Velkonix UI Kit"
+        subtitle="Amber / Gold theme applied to all primitives."
+        actions={<WalletConnectButton />}
+      />
+
+      <Section title="1. Base / Foundation">
+        <Card title="Buttons & Links">
+          <div className={styles.row}>
+            <Button>Primary</Button>
+            <Button variant="secondary">Secondary</Button>
+            <Button variant="ghost">Ghost</Button>
+            <Button variant="danger">Danger</Button>
+            <Button disabled>Disabled</Button>
+          </div>
+          <div className={styles.row}>
+            <IconButton
+              label="Settings"
+              icon={
+                <Icon size={18}>
+                  <circle cx="9" cy="9" r="8" fill="currentColor" />
+                </Icon>
+              }
+            />
+            <Link href="#">Inline link</Link>
+          </div>
+        </Card>
+        <Card title="Typography">
+          <Typography as="h1" variant="headline">
+            H1 — Velkonix Markets
+          </Typography>
+          <Typography as="h2" variant="title">
+            H2 — Supply overview
+          </Typography>
+          <Typography>Body text for metrics and descriptions.</Typography>
+          <Typography variant="label">Label / micro copy</Typography>
+        </Card>
+        <Card title="Divider / Spacer / Icon">
+          <Typography muted>Above divider</Typography>
+          <Divider />
+          <Typography muted>Below divider</Typography>
+          <Spacer size={12} />
+          <Icon size={20} aria-label="token">
+            <circle cx="10" cy="10" r="8" fill="currentColor" />
+          </Icon>
+        </Card>
+      </Section>
+
+      <Section title="2. Inputs & Controls">
+        <Card>
+          <div className={styles.gridTwo}>
+            <Input label="TextInput" placeholder="Enter amount" />
+            <NumberInput label="NumberInput" placeholder="0.00" />
+            <InputGroup label="InputGroup" prefix="MAX">
+              <input placeholder="0.00" />
+            </InputGroup>
+            <Select
+              label="Select"
+              options={[
+                { label: "Supply", value: "supply" },
+                { label: "Borrow", value: "borrow" },
+              ]}
+            />
+          </div>
+          <div className={styles.row}>
+            <Switch label="Collateral toggle" />
+            <Checkbox label="Agree to terms" />
+          </div>
+          <Tabs
+            items={[
+              { id: "convert", label: "Convert" },
+              { id: "stake", label: "Stake" },
+              { id: "rewards", label: "Rewards" },
+            ]}
+            activeId={activeTab}
+            onChange={setActiveTab}
+          />
+        </Card>
+      </Section>
+
+      <Section title="3. Feedback & States">
+        <Card>
+          <div className={styles.row}>
+            <Spinner />
+            <Badge>Default</Badge>
+            <Badge tone="success">Success</Badge>
+            <Badge tone="warning">Warning</Badge>
+            <Badge tone="error">Error</Badge>
+            <Tooltip content="APY details">
+              <Badge>Tooltip</Badge>
+            </Tooltip>
+          </div>
+          <div className={styles.gridTwo}>
+            <Skeleton height={14} />
+            <Skeleton height={14} />
+          </div>
+          <div className={styles.gridTwo}>
+            <Toast tone="success" title="Supply completed">
+              You supplied 1.2 ETH
+            </Toast>
+            <Toast tone="error" title="Transaction failed">
+              Retry the operation
+            </Toast>
+          </div>
+          <div className={styles.gridTwo}>
+            <EmptyState title="No positions" description="You have no open borrows." />
+            <ErrorState title="Data error" description="Failed to load markets." />
+          </div>
+        </Card>
+      </Section>
+
+      <Section title="4. Data Display">
+        <Card>
+          <Table<MarketRow>
+            columns={[
+              {
+                key: "asset",
+                title: "Asset",
+                render: (row) => <AssetCell symbol={row.asset} name={row.name} />,
+              },
+              {
+                key: "supplied",
+                title: "Total Supplied",
+                align: "right",
+                render: (row) => <ValueCell>{row.supplied}</ValueCell>,
+              },
+              {
+                key: "apy",
+                title: "Supply APY",
+                align: "right",
+                render: (row) => <ApyCell>{row.apy}</ApyCell>,
+              },
+            ]}
+            rows={markets}
+            getRowKey={(row) => row.asset}
+          />
+        </Card>
+      </Section>
+
+      <Section title="5. Modals & Overlays">
+        <Card>
+          <Button onClick={() => setIsModalOpen(true)}>Open Modal</Button>
+          <Modal
+            isOpen={isModalOpen}
+            title="Confirm action"
+            onClose={() => setIsModalOpen(false)}
+            footer={<Button onClick={() => setIsModalOpen(false)}>Close</Button>}
+          >
+            <Typography>Review transaction details before confirming.</Typography>
+          </Modal>
+        </Card>
+      </Section>
+
+      <Section title="6. Web3 / Protocol-specific">
+        <Card>
+          <div className={styles.row}>
+            <WalletConnectButton />
+            <WalletMenu address="0x18d3...7f2a" />
+            <ApproveButton />
+            <ActionButton label="Deposit" />
+            <ClaimButton />
+          </div>
+          <div className={styles.row}>
+            <TxStatus status="pending" />
+            <TxStatus status="success" />
+            <TxStatus status="failed" />
+          </div>
+        </Card>
+      </Section>
+
+      <Section title="7. Layout & Navigation">
+        <Card>
+          <Header
+            logo={<span>Velkonix</span>}
+            nav={<NavMenu items={["Home", "Markets", "Dashboard", "Staking"]} active="Markets" />}
+            actions={<WalletConnectButton />}
+          />
+          <Spacer size={12} />
+          <BackButton />
+          <Spacer size={12} />
+          <Footer
+            links={
+              <div className={styles.row}>
+                <Link href="#">X</Link>
+                <Link href="#">Discord</Link>
+                <Link href="#">GitHub</Link>
+                <Link href="#">GitBook</Link>
+              </div>
+            }
+            label="Velkonix"
+          />
+        </Card>
+      </Section>
+
+      <Section title="8. Domain Components (Feature-level)">
+        <div className={styles.gridThree}>
+          <Card title="MarketsTable">
+            <Typography muted>Sortable markets list.</Typography>
+          </Card>
+          <Card title="UserSummary">
+            <Typography muted>Net worth, APY, claim.</Typography>
+          </Card>
+          <Card title="Asset Panels">
+            <Typography muted>Supply / Borrow panels.</Typography>
+          </Card>
+          <Card title="Staking Blocks">
+            <Typography muted>Convert, Stake, Rewards, Exit.</Typography>
+          </Card>
+        </div>
+      </Section>
+
+      <Section title="9. Utility">
+        <Card>
+          <div className={styles.utility}>
+            FormatNumber(12345.678) → 12,345.68
+            <br />
+            FormatApy(0.0321) → 3.21%
+            <br />
+            FormatAddress(0x18d3c4a1...7f2a)
+          </div>
+        </Card>
+      </Section>
+    </PageContainer>
+  );
+}

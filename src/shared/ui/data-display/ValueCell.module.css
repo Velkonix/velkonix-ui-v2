@@ -1,0 +1,8 @@
+.value {
+  color: var(--text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.muted {
+  color: var(--text-muted);
+}

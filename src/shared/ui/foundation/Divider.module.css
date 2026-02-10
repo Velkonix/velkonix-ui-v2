@@ -1,0 +1,20 @@
+.divider {
+  border: none;
+  height: 1px;
+  margin: var(--space-4) 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--border-accent),
+    transparent
+  );
+}
+
+.strong {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 170, 60, 0.6),
+    transparent
+  );
+}

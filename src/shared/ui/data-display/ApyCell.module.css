@@ -1,0 +1,6 @@
+.apy {
+  color: var(--accent-primary);
+  cursor: pointer;
+  text-shadow: var(--glow-soft);
+  font-weight: var(--font-weight-medium);
+}

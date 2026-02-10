@@ -1,0 +1,18 @@
+.state {
+  padding: var(--space-4);
+  border-radius: 12px;
+  background: var(--gradient-surface);
+  box-shadow: inset 0 0 0 1px rgba(235, 95, 80, 0.4);
+  color: var(--text-secondary);
+}
+
+.title {
+  font-weight: var(--font-weight-semibold);
+  color: var(--error);
+  margin-bottom: var(--space-1);
+}
+
+.description {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}

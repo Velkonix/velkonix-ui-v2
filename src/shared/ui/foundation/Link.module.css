@@ -1,0 +1,16 @@
+.link {
+  color: var(--accent-primary);
+  text-decoration: none;
+  transition: color 0.12s ease, text-shadow 0.12s ease;
+}
+
+.link:hover {
+  color: var(--accent-hover);
+  text-shadow: var(--glow-soft);
+}
+
+.disabled {
+  color: var(--text-disabled);
+  cursor: not-allowed;
+  text-shadow: none;
+}
