@@ -10,6 +10,11 @@ export interface Asset {
   totalBorrowed: number;
   supplyApy: number;
   borrowApy: number;
+  maxLtv?: number;
+  liquidationThreshold?: number;
+  liquidationPenalty?: number;
+  borrowCap?: number;
+  reserveFactor?: number;
 }
 
 export interface UserSupply {
@@ -75,4 +80,5 @@ export interface StakingMockApi {
   vestingExit(user: Address): Promise<MockTxResult>;
   requestExit(user: Address, amount: number): Promise<MockTxResult>;
   executeExitFromQueue(user: Address, queueItemId: string): Promise<MockTxResult>;
+  cancelExitRequest(user: Address, queueItemId: string): Promise<MockTxResult>;
 }

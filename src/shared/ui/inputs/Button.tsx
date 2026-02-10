@@ -1,5 +1,6 @@
 import type { ButtonHTMLAttributes } from "react";
 
+import { Spinner } from "../feedback/Spinner";
 import { classNames } from "../utilities/classNames";
 import styles from "./Button.module.css";
 
@@ -36,8 +37,10 @@ export function Button({
       aria-busy={isLoading || undefined}
       {...props}
     >
-      <span className={styles.content}>{children}</span>
-      {isLoading && <span className={styles.spinner} aria-hidden="true" />}
+      <span className={styles.content}>
+        {isLoading ? <Spinner size="sm" className={styles.spinner} aria-hidden="true" /> : null}
+        {children}
+      </span>
     </button>
   );
 }

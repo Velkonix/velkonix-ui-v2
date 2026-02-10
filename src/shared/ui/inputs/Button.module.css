@@ -31,18 +31,11 @@
 }
 
 .spinner {
-  position: absolute;
-  right: var(--space-4);
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  border: 2px solid rgba(20, 14, 10, 0.25);
-  border-top-color: var(--text-on-accent);
-  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
 }
 
 .loading {
-  padding-right: var(--space-7);
+  opacity: 0.92;
 }
 
 .sm {
@@ -113,8 +106,3 @@
   transform: translateY(-1px);
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}

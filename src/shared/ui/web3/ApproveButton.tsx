@@ -1,8 +1,8 @@
-import type { ButtonHTMLAttributes } from "react";
+import type { ComponentProps } from "react";
 
 import { Button } from "../inputs/Button";
 
-type ApproveButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
+type ApproveButtonProps = Omit<ComponentProps<typeof Button>, "children" | "variant">;
 
 export function ApproveButton(props: ApproveButtonProps) {
   return (

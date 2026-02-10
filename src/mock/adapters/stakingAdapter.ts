@@ -205,4 +205,22 @@ export class StakingMockAdapter implements StakingMockApi {
       return next;
     });
   }
+
+  public cancelExitRequest(user: Address, queueItemId: string): Promise<MockTxResult> {
+    return this.txEngine.run({ op: "cancelExitRequest", user }, (state) => {
+      const next = cloneState(state);
+      const staking = getOrCreateUser(next, user).staking;
+      const item = staking.queue.find((entry) => entry.id === queueItemId);
+      if (item === undefined || item.status === "cancelled" || item.status === "executed") {
+        throwMockError("QUEUE_ITEM_NOT_FOUND", "Queue item not found");
+      }
+      const queueItem = item as NonNullable<typeof item>;
+      if (queueItem.status !== "queued") {
+        throwMockError("QUEUE_ITEM_NOT_CANCELLABLE", "Only queued items can be cancelled");
+      }
+      queueItem.status = "cancelled";
+      queueItem.canExit = false;
+      return next;
+    });
+  }
 }

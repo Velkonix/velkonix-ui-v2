@@ -1,0 +1,76 @@
+.page {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.pageHeader h1 {
+  font-size: var(--font-size-h2);
+}
+
+.summaryGrid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.summaryItem {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.summaryLabel {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.summaryValue {
+  color: var(--text-primary);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}
+
+@media (max-width: 768px) {
+  .summaryGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sortButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  padding: 0;
+}
+
+.sortButton:hover {
+  color: var(--accent-hover);
+  text-shadow: var(--glow-soft);
+}
+
+.sortArrow {
+  font-size: 0.62em;
+  line-height: 1;
+  transform: translateY(-0.03em);
+}
+
+.apyButton {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.apyButton:hover span {
+  filter: brightness(1.05);
+}
+
+.modalContent {
+  display: grid;
+  gap: var(--space-2);
+}

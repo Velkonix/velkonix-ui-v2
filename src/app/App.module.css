@@ -1,0 +1,26 @@
+.logo {
+  letter-spacing: 0.02em;
+}
+
+.logoLink {
+  color: var(--text-primary);
+}
+
+.navLinks {
+  display: inline-flex;
+  gap: var(--space-4);
+}
+
+.navLink {
+  color: var(--text-secondary);
+}
+
+.activeNavLink {
+  color: var(--accent-primary);
+  text-shadow: var(--glow-soft);
+}
+
+.footerLinks {
+  display: inline-flex;
+  gap: var(--space-3);
+}

@@ -1,0 +1,16 @@
+.page {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.actions {
+  display: inline-flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.navButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}

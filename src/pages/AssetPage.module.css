@@ -1,0 +1,142 @@
+.page {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.backRow {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.assetTitle {
+  display: flex;
+  align-items: center;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.infoColumn {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.actionsColumn {
+  position: sticky;
+  top: var(--space-6);
+}
+
+.actionsCard {
+  width: 100%;
+  display: grid;
+  gap: var(--space-4);
+}
+
+.walletModule {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.walletIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, var(--bg-tertiary), var(--bg-secondary));
+  box-shadow: inset 0 0 0 1px var(--border-subtle);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.walletIconSvg {
+  color: var(--text-secondary);
+}
+
+.walletSummary {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.walletBalance {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}
+
+.actionRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.actionText {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.actionValue {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-base);
+  color: var(--text-secondary);
+}
+
+.actionRow > button {
+  min-width: 140px;
+}
+
+.modalContent {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.txOverview {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  background: var(--bg-secondary);
+}
+
+.txOverviewTitle {
+  margin: 0 0 var(--space-1);
+}
+
+.txOverviewRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  min-height: 32px;
+}
+
+.modalContent > button {
+  margin-top: var(--space-1);
+}
+
+@media (max-width: 768px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .actionsColumn {
+    position: static;
+    order: -1;
+  }
+
+  .actionRow {
+    flex-wrap: wrap;
+  }
+
+  .actionRow > button {
+    width: 100%;
+    min-width: 0;
+  }
+}

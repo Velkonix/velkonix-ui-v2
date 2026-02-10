@@ -21,6 +21,12 @@
   padding: var(--space-5);
 }
 
+.xs {
+  width: min(90vw, 408px);
+  gap: var(--space-4);
+  padding: var(--space-5);
+}
+
 .sm {
   width: min(90vw, 420px);
 }

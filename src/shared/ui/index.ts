@@ -10,6 +10,7 @@ export { ErrorState } from "./feedback/ErrorState";
 export { Skeleton } from "./feedback/Skeleton";
 export { Spinner } from "./feedback/Spinner";
 export { Toast } from "./feedback/Toast";
+export { ToastPopup } from "./feedback/ToastPopup";
 export { Tooltip } from "./feedback/Tooltip";
 
 export { ApyCell } from "./data-display/ApyCell";
@@ -21,6 +22,7 @@ export { ValueCell } from "./data-display/ValueCell";
 export { Button } from "./inputs/Button";
 export { Checkbox } from "./inputs/Checkbox";
 export { IconButton } from "./inputs/IconButton";
+export { AmountInput } from "./inputs/AmountInput";
 export { Input } from "./inputs/Input";
 export { InputGroup } from "./inputs/InputGroup";
 export { NumberInput } from "./inputs/NumberInput";

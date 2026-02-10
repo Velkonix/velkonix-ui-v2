@@ -33,7 +33,7 @@ import {
 Экспортируются из `src/shared/ui/index.ts`:
 
 - Foundation: `Divider`, `Icon`, `Link`, `Spacer`, `Typography`
-- Inputs: `Button`, `Checkbox`, `IconButton`, `Input`, `InputGroup`, `NumberInput`, `Select`, `Switch`
+- Inputs: `AmountInput`, `Button`, `Checkbox`, `IconButton`, `Input`, `InputGroup`, `NumberInput`, `Select`, `Switch`
 - Feedback: `Badge`, `EmptyState`, `ErrorState`, `Skeleton`, `Spinner`, `Toast`, `Tooltip`
 - Data display: `ApyCell`, `AssetCell`, `Card`, `Table`, `ValueCell`
 - Modals: `Modal`
@@ -49,7 +49,8 @@ import {
 - **Icon-only action**: `IconButton`.
 - **Текстовые переходы/inline action**: `Link`.
 - **Текст и заголовки**: `Typography` (`headline`, `title`, `body`, `label`, `caption`).
-- **Формы**: `Input`, `NumberInput`, `InputGroup`, `Select`, `Checkbox`, `Switch`.
+- **Формы**: `Input`, `NumberInput`, `AmountInput`, `InputGroup`, `Select`, `Checkbox`, `Switch`.
+- **Amount c балансом/максом**: `AmountInput` для ввода суммы актива с `MAX`, строкой доступного баланса и USD-эквивалентом.
 - **Состояния загрузки/ошибки**: `Spinner`, `Skeleton`, `Toast`, `ErrorState`, `EmptyState`.
 - **Табличные данные**: `Table` + `AssetCell` + `ValueCell` + `ApyCell`.
 - **Диалоги**: `Modal` (подтверждение/детали APY).

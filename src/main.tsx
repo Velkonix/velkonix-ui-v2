@@ -2,9 +2,28 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./app/App";
 import { MockEngineProvider } from "./app/providers/MockEngineProvider";
+import { WalletProvider } from "./app/providers/WalletProvider";
 import "./styles/index.css";
 
 const root = document.getElementById("root");
+const forceMockFromQuery =
+  typeof window !== "undefined" && new URLSearchParams(window.location.search).get("mock") === "1";
+const isMockMode = import.meta.env.VITE_MOCK_MODE === "true" || forceMockFromQuery;
+
+if (typeof fetch === "function") {
+  fetch("http://127.0.0.1:7242/ingest/79658062-1f9f-451c-9869-7f640578985d", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      runId: "e2e-debug-1",
+      hypothesisId: "H1",
+      location: "src/main.tsx:9",
+      message: "Boot env evaluated",
+      data: { viteMockMode: import.meta.env.VITE_MOCK_MODE, forceMockFromQuery, isMockMode },
+      timestamp: Date.now(),
+    }),
+  }).catch(() => {});
+}
 
 if (!root) {
   throw new Error("Root element not found");
@@ -12,8 +31,14 @@ if (!root) {
 
 ReactDOM.createRoot(root).render(
   <React.StrictMode>
-    <MockEngineProvider>
-      <App />
-    </MockEngineProvider>
+    <WalletProvider mockMode={isMockMode}>
+      {isMockMode ? (
+        <MockEngineProvider>
+          <App mockMode />
+        </MockEngineProvider>
+      ) : (
+        <App mockMode={false} />
+      )}
+    </WalletProvider>
   </React.StrictMode>
 );

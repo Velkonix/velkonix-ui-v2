@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useEffect } from "react";
 
 import {
   ActionButton,
+  AmountInput,
   ApyCell,
   ApproveButton,
   AssetCell,
@@ -59,6 +61,25 @@ const markets: MarketRow[] = [
 export function UiKitPage() {
   const [activeTab, setActiveTab] = useState("convert");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [amountValue, setAmountValue] = useState("");
+
+  useEffect(() => {
+    if (typeof fetch !== "function") {
+      return;
+    }
+    fetch("http://127.0.0.1:7242/ingest/79658062-1f9f-451c-9869-7f640578985d", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        runId: "e2e-debug-1",
+        hypothesisId: "H4",
+        location: "src/pages/UiKitPage.tsx:65",
+        message: "UiKitPage mounted",
+        data: { reason: "mock branch not selected" },
+        timestamp: Date.now(),
+      }),
+    }).catch(() => {});
+  }, []);
 
   return (
     <PageContainer className={styles.page}>
@@ -112,7 +133,7 @@ export function UiKitPage() {
 
       <Section title="2. Inputs & Controls">
         <Card>
-          <div className={styles.gridTwo}>
+          <div className={styles.inputsGrid}>
             <Input label="TextInput" placeholder="Enter amount" />
             <NumberInput label="NumberInput" placeholder="0.00" />
             <InputGroup label="InputGroup" prefix="MAX">
@@ -124,6 +145,24 @@ export function UiKitPage() {
                 { label: "Supply", value: "supply" },
                 { label: "Borrow", value: "borrow" },
               ]}
+            />
+          </div>
+          <div className={styles.amountDemo}>
+            <AmountInput
+              label="AmountInput"
+              placeholder="0.00"
+              assetLabel="USDC"
+              assetIcon={
+                <Icon size={16} aria-label="USDC token icon">
+                  <circle cx="10" cy="10" r="8" fill="currentColor" />
+                </Icon>
+              }
+              balanceLabel="Available"
+              balanceValue="1,250.45"
+              usdValue="$125.04"
+              maxValue="1250.45"
+              value={amountValue}
+              onChange={(event) => setAmountValue(event.target.value)}
             />
           </div>
           <div className={styles.row}>
@@ -219,7 +258,7 @@ export function UiKitPage() {
         <Card>
           <div className={styles.row}>
             <WalletConnectButton />
-            <WalletMenu address="0x18d3...7f2a" />
+            <WalletMenu />
             <ApproveButton />
             <ActionButton label="Deposit" />
             <ClaimButton />

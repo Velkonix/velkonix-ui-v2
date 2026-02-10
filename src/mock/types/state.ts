@@ -9,6 +9,7 @@ export type MockErrorCode =
   | "LOCKED"
   | "QUEUE_ITEM_NOT_READY"
   | "QUEUE_ITEM_NOT_FOUND"
+  | "QUEUE_ITEM_NOT_CANCELLABLE"
   | "NO_REWARDS";
 
 export interface MockExitQueueItem {

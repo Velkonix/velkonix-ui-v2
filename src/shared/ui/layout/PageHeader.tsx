@@ -3,7 +3,7 @@ import type { HTMLAttributes, ReactNode } from "react";
 import { classNames } from "../utilities/classNames";
 import styles from "./PageHeader.module.css";
 
-type PageHeaderProps = HTMLAttributes<HTMLDivElement> & {
+type PageHeaderProps = Omit<HTMLAttributes<HTMLDivElement>, "title"> & {
   title: ReactNode;
   subtitle?: ReactNode;
   actions?: ReactNode;

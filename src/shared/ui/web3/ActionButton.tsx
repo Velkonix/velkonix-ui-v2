@@ -1,8 +1,8 @@
-import type { ButtonHTMLAttributes } from "react";
+import type { ComponentProps } from "react";
 
 import { Button } from "../inputs/Button";
 
-type ActionButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+type ActionButtonProps = Omit<ComponentProps<typeof Button>, "children" | "variant"> & {
   label: string;
 };
 

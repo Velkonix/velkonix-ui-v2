@@ -1,5 +1,6 @@
-import type { Address, Asset, StakingState, Tx, UserBorrow, UserSupply } from "../types/contracts";
+import type { Address, Asset, AssetId, StakingState, Tx, UserBorrow, UserSupply } from "../types/contracts";
 import type { MockDbState } from "../types/state";
+import type { MockExitQueueItem } from "../types/state";
 
 const toStakingState = (state: MockDbState, user: Address): StakingState => {
   const staking = state.users[user]?.staking;
@@ -21,7 +22,7 @@ const toStakingState = (state: MockDbState, user: Address): StakingState => {
       .map((item) => ({
         startDate: item.startDate,
         amount: item.amount,
-        canExit: item.canExit,
+        canExit: item.status === "ready" || Date.now() >= item.unlockDate,
       })),
   };
 };
@@ -41,11 +42,32 @@ export class MockSelectors {
     return this.readState().users[user]?.borrows ?? [];
   }
 
+  public getUserAllowance(user: Address, assetId: AssetId): number {
+    return this.readState().users[user]?.allowances[assetId] ?? 0;
+  }
+
+  public getUserBalance(user: Address, assetId: AssetId): number {
+    return this.readState().users[user]?.balances[assetId] ?? 0;
+  }
+
   public getStakingState(user: Address): StakingState {
     return toStakingState(this.readState(), user);
   }
 
   public getTx(txId: string): Tx | null {
     return this.readState().txs[txId] ?? null;
+  }
+
+  public getTxPool(): Tx[] {
+    return Object.values(this.readState().txs);
+  }
+
+  public getCurrentUser(): Address | null {
+    const users = Object.keys(this.readState().users) as Address[];
+    return users[0] ?? null;
+  }
+
+  public getExitQueueEntries(user: Address): MockExitQueueItem[] {
+    return this.readState().users[user]?.staking.queue ?? [];
   }
 }
