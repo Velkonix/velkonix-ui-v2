@@ -1,0 +1,137 @@
+.page {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.pageHeader h1 {
+  font-size: var(--font-size-h2);
+}
+
+.summaryGrid {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: end;
+}
+
+.summaryItem {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.summaryValue {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}
+
+.claimArea {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.positionsColumns {
+  display: flex;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.positionsColumn {
+  flex: 1 1 calc((100% - var(--space-5)) / 2);
+  max-width: calc((100% - var(--space-5)) / 2);
+  min-width: 0;
+}
+
+.positionsHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-3);
+}
+
+.positionsTitle {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  margin-right: var(--space-1);
+}
+
+.positionsStats {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.positionsStat {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-1);
+  text-align: left;
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-secondary);
+}
+
+.switchCell {
+  display: inline-flex;
+  justify-content: center;
+}
+
+.modalContent {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.txOverview {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  background: var(--bg-secondary);
+}
+
+.txOverviewTitle {
+  margin: 0 0 var(--space-1);
+}
+
+.txOverviewRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  min-height: 32px;
+}
+
+.txOverviewTransition {
+  font-weight: var(--font-weight-medium);
+}
+
+@media (max-width: 1024px) {
+  .summaryGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .claimArea {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 1200px) {
+  .positionsColumn {
+    flex-basis: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .summaryGrid {
+    grid-template-columns: 1fr;
+  }
+}

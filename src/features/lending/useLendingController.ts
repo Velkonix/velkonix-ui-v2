@@ -11,7 +11,14 @@ const parseAmount = (value: string): number => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
-type OperationName = "approve" | "supply" | "borrow";
+type OperationName =
+  | "approve"
+  | "supply"
+  | "withdraw"
+  | "borrow"
+  | "repay"
+  | "setCollateral"
+  | "claimLendingRewards";
 type ToastTone = "success" | "error" | "info";
 
 type ToastState = {
@@ -32,6 +39,34 @@ export type MarketRow = {
   totalBorrowed: number;
   supplyApy: number;
   borrowApy: number;
+};
+
+export type DashboardSupplyRow = {
+  assetId: string;
+  symbol: string;
+  name: string;
+  icon: string;
+  balance: number;
+  apy: number;
+  isCollateral: boolean;
+};
+
+export type DashboardBorrowRow = {
+  assetId: string;
+  symbol: string;
+  name: string;
+  icon: string;
+  debt: number;
+  apy: number;
+};
+
+export type DashboardSummary = {
+  netWorth: number;
+  averageApy: number;
+  borrowUtilization: number;
+  totalSupplied: number;
+  totalBorrowed: number;
+  lendingRewards: number;
 };
 
 const sortRows = (rows: MarketRow[], key: MarketSortKey, direction: SortDirection): MarketRow[] => {
@@ -77,6 +112,12 @@ export function useLendingController() {
   const assets = engine.selectors.getAssets();
   const userSupplies = user ? engine.selectors.getUserSupplies(user) : [];
   const userBorrows = user ? engine.selectors.getUserBorrows(user) : [];
+  const lendingRewards = user ? engine.selectors.getUserLendingRewards(user) : 0;
+
+  const assetsById = useMemo<Map<AssetId, Asset>>(
+    () => new Map(assets.map((asset) => [asset.id, asset])),
+    [assets, renderTick]
+  );
 
   const marketRows = useMemo<MarketRow[]>(
     () =>
@@ -105,6 +146,72 @@ export function useLendingController() {
         .slice(0, 8),
     [engine, txIds, renderTick]
   );
+
+  const dashboardSupplies = useMemo<DashboardSupplyRow[]>(
+    () =>
+      userSupplies
+        .map((supply) => {
+          const asset = assetsById.get(supply.assetId);
+          if (!asset) {
+            return null;
+          }
+
+          return {
+            assetId: supply.assetId,
+            symbol: asset.symbol,
+            name: asset.name,
+            icon: asset.icon,
+            balance: supply.balance,
+            apy: supply.apy,
+            isCollateral: supply.isCollateral,
+          };
+        })
+        .filter((row): row is DashboardSupplyRow => row !== null),
+    [assetsById, userSupplies, renderTick]
+  );
+
+  const dashboardBorrows = useMemo<DashboardBorrowRow[]>(
+    () =>
+      userBorrows
+        .map((borrowItem) => {
+          const asset = assetsById.get(borrowItem.assetId);
+          if (!asset) {
+            return null;
+          }
+
+          return {
+            assetId: borrowItem.assetId,
+            symbol: asset.symbol,
+            name: asset.name,
+            icon: asset.icon,
+            debt: borrowItem.debt,
+            apy: borrowItem.apy,
+          };
+        })
+        .filter((row): row is DashboardBorrowRow => row !== null),
+    [assetsById, userBorrows, renderTick]
+  );
+
+  const dashboardSummary = useMemo<DashboardSummary>(() => {
+    const totalSupplied = userSupplies.reduce((sum, item) => sum + item.balance, 0);
+    const totalBorrowed = userBorrows.reduce((sum, item) => sum + item.debt, 0);
+    const netWorth = totalSupplied - totalBorrowed;
+
+    const weightedSupplyApy = userSupplies.reduce((sum, item) => sum + item.balance * item.apy, 0);
+    const weightedBorrowApy = userBorrows.reduce((sum, item) => sum + item.debt * item.apy, 0);
+    const totalExposure = totalSupplied + totalBorrowed;
+    const averageApy = totalExposure > 0 ? (weightedSupplyApy - weightedBorrowApy) / totalExposure : 0;
+    const borrowUtilization = totalSupplied > 0 ? (totalBorrowed / totalSupplied) * 100 : 0;
+
+    return {
+      netWorth,
+      averageApy,
+      borrowUtilization,
+      totalSupplied,
+      totalBorrowed,
+      lendingRewards,
+    };
+  }, [lendingRewards, userBorrows, userSupplies, renderTick]);
 
   const setSort = useCallback(
     (nextKey: MarketSortKey) => {
@@ -188,6 +295,31 @@ export function useLendingController() {
     [engine.lending, runOperation, user]
   );
 
+  const withdraw = useCallback(
+    async (assetId: AssetId, amountText: string) => {
+      await runOperation("withdraw", () => engine.lending.withdraw(user as Address, assetId, parseAmount(amountText)));
+    },
+    [engine.lending, runOperation, user]
+  );
+
+  const repay = useCallback(
+    async (assetId: AssetId, amountText: string) => {
+      await runOperation("repay", () => engine.lending.repay(user as Address, assetId, parseAmount(amountText)));
+    },
+    [engine.lending, runOperation, user]
+  );
+
+  const setCollateral = useCallback(
+    async (assetId: AssetId, enabled: boolean) => {
+      await runOperation("setCollateral", () => engine.lending.setCollateral(user as Address, assetId, enabled));
+    },
+    [engine.lending, runOperation, user]
+  );
+
+  const claimLendingRewards = useCallback(async () => {
+    await runOperation("claimLendingRewards", () => engine.lending.claimLendingRewards(user as Address));
+  }, [engine.lending, runOperation, user]);
+
   const getSupplyForAsset = useCallback(
     (assetId: AssetId): UserSupply | null => userSupplies.find((item) => item.assetId === assetId) ?? null,
     [userSupplies]
@@ -230,6 +362,10 @@ export function useLendingController() {
     marketRows,
     userSupplies,
     userBorrows,
+    dashboardSupplies,
+    dashboardBorrows,
+    dashboardSummary,
+    lendingRewards,
     setSort,
     getAssetById,
     getSupplyForAsset,
@@ -239,6 +375,10 @@ export function useLendingController() {
     approve,
     supply,
     borrow,
+    withdraw,
+    repay,
+    setCollateral,
+    claimLendingRewards,
     clearToast: () => setToast(null),
   };
 }

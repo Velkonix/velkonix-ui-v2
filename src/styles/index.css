@@ -96,6 +96,19 @@ body {
   color: var(--text-primary);
   line-height: var(--line-height-base);
   -webkit-font-smoothing: antialiased;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+:where(p, span, div, td, th, h1, h2, h3, h4, h5, h6, a, li, label) {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+#root,
+#root * {
+  -webkit-user-select: text !important;
+  user-select: text !important;
 }
 
 button,

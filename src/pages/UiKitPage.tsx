@@ -87,6 +87,7 @@ export function UiKitPage() {
         title="Velkonix UI Kit"
         subtitle="Amber / Gold theme applied to all primitives."
         actions={<WalletConnectButton />}
+        className={styles.pageHeader}
       />
 
       <Section title="1. Base / Foundation">
@@ -119,6 +120,20 @@ export function UiKitPage() {
           </Typography>
           <Typography>Body text for metrics and descriptions.</Typography>
           <Typography variant="label">Label / micro copy</Typography>
+          <div className={styles.statPillsDemo}>
+            <div className={styles.statPill}>
+              <Typography as="span" variant="caption" muted>
+                Balance
+              </Typography>
+              <Typography as="span">12,450.00</Typography>
+            </div>
+            <div className={styles.statPill}>
+              <Typography as="span" variant="caption" muted>
+                APY
+              </Typography>
+              <Typography as="span">3.42%</Typography>
+            </div>
+          </div>
         </Card>
         <Card title="Divider / Spacer / Icon">
           <Typography muted>Above divider</Typography>

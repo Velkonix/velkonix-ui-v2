@@ -50,6 +50,10 @@ export class MockSelectors {
     return this.readState().users[user]?.balances[assetId] ?? 0;
   }
 
+  public getUserLendingRewards(user: Address): number {
+    return this.readState().users[user]?.lendingRewards ?? 0;
+  }
+
   public getStakingState(user: Address): StakingState {
     return toStakingState(this.readState(), user);
   }

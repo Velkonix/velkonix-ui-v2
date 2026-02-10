@@ -53,6 +53,7 @@ export function AssetPage() {
   const {
     wallet,
     busyOp,
+    lastError,
     toast,
     getAssetById,
     getSupplyForAsset,
@@ -87,6 +88,8 @@ export function AssetPage() {
   const walletBalance = getWalletBalanceForAsset(asset.id);
   const availableToSupply = walletBalance;
   const availableToBorrow = Math.max(0, asset.totalSupplied - asset.totalBorrowed);
+  const exceedsSupplyLimit = normalizedSupplyAmount > availableToSupply;
+  const exceedsBorrowLimit = normalizedBorrowAmount > availableToBorrow;
   const currentSupplied = supplyPosition?.balance ?? 0;
   const currentDebt = borrowPosition?.debt ?? 0;
   const supplyHealthFactor = currentDebt > 0 ? (currentSupplied + normalizedSupplyAmount) / currentDebt : Number.POSITIVE_INFINITY;
@@ -133,6 +136,11 @@ export function AssetPage() {
         <ToastPopup tone={toast.tone} title={toast.title} durationMs={5000} onClose={clearToast}>
           {toast.message}
         </ToastPopup>
+      ) : null}
+      {lastError ? (
+        <Typography muted role="status">
+          Last error: {lastError}
+        </Typography>
       ) : null}
 
       <div className={styles.layout}>
@@ -213,7 +221,7 @@ export function AssetPage() {
                 </div>
                 <ActionButton
                   label="Supply"
-                  disabled={!wallet.isConnected || busyOp !== null}
+                  disabled={!wallet.isConnected || busyOp !== null || availableToSupply <= 0}
                   onClick={() => setIsSupplyModalOpen(true)}
                 />
               </div>
@@ -229,7 +237,7 @@ export function AssetPage() {
                 </div>
                 <ActionButton
                   label="Borrow"
-                  disabled={!wallet.isConnected || busyOp !== null}
+                  disabled={!wallet.isConnected || busyOp !== null || availableToBorrow <= 0}
                   onClick={() => setIsBorrowModalOpen(true)}
                 />
               </div>
@@ -271,6 +279,11 @@ export function AssetPage() {
               <Typography as="span">{formatHealthFactor(supplyHealthFactor)}</Typography>
             </div>
           </div>
+          {exceedsSupplyLimit ? (
+            <Typography muted role="status">
+              Supply amount exceeds available balance.
+            </Typography>
+          ) : null}
           <ActionButton
             label={
               busyOp === "approve"
@@ -282,7 +295,7 @@ export function AssetPage() {
                     : "Deposit"
             }
             isLoading={busyOp === "approve" || busyOp === "supply"}
-            disabled={!wallet.isConnected || busyOp !== null || normalizedSupplyAmount <= 0}
+            disabled={!wallet.isConnected || busyOp !== null || normalizedSupplyAmount <= 0 || exceedsSupplyLimit}
             onClick={() => void (requiresApproval ? approve(asset.id, supplyAmount) : supply(asset.id, supplyAmount))}
           />
         </div>
@@ -317,10 +330,15 @@ export function AssetPage() {
               <Typography as="span">{formatHealthFactor(borrowHealthFactor)}</Typography>
             </div>
           </div>
+          {exceedsBorrowLimit ? (
+            <Typography muted role="status">
+              Borrow amount exceeds available liquidity.
+            </Typography>
+          ) : null}
           <ActionButton
             label={busyOp === "borrow" ? "Borrowing..." : "Borrow"}
             isLoading={busyOp === "borrow"}
-            disabled={!wallet.isConnected || busyOp !== null || normalizedBorrowAmount <= 0}
+            disabled={!wallet.isConnected || busyOp !== null || normalizedBorrowAmount <= 0 || exceedsBorrowLimit}
             onClick={() => void borrow(asset.id, borrowAmount)}
           />
         </div>

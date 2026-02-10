@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 
 import { AssetPage } from "../pages/AssetPage";
+import { DashboardPage } from "../pages/DashboardPage";
 import { HomePage } from "../pages/HomePage";
 import { MarketsPage } from "../pages/MarketsPage";
 import { UiKitPage } from "../pages/UiKitPage";
@@ -44,6 +45,7 @@ function MockAppShell() {
             nav={
               <div className={styles.navLinks}>
                 {navLink("/markets", "Markets")}
+                {navLink("/dashboard", "Dashboard")}
               </div>
             }
             actions={<WalletConnectButton />}
@@ -75,6 +77,7 @@ function MockAppShell() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/markets" element={<MarketsPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/asset/:assetId" element={<AssetPage />} />
         {isDev ? <Route path="/ui-kit" element={<UiKitPage />} /> : null}
         <Route path="*" element={<Navigate to="/" replace />} />

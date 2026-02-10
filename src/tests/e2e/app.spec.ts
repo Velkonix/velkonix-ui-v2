@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test("mock mode flow shows markets and mock address in connect button", async ({ page }) => {
-  await page.goto("/?mock=1");
+  await page.goto("/markets?mock=1");
 
   await expect(page.getByRole("heading", { name: "Markets" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Connect Wallet" })).toBeVisible();

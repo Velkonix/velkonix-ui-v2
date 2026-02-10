@@ -10,6 +10,14 @@ const forceMockFromQuery =
   typeof window !== "undefined" && new URLSearchParams(window.location.search).get("mock") === "1";
 const isMockMode = import.meta.env.VITE_MOCK_MODE === "true" || forceMockFromQuery;
 
+if (typeof document !== "undefined") {
+  const unblockUserInteraction = (event: Event) => {
+    event.stopPropagation();
+  };
+  document.addEventListener("contextmenu", unblockUserInteraction, { capture: true });
+  document.addEventListener("selectstart", unblockUserInteraction, { capture: true });
+}
+
 if (typeof fetch === "function") {
   fetch("http://127.0.0.1:7242/ingest/79658062-1f9f-451c-9869-7f640578985d", {
     method: "POST",

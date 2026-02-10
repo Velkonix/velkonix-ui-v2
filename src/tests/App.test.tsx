@@ -1,11 +1,11 @@
 import { render, screen } from "@testing-library/react";
-import App from "../app/App";
 import { WalletProvider } from "../app/providers/WalletProvider";
+import { HomePage } from "../pages/HomePage";
 
 test("renders bootstrap heading", () => {
   render(
     <WalletProvider mockMode>
-      <App mockMode={false} />
+      <HomePage />
     </WalletProvider>
   );
   expect(screen.getByRole("heading", { name: /velkonix home/i })).toBeInTheDocument();
