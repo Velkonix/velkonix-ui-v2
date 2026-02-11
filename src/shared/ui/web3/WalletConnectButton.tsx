@@ -10,14 +10,11 @@ export function WalletConnectButton({ className, onClick, disabled, ...props }: 
   const wallet = useWallet();
 
   if (wallet.isConnected) {
-    if (wallet.mode === "mock") {
-      return (
-        <Button className={`${styles.button} ${className ?? ""}`} variant="secondary" disabled {...props}>
-          {wallet.shortAddress ?? wallet.address ?? "Mock connected"}
-        </Button>
-      );
-    }
-    return null;
+    return (
+      <Button className={`${styles.button} ${className ?? ""}`} variant="secondary" disabled {...props}>
+        {wallet.shortAddress ?? wallet.address ?? "Wallet connected"}
+      </Button>
+    );
   }
 
   return (

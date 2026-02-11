@@ -17,3 +17,18 @@
 .label {
   font-size: var(--font-size-sm);
 }
+
+@media (max-width: 768px) {
+  .footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-3);
+  }
+
+  .links {
+    width: 100%;
+    flex-wrap: wrap;
+    row-gap: var(--space-2);
+  }
+}

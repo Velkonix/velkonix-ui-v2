@@ -1,5 +1,12 @@
 .button {
   padding: 0 var(--space-4);
-  min-height: 36px;
+  min-height: var(--touch-target-min);
   box-shadow: var(--glow-medium);
+  max-width: 100%;
+}
+
+.button span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

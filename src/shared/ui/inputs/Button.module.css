@@ -106,3 +106,9 @@
   transform: translateY(-1px);
 }
 
+@media (max-width: 768px) {
+  .sm {
+    min-height: 40px;
+  }
+}
+

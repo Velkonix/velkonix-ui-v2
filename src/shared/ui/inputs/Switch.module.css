@@ -3,6 +3,7 @@
   align-items: center;
   gap: var(--space-2);
   cursor: pointer;
+  min-height: var(--touch-target-min);
 }
 
 .input {
@@ -14,8 +15,8 @@
 
 .track {
   position: relative;
-  width: 40px;
-  height: 22px;
+  width: 48px;
+  height: 28px;
   background: linear-gradient(180deg, rgb(40, 30, 22), rgb(40, 30, 22));
   border-radius: var(--radius-pill);
   border: 1px solid rgba(55, 40, 30, 0.6);
@@ -26,8 +27,8 @@
   position: absolute;
   top: 2px;
   left: 2px;
-  width: 16px;
-  height: 16px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   background: var(--text-primary);
   transition: transform 0.2s ease;
@@ -40,7 +41,7 @@
 }
 
 .input:checked + .track .thumb {
-  transform: translateX(18px);
+  transform: translateX(20px);
   background: var(--text-on-accent);
 }
 

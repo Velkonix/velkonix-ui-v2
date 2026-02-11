@@ -1,5 +1,6 @@
 .menu {
-  padding: 6px var(--space-3);
+  min-height: var(--touch-target-min);
+  padding: var(--space-2) var(--space-3);
   border-radius: 10px;
   background: var(--gradient-surface);
   color: var(--text-secondary);
@@ -15,6 +16,6 @@
 }
 
 .disconnect {
-  min-height: 28px;
+  min-height: 36px;
   padding: 0 var(--space-2);
 }

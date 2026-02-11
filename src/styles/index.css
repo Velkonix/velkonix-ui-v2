@@ -88,6 +88,9 @@
   --breakpoint-md: 768px;
   --breakpoint-lg: 1024px;
   --breakpoint-xl: 1280px;
+  --container-gutter-desktop: var(--space-4);
+  --container-gutter-mobile: var(--space-3);
+  --touch-target-min: 44px;
 }
 
 body {
@@ -137,4 +140,11 @@ a:hover {
 .app {
   min-height: 100vh;
   background: var(--bg-primary);
+}
+
+@media (max-width: 768px) {
+  :root {
+    --font-size-h1: 40px;
+    --font-size-h2: 30px;
+  }
 }

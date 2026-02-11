@@ -22,7 +22,13 @@
   font-size: var(--font-size-sm);
   line-height: 1;
   cursor: pointer;
-  padding: 2px;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: var(--radius-pill);
 }
 
 .closeButton:hover {
@@ -57,7 +63,7 @@
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .container {
     right: var(--space-3);
     bottom: var(--space-3);

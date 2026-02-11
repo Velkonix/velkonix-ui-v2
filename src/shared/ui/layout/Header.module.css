@@ -1,7 +1,8 @@
 .header {
-  display: flex;
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-4);
   padding: var(--space-4) var(--space-6);
   background: linear-gradient(
@@ -20,11 +21,183 @@
 
 .nav {
   display: flex;
+  justify-content: center;
   gap: var(--space-4);
   color: var(--text-secondary);
+  min-width: 0;
 }
 
 .actions {
   display: inline-flex;
+  justify-self: end;
   gap: var(--space-2);
+}
+
+.mobileControls {
+  display: none;
+}
+
+.mobileActions {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.mobileActions > * {
+  min-width: 0;
+}
+
+.mobileActions :where(button, a) {
+  min-height: var(--touch-target-min);
+  max-width: min(62vw, 240px);
+  padding-inline: var(--space-3);
+}
+
+.mobileActions :where(button, a) :where(span) {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mobileMenuButton {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  border: 1px solid rgba(120, 85, 45, 0.35);
+  border-radius: var(--radius-md);
+  background: linear-gradient(180deg, rgba(26, 18, 13, 0.9), rgba(18, 12, 9, 0.95));
+  color: var(--text-primary);
+  box-shadow: inset 0 0 0 1px rgba(55, 40, 30, 0.6);
+  cursor: pointer;
+}
+
+.mobileMenuButton:hover {
+  border-color: rgba(255, 170, 60, 0.45);
+  box-shadow: var(--glow-soft);
+}
+
+.mobileMenuButton:focus-visible {
+  outline: none;
+  box-shadow: var(--glow-soft);
+}
+
+.mobileMenuIcon,
+.mobileMenuIcon::before,
+.mobileMenuIcon::after {
+  width: 18px;
+  height: 2px;
+  border-radius: var(--radius-pill);
+  background: currentColor;
+  display: block;
+}
+
+.mobileMenuIcon {
+  position: relative;
+}
+
+.mobileMenuIcon::before,
+.mobileMenuIcon::after {
+  content: "";
+  position: absolute;
+  left: 0;
+}
+
+.mobileMenuIcon::before {
+  top: -6px;
+}
+
+.mobileMenuIcon::after {
+  top: 6px;
+}
+
+.mobileDrawerOverlay {
+  position: fixed;
+  inset: 0;
+  display: block;
+  background: rgba(5, 3, 2, 0.72);
+  backdrop-filter: blur(3px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: var(--z-modal);
+  transition: opacity 180ms ease, visibility 180ms ease;
+}
+
+.mobileDrawerOverlayOpen {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.mobileDrawer {
+  height: 100dvh;
+  max-height: 100vh;
+  width: min(344px, 90vw);
+  margin-left: auto;
+  background: linear-gradient(180deg, rgba(18, 12, 9, 0.98), rgba(12, 8, 6, 0.98));
+  border-left: 1px solid rgba(120, 85, 45, 0.45);
+  box-shadow: -8px 0 24px rgba(5, 3, 2, 0.45);
+  padding: calc(var(--space-6) + env(safe-area-inset-top, 0px)) var(--space-5)
+    calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
+  display: grid;
+  align-content: start;
+  gap: var(--space-4);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  transform: translateX(100%);
+  transition: transform 180ms ease;
+}
+
+.mobileDrawerOverlayOpen .mobileDrawer {
+  transform: translateX(0);
+}
+
+.mobileDrawerNav {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .header {
+    grid-template-columns: 1fr auto;
+    padding: var(--space-3) var(--space-4);
+    gap: var(--space-3);
+  }
+
+  .logo {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .nav,
+  .actions {
+    display: none;
+  }
+
+  .mobileControls {
+    display: inline-flex;
+    justify-self: end;
+    align-items: center;
+    gap: var(--space-2);
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .mobileMenuButton {
+    display: inline-flex;
+    flex-shrink: 0;
+  }
+
+  .mobileDrawer {
+    width: min(344px, 92vw);
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+  }
 }

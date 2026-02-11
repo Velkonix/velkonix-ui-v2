@@ -24,7 +24,6 @@ import {
   InputGroup,
   Link,
   Modal,
-  NavMenu,
   NumberInput,
   PageContainer,
   PageHeader,
@@ -83,6 +82,20 @@ export function UiKitPage() {
       }),
     }).catch(() => {});
   }, []);
+
+  const headerDemoNav = (
+    <div className={styles.headerDemoNav}>
+      <Link href="#" className={styles.headerDemoLink}>
+        Markets
+      </Link>
+      <Link href="#" className={styles.headerDemoLink}>
+        Dashboard
+      </Link>
+      <Link href="#" className={styles.headerDemoLinkActive}>
+        Staking
+      </Link>
+    </div>
+  );
 
   return (
     <PageContainer className={styles.page}>
@@ -303,11 +316,17 @@ export function UiKitPage() {
 
       <Section title="7. Layout & Navigation">
         <Card>
-          <Header
-            logo={<span>Velkonix</span>}
-            nav={<NavMenu items={["Home", "Markets", "Dashboard", "Staking"]} active="Markets" />}
-            actions={<WalletConnectButton />}
-          />
+          <div className={styles.headerDemoStack}>
+            <div className={styles.headerDemoHint}>
+              Resize viewport to 768px or less to validate burger menu layout, link alignment, and actions placement.
+            </div>
+            <div className={styles.headerDemoFrame}>
+              <Header logo={<span>Velkonix</span>} nav={headerDemoNav} actions={<WalletConnectButton />} />
+            </div>
+            <div className={`${styles.headerDemoFrame} ${styles.headerDemoMobileViewport}`}>
+              <Header logo={<span>Velkonix</span>} nav={headerDemoNav} actions={<WalletConnectButton />} />
+            </div>
+          </div>
           <Spacer size={12} />
           <BackButton />
           <Spacer size={12} />

@@ -1,6 +1,9 @@
 .wrapper {
   width: 100%;
   overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable both-edges;
   border-radius: var(--radius-md);
   box-shadow: inset 0 0 0 1px rgba(55, 40, 30, 0.4);
   background: transparent;
@@ -39,6 +42,16 @@ tr:last-child td {
   cursor: pointer;
 }
 
+.clickable:focus-visible td {
+  outline: none;
+  background: rgba(255, 170, 60, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(255, 170, 60, 0.35);
+}
+
+.clickable:active td {
+  background: rgba(255, 170, 60, 0.12);
+}
+
 .left {
   text-align: left;
 }
@@ -49,4 +62,16 @@ tr:last-child td {
 
 .right {
   text-align: right;
+}
+
+@media (max-width: 768px) {
+  .table {
+    min-width: max-content;
+  }
+
+  th,
+  td {
+    white-space: nowrap;
+    padding: var(--space-3);
+  }
 }

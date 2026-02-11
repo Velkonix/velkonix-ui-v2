@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { useEffect } from "react";
+import { useEffect, useId } from "react";
 import { createPortal } from "react-dom";
 
 import { classNames } from "../utilities/classNames";
@@ -22,6 +22,8 @@ export function Modal({
   footer,
   size = "md",
 }: ModalProps) {
+  const titleId = useId();
+
   useEffect(() => {
     if (!isOpen) return;
     const handler = (event: KeyboardEvent) => {
@@ -41,11 +43,12 @@ export function Modal({
         className={classNames(styles.modal, styles[size])}
         role="dialog"
         aria-modal="true"
-        aria-label={title ?? "Dialog"}
+        aria-label={title ? undefined : "Dialog"}
+        aria-labelledby={title ? titleId : undefined}
         onClick={(event) => event.stopPropagation()}
       >
         <header className={styles.header}>
-          {title && <h3 className={styles.title}>{title}</h3>}
+          {title && <h3 id={titleId} className={styles.title}>{title}</h3>}
           <button
             className={styles.close}
             type="button"
