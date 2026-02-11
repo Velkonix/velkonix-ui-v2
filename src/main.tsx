@@ -5,7 +5,7 @@ import { MockEngineProvider } from "./app/providers/MockEngineProvider";
 import { WalletProvider } from "./app/providers/WalletProvider";
 import "./styles/index.css";
 
-const SUPPORTED_THEMES = ["amber", "experimental-1"] as const;
+const SUPPORTED_THEMES = ["amber", "experimental-1", "classic-defi-trust"] as const;
 type ThemeName = (typeof SUPPORTED_THEMES)[number];
 
 function resolveThemeName(value: string | undefined): ThemeName {

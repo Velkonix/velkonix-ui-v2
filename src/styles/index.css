@@ -196,6 +196,59 @@
   );
 }
 
+[data-theme="classic-defi-trust"] {
+  --theme-name: "classic-defi-trust";
+
+  --bg-primary-rgb: 11, 31, 51;
+  --bg-secondary-rgb: 20, 44, 69;
+  --bg-tertiary-rgb: 32, 59, 89;
+  --bg-overlay-rgb: 7, 20, 34;
+  --bg-primary: rgb(11, 31, 51);
+  --bg-secondary: rgb(20, 44, 69);
+  --bg-tertiary: rgb(32, 59, 89);
+  --bg-overlay: rgb(7, 20, 34);
+
+  --accent-primary-rgb: 47, 93, 138;
+  --accent-hover-rgb: 67, 117, 166;
+  --accent-active-rgb: 38, 77, 117;
+  --accent-glow-rgb: 63, 120, 176;
+  --accent-primary: rgb(47, 93, 138);
+  --accent-hover: rgb(67, 117, 166);
+  --accent-active: rgb(38, 77, 117);
+  --accent-glow: rgb(63, 120, 176);
+
+  --text-primary-rgb: 255, 255, 255;
+  --text-secondary-rgb: 167, 177, 188;
+  --text-muted-rgb: 133, 145, 158;
+  --text-disabled-rgb: 104, 116, 129;
+  --text-on-accent-rgb: 255, 255, 255;
+  --text-primary: rgb(255, 255, 255);
+  --text-secondary: rgb(167, 177, 188);
+  --text-muted: rgb(133, 145, 158);
+  --text-disabled: rgb(104, 116, 129);
+  --text-on-accent: rgb(255, 255, 255);
+
+  --border-subtle-rgb: 66, 91, 117;
+  --border-accent-rgb: 47, 93, 138;
+  --border-subtle: rgb(66, 91, 117);
+  --border-accent: rgb(47, 93, 138);
+
+  --success-rgb: 30, 201, 139;
+  --error-rgb: 230, 102, 99;
+  --warning-rgb: 232, 183, 82;
+  --info-rgb: 109, 159, 214;
+  --success: rgb(30, 201, 139);
+  --error: rgb(230, 102, 99);
+  --warning: rgb(232, 183, 82);
+  --info: rgb(109, 159, 214);
+
+  --gradient-accent: linear-gradient(
+    180deg,
+    rgb(67, 117, 166),
+    rgb(38, 77, 117)
+  );
+}
+
 body {
   margin: 0;
   font-family: var(--font-family-base);

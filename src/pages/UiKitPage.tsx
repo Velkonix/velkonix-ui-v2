@@ -48,6 +48,14 @@ import {
 } from "../shared/ui";
 import styles from "./UiKitPage.module.css";
 
+const THEME_OPTIONS = [
+  { value: "amber", label: "Amber" },
+  { value: "experimental-1", label: "Experimental 1" },
+  { value: "classic-defi-trust", label: "Classic DeFi Trust" },
+] as const;
+
+type ThemeName = (typeof THEME_OPTIONS)[number]["value"];
+
 type MarketRow = {
   asset: string;
   name: string;
@@ -64,6 +72,19 @@ export function UiKitPage() {
   const [activeTab, setActiveTab] = useState("convert");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [amountValue, setAmountValue] = useState("");
+  const [activeTheme, setActiveTheme] = useState<ThemeName>("amber");
+
+  useEffect(() => {
+    const themeFromDocument = document.documentElement.getAttribute("data-theme");
+    const isSupportedTheme = THEME_OPTIONS.some((option) => option.value === themeFromDocument);
+    if (isSupportedTheme) {
+      setActiveTheme(themeFromDocument as ThemeName);
+    }
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", activeTheme);
+  }, [activeTheme]);
 
   useEffect(() => {
     if (typeof fetch !== "function") {
@@ -101,8 +122,21 @@ export function UiKitPage() {
     <PageContainer className={styles.page}>
       <PageHeader
         title="Velkonix UI Kit"
-        subtitle="Amber / Gold theme applied to all primitives."
-        actions={<WalletConnectButton />}
+        subtitle="Switch between available color schemes and inspect components."
+        actions={
+          <div className={styles.pageHeaderActions}>
+            <Select
+              label="Color scheme"
+              value={activeTheme}
+              options={THEME_OPTIONS.map((option) => ({
+                label: option.label,
+                value: option.value,
+              }))}
+              onChange={(event) => setActiveTheme(event.target.value as ThemeName)}
+            />
+            <WalletConnectButton />
+          </div>
+        }
         className={styles.pageHeader}
       />
 

@@ -7,6 +7,17 @@
   font-size: var(--font-size-h2);
 }
 
+.pageHeaderActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: flex-end;
+}
+
+.pageHeaderActions > :first-child {
+  min-width: 220px;
+}
+
 .row {
   display: flex;
   flex-wrap: wrap;
@@ -111,6 +122,15 @@
 }
 
 @media (max-width: 768px) {
+  .pageHeaderActions {
+    width: 100%;
+  }
+
+  .pageHeaderActions > :first-child {
+    width: 100%;
+    min-width: 0;
+  }
+
   .amountDemo {
     max-width: 100%;
   }
