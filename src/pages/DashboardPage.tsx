@@ -161,7 +161,13 @@ export function DashboardPage() {
 
   return (
     <PageContainer className={styles.page}>
-      <PageHeader title="Dashboard" subtitle="Manage your supplies, borrows and lending rewards." className={styles.pageHeader} />
+      <PageHeader
+        title="Dashboard"
+        subtitle="your positions and protocol exposure"
+        titleAs="h2"
+        subtitleVariant="label"
+        className={styles.pageHeader}
+      />
 
       {toast ? (
         <ToastPopup tone={toast.tone} title={toast.title} durationMs={5000} onClose={clearToast}>

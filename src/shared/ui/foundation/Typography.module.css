@@ -30,14 +30,6 @@
   letter-spacing: 0.02em;
 }
 
-.microcaption {
-  font-size: var(--font-size-2xs);
-  line-height: 1.4;
-  font-weight: var(--font-weight-semibold);
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-}
-
 .label {
   font-size: var(--font-size-xs);
   line-height: var(--line-height-base);
@@ -47,12 +39,14 @@
 }
 
 .title {
+  font-family: var(--font-family-brand);
   font-size: var(--font-size-h2);
   line-height: var(--line-height-tight);
   font-weight: var(--font-weight-semibold);
 }
 
 .headline {
+  font-family: var(--font-family-brand);
   font-size: var(--font-size-h1);
   line-height: var(--line-height-tight);
   font-weight: var(--font-weight-semibold);

@@ -75,10 +75,8 @@ export function HomePage() {
         </div>
 
         <div className={styles.centerAction}>
-          <Button size="md" onClick={openPage} className={styles.superButton}>
-            <span className={styles.superButtonLabel} data-text="Open App">
-              Open App
-            </span>
+          <Button size="md" onClick={openPage}>
+            Open App
           </Button>
         </div>
       </section>

@@ -93,6 +93,7 @@
   );
 
   --font-family-base: "Inter", system-ui, -apple-system, sans-serif;
+  --font-family-brand: "Avenir Next", "Helvetica Neue", "Arial Black", Arial, sans-serif;
   --font-size-2xs: 11px;
   --font-size-xs: 12px;
   --font-size-sm: 14px;

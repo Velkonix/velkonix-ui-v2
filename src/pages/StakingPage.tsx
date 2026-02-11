@@ -95,7 +95,9 @@ export function StakingPage() {
     <PageContainer className={styles.page}>
       <PageHeader
         title="Staking"
-        subtitle="Convert, stake to rewards, claim APR rewards and manage exits."
+        subtitle="stake velk. earn from penalties and treasury flows"
+        titleAs="h2"
+        subtitleVariant="label"
         className={styles.pageHeader}
       />
 

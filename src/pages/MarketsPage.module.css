@@ -3,10 +3,6 @@
   gap: var(--space-6);
 }
 
-.pageHeader h1 {
-  font-size: var(--font-size-h2);
-}
-
 .summaryGrid {
   display: grid;
   gap: var(--space-4);

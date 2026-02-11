@@ -22,7 +22,6 @@ export function MarketsPage() {
   const { marketRows, setSort, sortDirection, sortKey } = useLendingController();
   const [apyModal, setApyModal] = useState<ApyModalState>(null);
 
-  const sortLabel = useMemo(() => `${sortDirection === "asc" ? "ascending" : "descending"} by ${sortKey}`, [sortDirection, sortKey]);
   const marketSummary = useMemo(() => {
     const totalMarketSize = marketRows.reduce((sum, row) => sum + row.totalSupplied, 0);
     const totalBorrows = marketRows.reduce((sum, row) => sum + row.totalBorrowed, 0);
@@ -54,7 +53,13 @@ export function MarketsPage() {
 
   return (
     <PageContainer className={styles.page}>
-      <PageHeader title="Markets" subtitle={`Track available pools and rates (${sortLabel}).`} className={styles.pageHeader} />
+      <PageHeader
+        title="Markets"
+        subtitle="lend and borrow with predictable rules"
+        titleAs="h2"
+        subtitleVariant="label"
+        className={styles.pageHeader}
+      />
 
       <Section>
         <Card>
