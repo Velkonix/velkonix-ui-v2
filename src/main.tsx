@@ -5,11 +5,25 @@ import { MockEngineProvider } from "./app/providers/MockEngineProvider";
 import { WalletProvider } from "./app/providers/WalletProvider";
 import "./styles/index.css";
 
-const SUPPORTED_THEMES = ["amber", "experimental-1", "classic-defi-trust"] as const;
+const SUPPORTED_THEMES = [
+  "amber",
+  "green",
+  "blue",
+  "classic-defi-trust",
+  "institutional-blue",
+  "dark-tech-finance",
+  "trust-growth",
+  "minimal-institutional",
+  "premium-defi",
+  "crypto-infrastructure",
+  "calm-trust",
+  "modern-bank-web3",
+  "velkonix-signature",
+] as const;
 type ThemeName = (typeof SUPPORTED_THEMES)[number];
 
 function resolveThemeName(value: string | undefined): ThemeName {
-  return SUPPORTED_THEMES.includes(value as ThemeName) ? (value as ThemeName) : "amber";
+  return SUPPORTED_THEMES.includes(value as ThemeName) ? (value as ThemeName) : "blue";
 }
 
 const root = document.getElementById("root");

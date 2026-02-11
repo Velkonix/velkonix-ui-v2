@@ -1,7 +1,47 @@
+import { useEffect, useState } from "react";
 import { Button, Typography } from "../shared/ui";
 import styles from "./HomePage.module.css";
 
+const HERO_WORD = "VELKONIX";
+const FLICKER_COUNT = 1;
+const FLICKER_CYCLE_MS = 25000;
+
+function pickRandomIndices(length: number, count: number, previousKey = ""): number[] {
+  const target = Math.min(length, Math.max(0, count));
+  if (target === 0) return [];
+
+  let next: number[] = [];
+  let key = "";
+  let attempts = 0;
+
+  do {
+    const values = new Set<number>();
+    while (values.size < target) {
+      values.add(Math.floor(Math.random() * length));
+    }
+    next = [...values].sort((a, b) => a - b);
+    key = next.join(",");
+    attempts += 1;
+  } while (key === previousKey && attempts < 8);
+
+  return next;
+}
+
 export function HomePage() {
+  const [flickerIndices, setFlickerIndices] = useState<number[]>(() =>
+    pickRandomIndices(HERO_WORD.length, FLICKER_COUNT),
+  );
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setFlickerIndices((prev) => pickRandomIndices(HERO_WORD.length, FLICKER_COUNT, prev.join(",")));
+    }, FLICKER_CYCLE_MS);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const flickerSet = new Set(flickerIndices);
+
   const openPage = () => {
     window.location.assign("/markets?mock=1");
   };
@@ -11,8 +51,16 @@ export function HomePage() {
       <section className={styles.shell}>
         <div className={styles.heroCenter}>
           <div className={styles.titleWrap}>
-            <h1 className={styles.heroTitle}>
-              VELKONIX
+            <h1 className={styles.heroTitle} data-text={HERO_WORD} aria-label={HERO_WORD}>
+              {HERO_WORD.split("").map((char, index) => (
+                <span
+                  key={`${char}-${index}`}
+                  aria-hidden="true"
+                  className={flickerSet.has(index) ? styles.flickerLetter : undefined}
+                >
+                  {char}
+                </span>
+              ))}
             </h1>
           </div>
 
@@ -28,7 +76,9 @@ export function HomePage() {
 
         <div className={styles.centerAction}>
           <Button size="md" onClick={openPage} className={styles.superButton}>
-            <span className={styles.superButtonLabel}>Open App</span>
+            <span className={styles.superButtonLabel} data-text="Open App">
+              Open App
+            </span>
           </Button>
         </div>
       </section>

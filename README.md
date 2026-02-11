@@ -12,9 +12,9 @@ Bootstrap project for the Velkonix DeFi UI.
 ## Internal Theme Switching
 - Theme is controlled by `VITE_THEME` in env.
 - Supported values:
-  - `amber` (default)
-  - `experimental-1`
+  - `blue` (default)
+  - `amber`
 - Example:
-  - `VITE_THEME=experimental-1 npm run dev`
+  - `VITE_THEME=blue npm run dev`
 
 The app applies `<html data-theme="...">` during bootstrap, and all UI colors must come from tokens in `src/styles/index.css`.

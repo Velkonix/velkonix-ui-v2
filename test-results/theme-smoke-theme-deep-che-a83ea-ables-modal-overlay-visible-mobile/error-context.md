@@ -1,0 +1,83 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - link "Velkonix" [ref=e6] [cursor=pointer]:
+      - /url: /
+    - generic [ref=e7]:
+      - button "Connect Wallet" [ref=e9] [cursor=pointer]:
+        - generic [ref=e10]: Connect Wallet
+      - button "Open navigation menu" [active] [ref=e11] [cursor=pointer]
+  - main [ref=e13]:
+    - generic [ref=e14]:
+      - generic [ref=e16]:
+        - heading "Staking" [level=1] [ref=e17]
+        - paragraph [ref=e18]: Convert, stake to rewards, claim APR rewards and manage exits.
+      - generic [ref=e19]:
+        - generic [ref=e20]:
+          - generic [ref=e25]:
+            - generic [ref=e26]:
+              - generic [ref=e27]: Total staked
+              - paragraph [ref=e28]: "0.00"
+            - generic [ref=e29]:
+              - generic [ref=e30]: APR
+              - paragraph [ref=e31]: 0.00%
+          - generic [ref=e35]:
+            - paragraph [ref=e37]: Claim rewards
+            - generic [ref=e38]:
+              - img "Reward icon" [ref=e40]
+              - generic [ref=e44]:
+                - generic [ref=e45]: Unclaimed rewards
+                - paragraph [ref=e46]: 0.00 xVELK
+            - button "Claim" [disabled] [ref=e47]:
+              - generic [ref=e48]: Claim
+        - generic [ref=e52]:
+          - tablist [ref=e53]:
+            - tab "Convert" [selected] [ref=e54] [cursor=pointer]
+            - tab "Stake" [ref=e55] [cursor=pointer]
+            - tab "Unstake" [ref=e56] [cursor=pointer]
+            - tab "Exit" [ref=e57] [cursor=pointer]
+          - generic [ref=e59]:
+            - generic [ref=e60]:
+              - generic [ref=e61]: Convert amount
+              - generic [ref=e62]:
+                - generic [ref=e63]:
+                  - textbox "Convert amount" [ref=e64]:
+                    - /placeholder: "0.00"
+                    - text: "100"
+                  - generic [ref=e65]:
+                    - button "Clear amount" [ref=e66] [cursor=pointer]:
+                      - img [ref=e67]
+                    - generic [ref=e71]: VELK
+                - generic [ref=e73]:
+                  - generic [ref=e74]: Balance
+                  - button "Use maximum amount" [disabled] [ref=e75]: MAX
+            - paragraph [ref=e76]: Convert VELK into xVELK staked position.
+            - button "Convert" [disabled] [ref=e77]:
+              - generic [ref=e78]: Convert
+      - generic [ref=e82]:
+        - generic [ref=e83]:
+          - paragraph [ref=e84]: Exit queue
+          - generic [ref=e85]:
+            - generic [ref=e86]:
+              - generic [ref=e87]: Ready
+              - generic [ref=e88]: "0"
+            - generic [ref=e89]:
+              - generic [ref=e90]: Total
+              - generic [ref=e91]: "0"
+        - generic [ref=e92]:
+          - generic [ref=e93]: No exit requests
+          - generic [ref=e94]: Create queue request in Exit tab to see it here.
+  - contentinfo [ref=e95]:
+    - generic [ref=e97]:
+      - link "X" [ref=e98] [cursor=pointer]:
+        - /url: https://x.com
+      - link "Discord" [ref=e99] [cursor=pointer]:
+        - /url: https://discord.com
+      - link "GitHub" [ref=e100] [cursor=pointer]:
+        - /url: https://github.com
+      - link "GitBook" [ref=e101] [cursor=pointer]:
+        - /url: https://docs.github.com
+    - generic [ref=e102]: Velkonix
+```

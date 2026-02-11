@@ -143,8 +143,61 @@
   --touch-target-min: 44px;
 }
 
-[data-theme="experimental-1"] {
-  --theme-name: "experimental-1";
+[data-theme="green"] {
+  --theme-name: "green";
+
+  --bg-primary-rgb: 12, 8, 6;
+  --bg-secondary-rgb: 18, 12, 9;
+  --bg-tertiary-rgb: 26, 18, 13;
+  --bg-overlay-rgb: 8, 5, 4;
+  --bg-primary: rgb(12, 8, 6);
+  --bg-secondary: rgb(18, 12, 9);
+  --bg-tertiary: rgb(26, 18, 13);
+  --bg-overlay: rgb(8, 5, 4);
+
+  --accent-primary-rgb: 43, 191, 156;
+  --accent-hover-rgb: 71, 211, 179;
+  --accent-active-rgb: 31, 158, 128;
+  --accent-glow-rgb: 53, 213, 175;
+  --accent-primary: rgb(43, 191, 156);
+  --accent-hover: rgb(71, 211, 179);
+  --accent-active: rgb(31, 158, 128);
+  --accent-glow: rgb(53, 213, 175);
+
+  --text-primary-rgb: 245, 235, 225;
+  --text-secondary-rgb: 190, 170, 155;
+  --text-muted-rgb: 140, 120, 105;
+  --text-disabled-rgb: 90, 75, 65;
+  --text-on-accent-rgb: 9, 27, 22;
+  --text-primary: rgb(245, 235, 225);
+  --text-secondary: rgb(190, 170, 155);
+  --text-muted: rgb(140, 120, 105);
+  --text-disabled: rgb(90, 75, 65);
+  --text-on-accent: rgb(9, 27, 22);
+
+  --border-subtle-rgb: 55, 40, 30;
+  --border-accent-rgb: 54, 140, 120;
+  --border-subtle: rgb(55, 40, 30);
+  --border-accent: rgb(54, 140, 120);
+
+  --success-rgb: 67, 205, 170;
+  --error-rgb: 235, 95, 80;
+  --warning-rgb: 255, 185, 90;
+  --info-rgb: 110, 160, 220;
+  --success: rgb(67, 205, 170);
+  --error: rgb(235, 95, 80);
+  --warning: rgb(255, 185, 90);
+  --info: rgb(110, 160, 220);
+
+  --gradient-accent: linear-gradient(
+    180deg,
+    rgb(71, 211, 179),
+    rgb(31, 158, 128)
+  );
+}
+
+[data-theme="blue"] {
+  --theme-name: "blue";
 
   --bg-primary-rgb: 7, 12, 20;
   --bg-secondary-rgb: 11, 19, 31;
@@ -246,6 +299,483 @@
     180deg,
     rgb(67, 117, 166),
     rgb(38, 77, 117)
+  );
+}
+
+[data-theme="institutional-blue"] {
+  --theme-name: "institutional-blue";
+
+  --bg-primary-rgb: 10, 37, 64;
+  --bg-secondary-rgb: 15, 44, 74;
+  --bg-tertiary-rgb: 22, 57, 92;
+  --bg-overlay-rgb: 7, 27, 47;
+  --bg-primary: rgb(10, 37, 64);
+  --bg-secondary: rgb(15, 44, 74);
+  --bg-tertiary: rgb(22, 57, 92);
+  --bg-overlay: rgb(7, 27, 47);
+
+  --accent-primary-rgb: 31, 106, 225;
+  --accent-hover-rgb: 63, 128, 230;
+  --accent-active-rgb: 24, 86, 184;
+  --accent-glow-rgb: 201, 162, 77;
+  --accent-primary: rgb(31, 106, 225);
+  --accent-hover: rgb(63, 128, 230);
+  --accent-active: rgb(24, 86, 184);
+  --accent-glow: rgb(201, 162, 77);
+
+  --text-primary-rgb: 255, 255, 255;
+  --text-secondary-rgb: 230, 234, 240;
+  --text-muted-rgb: 176, 188, 204;
+  --text-disabled-rgb: 130, 145, 164;
+  --text-on-accent-rgb: 255, 255, 255;
+  --text-primary: rgb(255, 255, 255);
+  --text-secondary: rgb(230, 234, 240);
+  --text-muted: rgb(176, 188, 204);
+  --text-disabled: rgb(130, 145, 164);
+  --text-on-accent: rgb(255, 255, 255);
+
+  --border-subtle-rgb: 69, 95, 127;
+  --border-accent-rgb: 201, 162, 77;
+  --border-subtle: rgb(69, 95, 127);
+  --border-accent: rgb(201, 162, 77);
+
+  --success-rgb: 71, 191, 154;
+  --error-rgb: 219, 96, 96;
+  --warning-rgb: 201, 162, 77;
+  --info-rgb: 81, 150, 237;
+  --success: rgb(71, 191, 154);
+  --error: rgb(219, 96, 96);
+  --warning: rgb(201, 162, 77);
+  --info: rgb(81, 150, 237);
+
+  --gradient-accent: linear-gradient(
+    180deg,
+    rgb(63, 128, 230),
+    rgb(24, 86, 184)
+  );
+}
+
+[data-theme="dark-tech-finance"] {
+  --theme-name: "dark-tech-finance";
+
+  --bg-primary-rgb: 14, 17, 23;
+  --bg-secondary-rgb: 28, 36, 49;
+  --bg-tertiary-rgb: 37, 48, 64;
+  --bg-overlay-rgb: 10, 13, 18;
+  --bg-primary: rgb(14, 17, 23);
+  --bg-secondary: rgb(28, 36, 49);
+  --bg-tertiary: rgb(37, 48, 64);
+  --bg-overlay: rgb(10, 13, 18);
+
+  --accent-primary-rgb: 79, 140, 255;
+  --accent-hover-rgb: 110, 160, 255;
+  --accent-active-rgb: 61, 117, 224;
+  --accent-glow-rgb: 63, 224, 181;
+  --accent-primary: rgb(79, 140, 255);
+  --accent-hover: rgb(110, 160, 255);
+  --accent-active: rgb(61, 117, 224);
+  --accent-glow: rgb(63, 224, 181);
+
+  --text-primary-rgb: 233, 239, 248;
+  --text-secondary-rgb: 154, 164, 178;
+  --text-muted-rgb: 125, 137, 152;
+  --text-disabled-rgb: 95, 106, 121;
+  --text-on-accent-rgb: 247, 250, 255;
+  --text-primary: rgb(233, 239, 248);
+  --text-secondary: rgb(154, 164, 178);
+  --text-muted: rgb(125, 137, 152);
+  --text-disabled: rgb(95, 106, 121);
+  --text-on-accent: rgb(247, 250, 255);
+
+  --border-subtle-rgb: 56, 69, 88;
+  --border-accent-rgb: 63, 224, 181;
+  --border-subtle: rgb(56, 69, 88);
+  --border-accent: rgb(63, 224, 181);
+
+  --success-rgb: 63, 224, 181;
+  --error-rgb: 232, 106, 116;
+  --warning-rgb: 255, 191, 102;
+  --info-rgb: 79, 140, 255;
+  --success: rgb(63, 224, 181);
+  --error: rgb(232, 106, 116);
+  --warning: rgb(255, 191, 102);
+  --info: rgb(79, 140, 255);
+
+  --gradient-accent: linear-gradient(
+    180deg,
+    rgb(110, 160, 255),
+    rgb(63, 224, 181)
+  );
+}
+
+[data-theme="trust-growth"] {
+  --theme-name: "trust-growth";
+
+  --bg-primary-rgb: 15, 42, 68;
+  --bg-secondary-rgb: 46, 52, 64;
+  --bg-tertiary-rgb: 24, 88, 98;
+  --bg-overlay-rgb: 10, 24, 38;
+  --bg-primary: rgb(15, 42, 68);
+  --bg-secondary: rgb(46, 52, 64);
+  --bg-tertiary: rgb(24, 88, 98);
+  --bg-overlay: rgb(10, 24, 38);
+
+  --accent-primary-rgb: 31, 127, 139;
+  --accent-hover-rgb: 59, 153, 164;
+  --accent-active-rgb: 24, 102, 112;
+  --accent-glow-rgb: 143, 227, 197;
+  --accent-primary: rgb(31, 127, 139);
+  --accent-hover: rgb(59, 153, 164);
+  --accent-active: rgb(24, 102, 112);
+  --accent-glow: rgb(143, 227, 197);
+
+  --text-primary-rgb: 246, 249, 252;
+  --text-secondary-rgb: 199, 219, 230;
+  --text-muted-rgb: 148, 168, 186;
+  --text-disabled-rgb: 106, 122, 138;
+  --text-on-accent-rgb: 246, 249, 252;
+  --text-primary: rgb(246, 249, 252);
+  --text-secondary: rgb(199, 219, 230);
+  --text-muted: rgb(148, 168, 186);
+  --text-disabled: rgb(106, 122, 138);
+  --text-on-accent: rgb(246, 249, 252);
+
+  --border-subtle-rgb: 46, 52, 64;
+  --border-accent-rgb: 31, 127, 139;
+  --border-subtle: rgb(46, 52, 64);
+  --border-accent: rgb(31, 127, 139);
+
+  --success-rgb: 143, 227, 197;
+  --error-rgb: 224, 99, 107;
+  --warning-rgb: 230, 186, 102;
+  --info-rgb: 59, 153, 164;
+  --success: rgb(143, 227, 197);
+  --error: rgb(224, 99, 107);
+  --warning: rgb(230, 186, 102);
+  --info: rgb(59, 153, 164);
+
+  --gradient-accent: linear-gradient(
+    180deg,
+    rgb(59, 153, 164),
+    rgb(24, 102, 112)
+  );
+}
+
+[data-theme="minimal-institutional"] {
+  --theme-name: "minimal-institutional";
+
+  --bg-primary-rgb: 27, 31, 36;
+  --bg-secondary-rgb: 46, 51, 58;
+  --bg-tertiary-rgb: 58, 65, 74;
+  --bg-overlay-rgb: 17, 22, 28;
+  --bg-primary: rgb(27, 31, 36);
+  --bg-secondary: rgb(46, 51, 58);
+  --bg-tertiary: rgb(58, 65, 74);
+  --bg-overlay: rgb(17, 22, 28);
+
+  --accent-primary-rgb: 37, 99, 235;
+  --accent-hover-rgb: 59, 130, 246;
+  --accent-active-rgb: 29, 78, 216;
+  --accent-glow-rgb: 37, 99, 235;
+  --accent-primary: rgb(37, 99, 235);
+  --accent-hover: rgb(59, 130, 246);
+  --accent-active: rgb(29, 78, 216);
+  --accent-glow: rgb(37, 99, 235);
+
+  --text-primary-rgb: 255, 255, 255;
+  --text-secondary-rgb: 221, 226, 232;
+  --text-muted-rgb: 165, 174, 186;
+  --text-disabled-rgb: 122, 130, 142;
+  --text-on-accent-rgb: 255, 255, 255;
+  --text-primary: rgb(255, 255, 255);
+  --text-secondary: rgb(221, 226, 232);
+  --text-muted: rgb(165, 174, 186);
+  --text-disabled: rgb(122, 130, 142);
+  --text-on-accent: rgb(255, 255, 255);
+
+  --border-subtle-rgb: 109, 118, 130;
+  --border-accent-rgb: 37, 99, 235;
+  --border-subtle: rgb(109, 118, 130);
+  --border-accent: rgb(37, 99, 235);
+
+  --success-rgb: 74, 222, 128;
+  --error-rgb: 239, 68, 68;
+  --warning-rgb: 245, 158, 11;
+  --info-rgb: 37, 99, 235;
+  --success: rgb(74, 222, 128);
+  --error: rgb(239, 68, 68);
+  --warning: rgb(245, 158, 11);
+  --info: rgb(37, 99, 235);
+
+  --gradient-accent: linear-gradient(
+    180deg,
+    rgb(59, 130, 246),
+    rgb(29, 78, 216)
+  );
+}
+
+[data-theme="premium-defi"] {
+  --theme-name: "premium-defi";
+
+  --bg-primary-rgb: 12, 27, 42;
+  --bg-secondary-rgb: 18, 39, 58;
+  --bg-tertiary-rgb: 26, 52, 74;
+  --bg-overlay-rgb: 8, 18, 30;
+  --bg-primary: rgb(12, 27, 42);
+  --bg-secondary: rgb(18, 39, 58);
+  --bg-tertiary: rgb(26, 52, 74);
+  --bg-overlay: rgb(8, 18, 30);
+
+  --accent-primary-rgb: 15, 118, 110;
+  --accent-hover-rgb: 20, 148, 138;
+  --accent-active-rgb: 12, 98, 92;
+  --accent-glow-rgb: 214, 178, 94;
+  --accent-primary: rgb(15, 118, 110);
+  --accent-hover: rgb(20, 148, 138);
+  --accent-active: rgb(12, 98, 92);
+  --accent-glow: rgb(214, 178, 94);
+
+  --text-primary-rgb: 250, 249, 246;
+  --text-secondary-rgb: 138, 148, 166;
+  --text-muted-rgb: 116, 126, 142;
+  --text-disabled-rgb: 92, 101, 116;
+  --text-on-accent-rgb: 250, 249, 246;
+  --text-primary: rgb(250, 249, 246);
+  --text-secondary: rgb(138, 148, 166);
+  --text-muted: rgb(116, 126, 142);
+  --text-disabled: rgb(92, 101, 116);
+  --text-on-accent: rgb(250, 249, 246);
+
+  --border-subtle-rgb: 65, 80, 100;
+  --border-accent-rgb: 214, 178, 94;
+  --border-subtle: rgb(65, 80, 100);
+  --border-accent: rgb(214, 178, 94);
+
+  --success-rgb: 45, 181, 139;
+  --error-rgb: 227, 97, 111;
+  --warning-rgb: 214, 178, 94;
+  --info-rgb: 91, 163, 255;
+  --success: rgb(45, 181, 139);
+  --error: rgb(227, 97, 111);
+  --warning: rgb(214, 178, 94);
+  --info: rgb(91, 163, 255);
+
+  --gradient-accent: linear-gradient(
+    180deg,
+    rgb(214, 178, 94),
+    rgb(15, 118, 110)
+  );
+}
+
+[data-theme="crypto-infrastructure"] {
+  --theme-name: "crypto-infrastructure";
+
+  --bg-primary-rgb: 17, 24, 39;
+  --bg-secondary-rgb: 26, 35, 54;
+  --bg-tertiary-rgb: 46, 56, 82;
+  --bg-overlay-rgb: 11, 16, 28;
+  --bg-primary: rgb(17, 24, 39);
+  --bg-secondary: rgb(26, 35, 54);
+  --bg-tertiary: rgb(46, 56, 82);
+  --bg-overlay: rgb(11, 16, 28);
+
+  --accent-primary-rgb: 67, 56, 202;
+  --accent-hover-rgb: 99, 102, 241;
+  --accent-active-rgb: 55, 48, 163;
+  --accent-glow-rgb: 34, 211, 238;
+  --accent-primary: rgb(67, 56, 202);
+  --accent-hover: rgb(99, 102, 241);
+  --accent-active: rgb(55, 48, 163);
+  --accent-glow: rgb(34, 211, 238);
+
+  --text-primary-rgb: 243, 244, 246;
+  --text-secondary-rgb: 156, 163, 175;
+  --text-muted-rgb: 124, 133, 148;
+  --text-disabled-rgb: 96, 106, 122;
+  --text-on-accent-rgb: 255, 255, 255;
+  --text-primary: rgb(243, 244, 246);
+  --text-secondary: rgb(156, 163, 175);
+  --text-muted: rgb(124, 133, 148);
+  --text-disabled: rgb(96, 106, 122);
+  --text-on-accent: rgb(255, 255, 255);
+
+  --border-subtle-rgb: 75, 85, 102;
+  --border-accent-rgb: 34, 211, 238;
+  --border-subtle: rgb(75, 85, 102);
+  --border-accent: rgb(34, 211, 238);
+
+  --success-rgb: 52, 211, 153;
+  --error-rgb: 244, 114, 128;
+  --warning-rgb: 251, 191, 36;
+  --info-rgb: 34, 211, 238;
+  --success: rgb(52, 211, 153);
+  --error: rgb(244, 114, 128);
+  --warning: rgb(251, 191, 36);
+  --info: rgb(34, 211, 238);
+
+  --gradient-accent: linear-gradient(
+    180deg,
+    rgb(99, 102, 241),
+    rgb(34, 211, 238)
+  );
+}
+
+[data-theme="calm-trust"] {
+  --theme-name: "calm-trust";
+
+  --bg-primary-rgb: 36, 58, 94;
+  --bg-secondary-rgb: 57, 84, 124;
+  --bg-tertiary-rgb: 74, 103, 140;
+  --bg-overlay-rgb: 24, 39, 63;
+  --bg-primary: rgb(36, 58, 94);
+  --bg-secondary: rgb(57, 84, 124);
+  --bg-tertiary: rgb(74, 103, 140);
+  --bg-overlay: rgb(24, 39, 63);
+
+  --accent-primary-rgb: 91, 125, 166;
+  --accent-hover-rgb: 113, 146, 186;
+  --accent-active-rgb: 74, 103, 140;
+  --accent-glow-rgb: 74, 222, 128;
+  --accent-primary: rgb(91, 125, 166);
+  --accent-hover: rgb(113, 146, 186);
+  --accent-active: rgb(74, 103, 140);
+  --accent-glow: rgb(74, 222, 128);
+
+  --text-primary-rgb: 255, 255, 255;
+  --text-secondary-rgb: 199, 210, 224;
+  --text-muted-rgb: 164, 177, 195;
+  --text-disabled-rgb: 125, 140, 161;
+  --text-on-accent-rgb: 255, 255, 255;
+  --text-primary: rgb(255, 255, 255);
+  --text-secondary: rgb(199, 210, 224);
+  --text-muted: rgb(164, 177, 195);
+  --text-disabled: rgb(125, 140, 161);
+  --text-on-accent: rgb(255, 255, 255);
+
+  --border-subtle-rgb: 108, 129, 158;
+  --border-accent-rgb: 74, 222, 128;
+  --border-subtle: rgb(108, 129, 158);
+  --border-accent: rgb(74, 222, 128);
+
+  --success-rgb: 74, 222, 128;
+  --error-rgb: 231, 109, 119;
+  --warning-rgb: 234, 194, 110;
+  --info-rgb: 91, 125, 166;
+  --success: rgb(74, 222, 128);
+  --error: rgb(231, 109, 119);
+  --warning: rgb(234, 194, 110);
+  --info: rgb(91, 125, 166);
+
+  --gradient-accent: linear-gradient(
+    180deg,
+    rgb(113, 146, 186),
+    rgb(74, 222, 128)
+  );
+}
+
+[data-theme="modern-bank-web3"] {
+  --theme-name: "modern-bank-web3";
+
+  --bg-primary-rgb: 15, 23, 42;
+  --bg-secondary-rgb: 27, 38, 60;
+  --bg-tertiary-rgb: 44, 60, 86;
+  --bg-overlay-rgb: 10, 16, 30;
+  --bg-primary: rgb(15, 23, 42);
+  --bg-secondary: rgb(27, 38, 60);
+  --bg-tertiary: rgb(44, 60, 86);
+  --bg-overlay: rgb(10, 16, 30);
+
+  --accent-primary-rgb: 59, 130, 246;
+  --accent-hover-rgb: 96, 165, 250;
+  --accent-active-rgb: 37, 99, 235;
+  --accent-glow-rgb: 34, 197, 94;
+  --accent-primary: rgb(59, 130, 246);
+  --accent-hover: rgb(96, 165, 250);
+  --accent-active: rgb(37, 99, 235);
+  --accent-glow: rgb(34, 197, 94);
+
+  --text-primary-rgb: 248, 250, 252;
+  --text-secondary-rgb: 203, 213, 225;
+  --text-muted-rgb: 158, 171, 188;
+  --text-disabled-rgb: 122, 136, 156;
+  --text-on-accent-rgb: 255, 255, 255;
+  --text-primary: rgb(248, 250, 252);
+  --text-secondary: rgb(203, 213, 225);
+  --text-muted: rgb(158, 171, 188);
+  --text-disabled: rgb(122, 136, 156);
+  --text-on-accent: rgb(255, 255, 255);
+
+  --border-subtle-rgb: 89, 103, 126;
+  --border-accent-rgb: 34, 197, 94;
+  --border-subtle: rgb(89, 103, 126);
+  --border-accent: rgb(34, 197, 94);
+
+  --success-rgb: 34, 197, 94;
+  --error-rgb: 239, 68, 68;
+  --warning-rgb: 245, 158, 11;
+  --info-rgb: 59, 130, 246;
+  --success: rgb(34, 197, 94);
+  --error: rgb(239, 68, 68);
+  --warning: rgb(245, 158, 11);
+  --info: rgb(59, 130, 246);
+
+  --gradient-accent: linear-gradient(
+    180deg,
+    rgb(96, 165, 250),
+    rgb(34, 197, 94)
+  );
+}
+
+[data-theme="velkonix-signature"] {
+  --theme-name: "velkonix-signature";
+
+  --bg-primary-rgb: 11, 19, 43;
+  --bg-secondary-rgb: 17, 31, 63;
+  --bg-tertiary-rgb: 23, 48, 110;
+  --bg-overlay-rgb: 8, 14, 32;
+  --bg-primary: rgb(11, 19, 43);
+  --bg-secondary: rgb(17, 31, 63);
+  --bg-tertiary: rgb(23, 48, 110);
+  --bg-overlay: rgb(8, 14, 32);
+
+  --accent-primary-rgb: 28, 63, 170;
+  --accent-hover-rgb: 52, 89, 198;
+  --accent-active-rgb: 22, 51, 142;
+  --accent-glow-rgb: 22, 199, 132;
+  --accent-primary: rgb(28, 63, 170);
+  --accent-hover: rgb(52, 89, 198);
+  --accent-active: rgb(22, 51, 142);
+  --accent-glow: rgb(22, 199, 132);
+
+  --text-primary-rgb: 249, 251, 255;
+  --text-secondary-rgb: 191, 201, 217;
+  --text-muted-rgb: 151, 163, 182;
+  --text-disabled-rgb: 115, 128, 149;
+  --text-on-accent-rgb: 255, 255, 255;
+  --text-primary: rgb(249, 251, 255);
+  --text-secondary: rgb(191, 201, 217);
+  --text-muted: rgb(151, 163, 182);
+  --text-disabled: rgb(115, 128, 149);
+  --text-on-accent: rgb(255, 255, 255);
+
+  --border-subtle-rgb: 71, 86, 114;
+  --border-accent-rgb: 22, 199, 132;
+  --border-subtle: rgb(71, 86, 114);
+  --border-accent: rgb(22, 199, 132);
+
+  --success-rgb: 22, 199, 132;
+  --error-rgb: 235, 98, 109;
+  --warning-rgb: 217, 178, 94;
+  --info-rgb: 79, 140, 255;
+  --success: rgb(22, 199, 132);
+  --error: rgb(235, 98, 109);
+  --warning: rgb(217, 178, 94);
+  --info: rgb(79, 140, 255);
+
+  --gradient-accent: linear-gradient(
+    180deg,
+    rgb(52, 89, 198),
+    rgb(22, 199, 132)
   );
 }
 

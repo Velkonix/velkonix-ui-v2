@@ -50,8 +50,18 @@ import styles from "./UiKitPage.module.css";
 
 const THEME_OPTIONS = [
   { value: "amber", label: "Amber" },
-  { value: "experimental-1", label: "Experimental 1" },
+  { value: "green", label: "Green" },
+  { value: "blue", label: "Blue" },
   { value: "classic-defi-trust", label: "Classic DeFi Trust" },
+  { value: "institutional-blue", label: "Institutional Blue" },
+  { value: "dark-tech-finance", label: "Dark Tech Finance" },
+  { value: "trust-growth", label: "Trust + Growth" },
+  { value: "minimal-institutional", label: "Minimal Institutional" },
+  { value: "premium-defi", label: "Premium DeFi" },
+  { value: "crypto-infrastructure", label: "Crypto Infrastructure" },
+  { value: "calm-trust", label: "Calm Trust" },
+  { value: "modern-bank-web3", label: "Modern Bank x Web3" },
+  { value: "velkonix-signature", label: "Velkonix Signature" },
 ] as const;
 
 type ThemeName = (typeof THEME_OPTIONS)[number]["value"];
@@ -72,7 +82,7 @@ export function UiKitPage() {
   const [activeTab, setActiveTab] = useState("convert");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [amountValue, setAmountValue] = useState("");
-  const [activeTheme, setActiveTheme] = useState<ThemeName>("amber");
+  const [activeTheme, setActiveTheme] = useState<ThemeName>("blue");
 
   useEffect(() => {
     const themeFromDocument = document.documentElement.getAttribute("data-theme");
