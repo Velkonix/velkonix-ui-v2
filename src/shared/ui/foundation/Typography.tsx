@@ -3,7 +3,7 @@ import type { ElementType, HTMLAttributes } from "react";
 import { classNames } from "../utilities/classNames";
 import styles from "./Typography.module.css";
 
-type TypographyVariant = "body" | "caption" | "label" | "title" | "headline";
+type TypographyVariant = "body" | "caption" | "microcaption" | "label" | "title" | "headline";
 
 type TypographyProps<T extends ElementType> = {
   as?: T;

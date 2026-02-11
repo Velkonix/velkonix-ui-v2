@@ -37,9 +37,11 @@ export interface ExitQueueItem {
 }
 
 export interface StakingState {
+  velkBalance: number;
   staked: number;
   rewards: number;
   apr: number;
+  instantExitPenaltyBps: number;
   exitQueue: ExitQueueItem[];
 }
 

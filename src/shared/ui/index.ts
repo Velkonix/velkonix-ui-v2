@@ -16,6 +16,7 @@ export { Tooltip } from "./feedback/Tooltip";
 export { ApyCell } from "./data-display/ApyCell";
 export { AssetCell } from "./data-display/AssetCell";
 export { Card } from "./data-display/Card";
+export { PanelHeader, PanelHeaderStat } from "./data-display/PanelHeader";
 export { Table } from "./data-display/Table";
 export { ValueCell } from "./data-display/ValueCell";
 
@@ -46,6 +47,7 @@ export { ActionButton } from "./web3/ActionButton";
 export { ApproveButton } from "./web3/ApproveButton";
 export { ClaimButton } from "./web3/ClaimButton";
 export { TxStatus } from "./web3/TxStatus";
+export { WalletBalanceCard } from "./web3/WalletBalanceCard";
 export { WalletConnectButton } from "./web3/WalletConnectButton";
 export { WalletMenu } from "./web3/WalletMenu";
 

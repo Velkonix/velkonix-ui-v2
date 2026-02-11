@@ -45,6 +45,7 @@
   --gradient-input: linear-gradient(180deg, var(--bg-secondary), var(--bg-tertiary));
 
   --font-family-base: "Inter", system-ui, -apple-system, sans-serif;
+  --font-size-2xs: 11px;
   --font-size-xs: 12px;
   --font-size-sm: 14px;
   --font-size-md: 16px;

@@ -1,0 +1,32 @@
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-3);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  margin-right: var(--space-1);
+}
+
+.details {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.stat {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  text-align: left;
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-secondary);
+}

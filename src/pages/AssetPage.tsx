@@ -10,7 +10,6 @@ import {
   Card,
   Divider,
   ErrorState,
-  Icon,
   Modal,
   PageContainer,
   PageHeader,
@@ -19,6 +18,7 @@ import {
   ToastPopup,
   Typography,
   ValueCell,
+  WalletBalanceCard,
 } from "../shared/ui";
 import styles from "./AssetPage.module.css";
 
@@ -185,28 +185,7 @@ export function AssetPage() {
         <aside className={styles.actionsColumn}>
           <Section>
             <Card className={styles.actionsCard}>
-              <div className={styles.walletModule}>
-                <div className={styles.walletIcon}>
-                  <Icon size={18} aria-label="Wallet icon" className={styles.walletIconSvg}>
-                    <rect x="2.5" y="5" width="15" height="10" rx="2.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
-                    <path
-                      d="M11.8 8.4h5v3.2h-5a1.6 1.6 0 1 1 0-3.2Z"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                    />
-                    <circle cx="13.8" cy="10" r="0.9" fill="currentColor" />
-                  </Icon>
-                </div>
-                <div className={styles.walletSummary}>
-                  <Typography as="span" variant="caption" muted>
-                    Wallet balance
-                  </Typography>
-                  <Typography as="p" variant="body" className={styles.walletBalance}>
-                    {formatTokenAmount(walletBalance, asset.symbol)}
-                  </Typography>
-                </div>
-              </div>
+              <WalletBalanceCard value={formatTokenAmount(walletBalance, asset.symbol)} />
 
               <Divider />
 

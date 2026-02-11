@@ -11,6 +11,8 @@ import {
   Modal,
   PageContainer,
   PageHeader,
+  PanelHeader,
+  PanelHeaderStat,
   Section,
   Switch,
   Table,
@@ -221,25 +223,15 @@ export function DashboardPage() {
       <div className={styles.positionsColumns}>
         <Section className={styles.positionsColumn}>
           <Card>
-            <div className={styles.positionsHeader}>
-              <Typography as="p" variant="label" className={styles.positionsTitle}>
-                Your supplies
-              </Typography>
-              <div className={styles.positionsStats}>
-                <div className={styles.positionsStat}>
-                  <Typography as="span" variant="caption" muted>
-                    Balance
-                  </Typography>
-                  <Typography as="span">{formatAmount(suppliesBalance)}</Typography>
-                </div>
-                <div className={styles.positionsStat}>
-                  <Typography as="span" variant="caption" muted>
-                    APY
-                  </Typography>
-                  <Typography as="span">{formatPercent(suppliesWeightedApy)}</Typography>
-                </div>
-              </div>
-            </div>
+            <PanelHeader
+              title="Your supplies"
+              details={
+                <>
+                  <PanelHeaderStat label="Balance" value={formatAmount(suppliesBalance)} />
+                  <PanelHeaderStat label="APY" value={formatPercent(suppliesWeightedApy)} />
+                </>
+              }
+            />
             {dashboardSupplies.length === 0 ? (
               <EmptyState title="No supplied positions" description="Supply assets from Markets or Asset page to see them here." />
             ) : (
@@ -315,25 +307,15 @@ export function DashboardPage() {
 
         <Section className={styles.positionsColumn}>
           <Card>
-            <div className={styles.positionsHeader}>
-              <Typography as="p" variant="label" className={styles.positionsTitle}>
-                Your borrows
-              </Typography>
-              <div className={styles.positionsStats}>
-                <div className={styles.positionsStat}>
-                  <Typography as="span" variant="caption" muted>
-                    Balance
-                  </Typography>
-                  <Typography as="span">{formatAmount(borrowsBalance)}</Typography>
-                </div>
-                <div className={styles.positionsStat}>
-                  <Typography as="span" variant="caption" muted>
-                    APY
-                  </Typography>
-                  <Typography as="span">{formatPercent(borrowsWeightedApy)}</Typography>
-                </div>
-              </div>
-            </div>
+            <PanelHeader
+              title="Your borrows"
+              details={
+                <>
+                  <PanelHeaderStat label="Balance" value={formatAmount(borrowsBalance)} />
+                  <PanelHeaderStat label="APY" value={formatPercent(borrowsWeightedApy)} />
+                </>
+              }
+            />
             {dashboardBorrows.length === 0 ? (
               <EmptyState title="No borrow positions" description="Borrow assets on the Asset page to manage debt here." />
             ) : (

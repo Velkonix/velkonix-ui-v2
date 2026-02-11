@@ -28,6 +28,8 @@ import {
   NumberInput,
   PageContainer,
   PageHeader,
+  PanelHeader,
+  PanelHeaderStat,
   Section,
   Select,
   Skeleton,
@@ -41,6 +43,7 @@ import {
   TxStatus,
   Typography,
   ValueCell,
+  WalletBalanceCard,
   WalletConnectButton,
   WalletMenu,
 } from "../shared/ui";
@@ -120,6 +123,7 @@ export function UiKitPage() {
           </Typography>
           <Typography>Body text for metrics and descriptions.</Typography>
           <Typography variant="label">Label / micro copy</Typography>
+          <Typography variant="microcaption">Microcaption / action helper text</Typography>
           <div className={styles.statPillsDemo}>
             <div className={styles.statPill}>
               <Typography as="span" variant="caption" muted>
@@ -229,6 +233,15 @@ export function UiKitPage() {
 
       <Section title="4. Data Display">
         <Card>
+          <PanelHeader
+            title="Panel header"
+            details={
+              <>
+                <PanelHeaderStat label="Balance" value="12,450.00" />
+                <PanelHeaderStat label="APY" value="3.42%" />
+              </>
+            }
+          />
           <Table<MarketRow>
             columns={[
               {
@@ -271,6 +284,8 @@ export function UiKitPage() {
 
       <Section title="6. Web3 / Protocol-specific">
         <Card>
+          <WalletBalanceCard value="12,450.00 VELK" />
+          <Spacer size={12} />
           <div className={styles.row}>
             <WalletConnectButton />
             <WalletMenu />

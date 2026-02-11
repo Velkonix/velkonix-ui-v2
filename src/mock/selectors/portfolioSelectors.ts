@@ -6,17 +6,21 @@ const toStakingState = (state: MockDbState, user: Address): StakingState => {
   const staking = state.users[user]?.staking;
   if (!staking) {
     return {
+      velkBalance: 0,
       staked: 0,
       rewards: 0,
       apr: 0,
+      instantExitPenaltyBps: 0,
       exitQueue: [],
     };
   }
 
   return {
+    velkBalance: staking.velkBalance,
     staked: staking.staked,
     rewards: staking.rewards,
     apr: staking.apr,
+    instantExitPenaltyBps: staking.instantExitPenaltyBps,
     exitQueue: staking.queue
       .filter((item) => item.status === "queued" || item.status === "ready")
       .map((item) => ({

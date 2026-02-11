@@ -23,3 +23,31 @@ test("real mode shows wallet connect action", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("button", { name: "Connect Wallet" }).first()).toBeVisible();
 });
+
+test("staking flow supports convert and queue exit in mock mode", async ({ page }) => {
+  await page.goto("/staking?mock=1");
+
+  await page.evaluate(() => {
+    const raw = window.localStorage.getItem("mock.settings");
+    const settings = raw ? JSON.parse(raw) : {};
+    settings.failRateBps = 0;
+    settings.queueVestingMs = 200;
+    window.localStorage.setItem("mock.settings", JSON.stringify(settings));
+  });
+
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "Staking" })).toBeVisible();
+
+  await page.getByRole("button", { name: "Connect Wallet" }).click();
+  await expect(page.getByRole("button", { name: /0x/i })).toBeVisible();
+
+  await page.getByRole("textbox", { name: "Convert amount" }).fill("300");
+  await page.getByRole("button", { name: "Convert" }).click();
+  await expect(page.getByText("CONVERT success")).toBeVisible();
+
+  await page.getByRole("tab", { name: "Exit" }).click();
+  await page.getByRole("textbox", { name: "Exit amount" }).fill("50");
+  await page.getByRole("button", { name: "Request Exit" }).click();
+  await expect(page.getByText("REQUESTEXIT success")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Execute Exit" })).toBeDisabled();
+});

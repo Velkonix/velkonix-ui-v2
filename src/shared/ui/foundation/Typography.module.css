@@ -30,6 +30,14 @@
   letter-spacing: 0.02em;
 }
 
+.microcaption {
+  font-size: var(--font-size-2xs);
+  line-height: 1.4;
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
 .label {
   font-size: var(--font-size-xs);
   line-height: var(--line-height-base);

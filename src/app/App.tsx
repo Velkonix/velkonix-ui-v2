@@ -4,6 +4,7 @@ import { AssetPage } from "../pages/AssetPage";
 import { DashboardPage } from "../pages/DashboardPage";
 import { HomePage } from "../pages/HomePage";
 import { MarketsPage } from "../pages/MarketsPage";
+import { StakingPage } from "../pages/StakingPage";
 import { UiKitPage } from "../pages/UiKitPage";
 import { AppLayout, Footer, Header, Link, WalletConnectButton } from "../shared/ui";
 import styles from "./App.module.css";
@@ -46,6 +47,7 @@ function MockAppShell() {
               <div className={styles.navLinks}>
                 {navLink("/markets", "Markets")}
                 {navLink("/dashboard", "Dashboard")}
+                {navLink("/staking", "Staking")}
               </div>
             }
             actions={<WalletConnectButton />}
@@ -78,6 +80,7 @@ function MockAppShell() {
         <Route path="/" element={<HomePage />} />
         <Route path="/markets" element={<MarketsPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/staking" element={<StakingPage />} />
         <Route path="/asset/:assetId" element={<AssetPage />} />
         {isDev ? <Route path="/ui-kit" element={<UiKitPage />} /> : null}
         <Route path="*" element={<Navigate to="/" replace />} />

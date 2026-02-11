@@ -89,9 +89,11 @@ export function MockModePage() {
   const stakingState = user
     ? engine.selectors.getStakingState(user)
     : {
+        velkBalance: 0,
         staked: 0,
         rewards: 0,
         apr: 0,
+        instantExitPenaltyBps: 0,
         exitQueue: [],
       };
   const queueEntries = user

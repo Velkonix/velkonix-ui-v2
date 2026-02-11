@@ -1,0 +1,137 @@
+.page {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.pageHeader h1 {
+  font-size: var(--font-size-h2);
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.summaryItem {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.summaryValue {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
+.tabPanel {
+  margin-top: var(--space-4);
+}
+
+.tabContent {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.buttonRow {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.exitActionRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.buttonRow > button {
+  width: 100%;
+  min-width: 0;
+}
+
+.exitActionRow > button {
+  width: 100%;
+  min-width: 0;
+}
+
+.rewardsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.mainRow {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+
+.mainColumn {
+  flex: 1 1 420px;
+  min-width: 0;
+}
+
+.leftColumn {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-rows: auto 1fr;
+}
+
+.actionsColumn {
+  align-self: stretch;
+}
+
+.claimCard,
+.actionsCard {
+  height: 100%;
+}
+
+.queueActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+@media (max-width: 1024px) {
+  .summaryGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rewardsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .summaryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .mainColumn {
+    flex-basis: 100%;
+  }
+
+  .leftColumn {
+    grid-template-rows: auto;
+  }
+
+  .claimCard,
+  .actionsCard {
+    height: auto;
+  }
+
+  .buttonRow > button {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .exitActionRow > button {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .queueActions {
+    flex-direction: column;
+  }
+}
