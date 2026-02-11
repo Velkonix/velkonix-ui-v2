@@ -41,14 +41,14 @@
   right: 0;
   bottom: 0;
   height: 3px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(var(--surface-highlight-rgb), 0.08);
 }
 
 .progressBar {
   width: 100%;
   height: 100%;
   transform-origin: left center;
-  background: rgba(255, 255, 255, 0.45);
+  background: rgba(var(--surface-highlight-rgb), 0.45);
   animation-name: countdown;
   animation-timing-function: linear;
   animation-fill-mode: forwards;

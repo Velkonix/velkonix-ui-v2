@@ -43,7 +43,7 @@
     padding: 0 var(--space-3);
     border-radius: var(--radius-md);
     border: 1px solid transparent;
-    background: rgba(26, 18, 13, 0.72);
+    background: rgba(var(--bg-tertiary-rgb), 0.72);
     line-height: 1.25;
     word-break: break-word;
   }
@@ -53,8 +53,8 @@
   }
 
   .activeNavLink {
-    border-color: rgba(255, 170, 60, 0.35);
-    background: rgba(255, 170, 60, 0.12);
+    border-color: rgba(var(--accent-primary-rgb), 0.35);
+    background: rgba(var(--accent-primary-rgb), 0.12);
   }
 
   .footerLinks {

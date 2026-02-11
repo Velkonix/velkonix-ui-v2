@@ -7,11 +7,11 @@
   padding: var(--space-4) var(--space-6);
   background: linear-gradient(
     180deg,
-    rgba(12, 8, 6, 0.85),
-    rgba(18, 12, 9, 0.8)
+    rgba(var(--bg-primary-rgb), 0.85),
+    rgba(var(--bg-secondary-rgb), 0.8)
   );
   backdrop-filter: blur(10px);
-  box-shadow: inset 0 -1px 0 rgba(55, 40, 30, 0.6);
+  box-shadow: inset 0 -1px 0 rgba(var(--border-subtle-rgb), 0.6);
 }
 
 .logo {
@@ -66,16 +66,16 @@
   justify-content: center;
   width: var(--touch-target-min);
   height: var(--touch-target-min);
-  border: 1px solid rgba(120, 85, 45, 0.35);
+  border: 1px solid rgba(var(--border-accent-rgb), 0.35);
   border-radius: var(--radius-md);
-  background: linear-gradient(180deg, rgba(26, 18, 13, 0.9), rgba(18, 12, 9, 0.95));
+  background: linear-gradient(180deg, rgba(var(--bg-tertiary-rgb), 0.9), rgba(var(--bg-secondary-rgb), 0.95));
   color: var(--text-primary);
-  box-shadow: inset 0 0 0 1px rgba(55, 40, 30, 0.6);
+  box-shadow: inset 0 0 0 1px rgba(var(--border-subtle-rgb), 0.6);
   cursor: pointer;
 }
 
 .mobileMenuButton:hover {
-  border-color: rgba(255, 170, 60, 0.45);
+  border-color: rgba(var(--accent-primary-rgb), 0.45);
   box-shadow: var(--glow-soft);
 }
 
@@ -117,7 +117,7 @@
   position: fixed;
   inset: 0;
   display: block;
-  background: rgba(5, 3, 2, 0.72);
+  background: rgba(var(--bg-overlay-rgb), 0.72);
   backdrop-filter: blur(3px);
   opacity: 0;
   visibility: hidden;
@@ -137,9 +137,9 @@
   max-height: 100vh;
   width: min(344px, 90vw);
   margin-left: auto;
-  background: linear-gradient(180deg, rgba(18, 12, 9, 0.98), rgba(12, 8, 6, 0.98));
-  border-left: 1px solid rgba(120, 85, 45, 0.45);
-  box-shadow: -8px 0 24px rgba(5, 3, 2, 0.45);
+  background: linear-gradient(180deg, rgba(var(--bg-secondary-rgb), 0.98), rgba(var(--bg-primary-rgb), 0.98));
+  border-left: 1px solid rgba(var(--border-accent-rgb), 0.45);
+  box-shadow: var(--shadow-drawer);
   padding: calc(var(--space-6) + env(safe-area-inset-top, 0px)) var(--space-5)
     calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
   display: grid;

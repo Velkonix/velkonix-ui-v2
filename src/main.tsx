@@ -5,10 +5,22 @@ import { MockEngineProvider } from "./app/providers/MockEngineProvider";
 import { WalletProvider } from "./app/providers/WalletProvider";
 import "./styles/index.css";
 
+const SUPPORTED_THEMES = ["amber", "experimental-1"] as const;
+type ThemeName = (typeof SUPPORTED_THEMES)[number];
+
+function resolveThemeName(value: string | undefined): ThemeName {
+  return SUPPORTED_THEMES.includes(value as ThemeName) ? (value as ThemeName) : "amber";
+}
+
 const root = document.getElementById("root");
 const forceMockFromQuery =
   typeof window !== "undefined" && new URLSearchParams(window.location.search).get("mock") === "1";
 const isMockMode = import.meta.env.VITE_MOCK_MODE === "true" || forceMockFromQuery;
+const activeTheme = resolveThemeName(import.meta.env.VITE_THEME);
+
+if (typeof document !== "undefined") {
+  document.documentElement.setAttribute("data-theme", activeTheme);
+}
 
 if (typeof document !== "undefined") {
   const unblockUserInteraction = (event: Event) => {

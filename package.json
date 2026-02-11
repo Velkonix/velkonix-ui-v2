@@ -6,6 +6,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
+    "lint:colors": "node scripts/check-no-hardcoded-colors.mjs",
     "test": "npm run test:unit && npm run test:e2e",
     "test:unit": "jest --config jest.config.ts",
     "test:e2e": "playwright test"

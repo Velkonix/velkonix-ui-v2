@@ -19,13 +19,13 @@
 }
 
 .success {
-  box-shadow: inset 0 0 0 1px rgba(80, 200, 140, 0.4), var(--glow-soft);
+  box-shadow: inset 0 0 0 1px rgba(var(--success-rgb), 0.4), var(--glow-soft);
 }
 
 .error {
-  box-shadow: inset 0 0 0 1px rgba(235, 95, 80, 0.4), var(--glow-soft);
+  box-shadow: inset 0 0 0 1px rgba(var(--error-rgb), 0.4), var(--glow-soft);
 }
 
 .info {
-  box-shadow: inset 0 0 0 1px rgba(110, 160, 220, 0.35), var(--glow-soft);
+  box-shadow: inset 0 0 0 1px rgba(var(--info-rgb), 0.35), var(--glow-soft);
 }

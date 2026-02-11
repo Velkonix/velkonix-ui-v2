@@ -16,7 +16,7 @@
   background: var(--gradient-input);
   display: flex;
   align-items: center;
-  box-shadow: inset 0 0 0 1px rgba(55, 40, 30, 0.35);
+  box-shadow: inset 0 0 0 1px rgba(var(--border-subtle-rgb), 0.35);
 }
 
 .control:focus-within {

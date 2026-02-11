@@ -6,35 +6,78 @@
 
 :root {
   color-scheme: dark;
+  --theme-name: "amber";
+
+  --bg-primary-rgb: 12, 8, 6;
+  --bg-secondary-rgb: 18, 12, 9;
+  --bg-tertiary-rgb: 26, 18, 13;
+  --bg-overlay-rgb: 8, 5, 4;
   --bg-primary: rgb(12, 8, 6);
   --bg-secondary: rgb(18, 12, 9);
   --bg-tertiary: rgb(26, 18, 13);
   --bg-overlay: rgb(8, 5, 4);
 
+  --accent-primary-rgb: 255, 170, 60;
+  --accent-hover-rgb: 255, 190, 90;
+  --accent-active-rgb: 230, 150, 45;
+  --accent-glow-rgb: 255, 140, 0;
   --accent-primary: rgb(255, 170, 60);
   --accent-hover: rgb(255, 190, 90);
   --accent-active: rgb(230, 150, 45);
   --accent-glow: rgb(255, 140, 0);
-  --accent-primary-rgb: 255 170 60;
-  --accent-glow-rgb: 255 140 0;
 
+  --text-primary-rgb: 245, 235, 225;
+  --text-secondary-rgb: 190, 170, 155;
+  --text-muted-rgb: 140, 120, 105;
+  --text-disabled-rgb: 90, 75, 65;
+  --text-on-accent-rgb: 20, 14, 10;
   --text-primary: rgb(245, 235, 225);
   --text-secondary: rgb(190, 170, 155);
   --text-muted: rgb(140, 120, 105);
   --text-disabled: rgb(90, 75, 65);
   --text-on-accent: rgb(20, 14, 10);
 
+  --border-subtle-rgb: 55, 40, 30;
+  --border-accent-rgb: 120, 85, 45;
   --border-subtle: rgb(55, 40, 30);
   --border-accent: rgb(120, 85, 45);
 
+  --success-rgb: 80, 200, 140;
+  --error-rgb: 235, 95, 80;
+  --warning-rgb: 255, 185, 90;
+  --info-rgb: 110, 160, 220;
   --success: rgb(80, 200, 140);
   --error: rgb(235, 95, 80);
   --warning: rgb(255, 185, 90);
   --info: rgb(110, 160, 220);
 
-  --glow-strong: 0 0 24px rgba(255, 140, 0, 0.45);
-  --glow-medium: 0 0 16px rgba(255, 140, 0, 0.3);
-  --glow-soft: 0 0 8px rgba(255, 140, 0, 0.18);
+  --surface-highlight-rgb: 255, 255, 255;
+  --surface-lowlight-rgb: 0, 0, 0;
+
+  --overlay-alpha-strong: 0.85;
+  --overlay-alpha-medium: 0.72;
+  --surface-alpha-95: 0.95;
+  --surface-alpha-9: 0.9;
+  --surface-alpha-8: 0.8;
+  --surface-alpha-72: 0.72;
+  --surface-alpha-6: 0.6;
+  --border-alpha-6: 0.6;
+  --border-alpha-45: 0.45;
+  --border-alpha-4: 0.4;
+  --border-alpha-35: 0.35;
+  --accent-alpha-45: 0.45;
+  --accent-alpha-35: 0.35;
+  --accent-alpha-18: 0.18;
+  --accent-alpha-12: 0.12;
+  --accent-alpha-08: 0.08;
+  --accent-alpha-05: 0.05;
+
+  --glow-strong: 0 0 24px rgba(var(--accent-glow-rgb), 0.45);
+  --glow-medium: 0 0 16px rgba(var(--accent-glow-rgb), 0.3);
+  --glow-soft: 0 0 8px rgba(var(--accent-glow-rgb), 0.18);
+  --surface-ring-subtle: inset 0 0 0 1px rgba(var(--border-subtle-rgb), 0.4);
+  --surface-ring-medium: inset 0 0 0 1px rgba(var(--border-subtle-rgb), 0.6);
+  --surface-ring-accent: inset 0 0 0 1px rgba(var(--accent-primary-rgb), 0.35);
 
   --gradient-accent: linear-gradient(
     180deg,
@@ -43,6 +86,11 @@
   );
   --gradient-surface: linear-gradient(180deg, var(--bg-secondary), var(--bg-tertiary));
   --gradient-input: linear-gradient(180deg, var(--bg-secondary), var(--bg-tertiary));
+  --gradient-button-danger: linear-gradient(
+    180deg,
+    rgba(var(--error-rgb), 0.95),
+    rgba(var(--error-rgb), 0.6)
+  );
 
   --font-family-base: "Inter", system-ui, -apple-system, sans-serif;
   --font-size-2xs: 11px;
@@ -75,9 +123,11 @@
   --radius-md: 10px;
   --radius-lg: 16px;
   --radius-pill: 999px;
+  --radius-button: 12px;
 
-  --shadow-sm: 0 10px 20px rgba(8, 5, 4, 0.35);
-  --shadow-md: 0 16px 30px rgba(8, 5, 4, 0.45);
+  --shadow-sm: 0 10px 20px rgba(var(--bg-overlay-rgb), 0.35);
+  --shadow-md: 0 16px 30px rgba(var(--bg-overlay-rgb), 0.45);
+  --shadow-drawer: -8px 0 24px rgba(var(--bg-overlay-rgb), 0.45);
 
   --z-base: 0;
   --z-dropdown: 20;
@@ -91,6 +141,59 @@
   --container-gutter-desktop: var(--space-4);
   --container-gutter-mobile: var(--space-3);
   --touch-target-min: 44px;
+}
+
+[data-theme="experimental-1"] {
+  --theme-name: "experimental-1";
+
+  --bg-primary-rgb: 7, 12, 20;
+  --bg-secondary-rgb: 11, 19, 31;
+  --bg-tertiary-rgb: 18, 28, 42;
+  --bg-overlay-rgb: 4, 8, 14;
+  --bg-primary: rgb(7, 12, 20);
+  --bg-secondary: rgb(11, 19, 31);
+  --bg-tertiary: rgb(18, 28, 42);
+  --bg-overlay: rgb(4, 8, 14);
+
+  --accent-primary-rgb: 108, 208, 255;
+  --accent-hover-rgb: 146, 224, 255;
+  --accent-active-rgb: 70, 176, 232;
+  --accent-glow-rgb: 72, 196, 255;
+  --accent-primary: rgb(108, 208, 255);
+  --accent-hover: rgb(146, 224, 255);
+  --accent-active: rgb(70, 176, 232);
+  --accent-glow: rgb(72, 196, 255);
+
+  --text-primary-rgb: 228, 239, 255;
+  --text-secondary-rgb: 176, 197, 223;
+  --text-muted-rgb: 126, 147, 172;
+  --text-disabled-rgb: 91, 108, 128;
+  --text-on-accent-rgb: 8, 19, 31;
+  --text-primary: rgb(228, 239, 255);
+  --text-secondary: rgb(176, 197, 223);
+  --text-muted: rgb(126, 147, 172);
+  --text-disabled: rgb(91, 108, 128);
+  --text-on-accent: rgb(8, 19, 31);
+
+  --border-subtle-rgb: 42, 62, 88;
+  --border-accent-rgb: 82, 123, 168;
+  --border-subtle: rgb(42, 62, 88);
+  --border-accent: rgb(82, 123, 168);
+
+  --success-rgb: 96, 210, 168;
+  --error-rgb: 248, 121, 120;
+  --warning-rgb: 255, 194, 106;
+  --info-rgb: 122, 170, 255;
+  --success: rgb(96, 210, 168);
+  --error: rgb(248, 121, 120);
+  --warning: rgb(255, 194, 106);
+  --info: rgb(122, 170, 255);
+
+  --gradient-accent: linear-gradient(
+    180deg,
+    rgb(156, 228, 255),
+    rgb(72, 186, 245)
+  );
 }
 
 body {
@@ -143,7 +246,8 @@ a:hover {
 }
 
 @media (max-width: 768px) {
-  :root {
+  :root,
+  [data-theme] {
     --font-size-h1: 40px;
     --font-size-h2: 30px;
   }

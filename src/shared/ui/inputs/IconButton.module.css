@@ -15,8 +15,8 @@
 .button:hover:not(:disabled) {
   background: linear-gradient(
     180deg,
-    rgba(255, 170, 60, 0.12),
-    rgba(255, 170, 60, 0.06)
+    rgba(var(--accent-primary-rgb), 0.12),
+    rgba(var(--accent-primary-rgb), 0.06)
   );
   box-shadow: var(--glow-soft);
   color: var(--text-primary);

@@ -1,7 +1,7 @@
 .button {
   position: relative;
   border: 1px solid transparent;
-  border-radius: 12px;
+  border-radius: var(--radius-button);
   padding: 0 var(--space-5);
   display: inline-flex;
   align-items: center;
@@ -22,6 +22,7 @@
 .button:disabled {
   cursor: not-allowed;
   box-shadow: none;
+  border-color: rgba(var(--border-accent-rgb), 0.55);
 }
 
 .content {
@@ -70,8 +71,9 @@
 }
 
 .primary:disabled {
-  background: rgb(60, 45, 35);
+  background: rgba(var(--bg-tertiary-rgb), 0.9);
   color: var(--text-disabled);
+  box-shadow: inset 0 0 0 1px rgba(var(--border-accent-rgb), 0.2);
 }
 
 .secondary {
@@ -96,7 +98,7 @@
 }
 
 .danger {
-  background: linear-gradient(180deg, rgba(235, 95, 80, 0.95), rgba(235, 95, 80, 0.6));
+  background: var(--gradient-button-danger);
   color: var(--text-on-accent);
   box-shadow: var(--glow-medium);
 }

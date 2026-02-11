@@ -17,9 +17,9 @@
   position: relative;
   width: 48px;
   height: 28px;
-  background: linear-gradient(180deg, rgb(40, 30, 22), rgb(40, 30, 22));
+  background: linear-gradient(180deg, rgba(var(--bg-tertiary-rgb), 0.9), rgba(var(--bg-tertiary-rgb), 0.9));
   border-radius: var(--radius-pill);
-  border: 1px solid rgba(55, 40, 30, 0.6);
+  border: 1px solid rgba(var(--border-subtle-rgb), 0.6);
   transition: background 0.2s ease, border-color 0.2s ease;
 }
 
@@ -36,7 +36,7 @@
 
 .input:checked + .track {
   background: var(--gradient-accent);
-  border-color: rgba(255, 170, 60, 0.6);
+  border-color: rgba(var(--accent-primary-rgb), 0.6);
   box-shadow: var(--glow-soft);
 }
 

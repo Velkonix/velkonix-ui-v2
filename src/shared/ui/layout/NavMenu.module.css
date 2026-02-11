@@ -27,6 +27,6 @@
 
   .item {
     width: 100%;
-    background: rgba(26, 18, 13, 0.7);
+    background: rgba(var(--bg-tertiary-rgb), 0.7);
   }
 }

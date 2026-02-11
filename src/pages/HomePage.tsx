@@ -1,43 +1,37 @@
-import { Button, Card, PageContainer, PageHeader, Section, Typography, WalletConnectButton, WalletMenu } from "../shared/ui";
+import { Button, Typography } from "../shared/ui";
 import styles from "./HomePage.module.css";
 
 export function HomePage() {
-  const openPage = (path: string) => {
-    window.location.assign(path);
+  const openPage = () => {
+    window.location.assign("/markets?mock=1");
   };
 
   return (
-    <PageContainer className={styles.page}>
-      <PageHeader
-        title="Velkonix Home"
-        subtitle="Self-service DeFi interface for lending and staking."
-        actions={
-          <div className={styles.actions}>
-            <WalletMenu />
-            <WalletConnectButton />
+    <div className={styles.page}>
+      <section className={styles.shell}>
+        <div className={styles.heroCenter}>
+          <div className={styles.titleWrap}>
+            <h1 className={styles.heroTitle}>
+              VELKONIX
+            </h1>
           </div>
-        }
-      />
 
-      <Section title="Welcome">
-        <Card>
-          <Typography>
-            This is the main page of Velkonix UI. Connect wallet to access protocol actions in markets, asset pages,
-            and staking modules.
-          </Typography>
-        </Card>
-      </Section>
-
-      <Section title="Quick Navigation">
-        <Card>
-          <div className={styles.navButtons}>
-            <Button onClick={() => openPage("/?mock=1")}>Open App</Button>
-            <Button variant="secondary" onClick={() => openPage("/markets?mock=1")}>
-              Go to Markets
-            </Button>
+          <div className={styles.pitch}>
+            <Typography as="p" variant="label" align="center" className={styles.pitchPrimary}>
+              battle-tested defi mechanics - back on <strong>ethereum</strong>.
+            </Typography>
+            <Typography as="p" variant="microcaption" align="center" className={styles.pitchSecondary}>
+              vanilla lending. real tokenomics. no experiments.
+            </Typography>
           </div>
-        </Card>
-      </Section>
-    </PageContainer>
+        </div>
+
+        <div className={styles.centerAction}>
+          <Button size="md" onClick={openPage} className={styles.superButton}>
+            <span className={styles.superButtonLabel}>Open App</span>
+          </Button>
+        </div>
+      </section>
+    </div>
   );
 }
