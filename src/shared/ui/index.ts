@@ -16,6 +16,7 @@ export { Tooltip } from "./feedback/Tooltip";
 export { ApyCell } from "./data-display/ApyCell";
 export { AssetCell } from "./data-display/AssetCell";
 export { Card } from "./data-display/Card";
+export { MetricTile } from "./data-display/MetricTile";
 export { PanelHeader, PanelHeaderStat } from "./data-display/PanelHeader";
 export { Table } from "./data-display/Table";
 export { ValueCell } from "./data-display/ValueCell";

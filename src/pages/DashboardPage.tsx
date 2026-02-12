@@ -8,6 +8,8 @@ import {
   Card,
   ClaimButton,
   EmptyState,
+  Icon,
+  MetricTile,
   Modal,
   PageContainer,
   PageHeader,
@@ -181,49 +183,116 @@ export function DashboardPage() {
       ) : null}
 
       <Section>
-        <Card>
-          <div className={styles.summaryGrid}>
-            <div className={styles.summaryItem}>
-              <Typography as="span" variant="caption" muted>
-                Net worth
-              </Typography>
-              <Typography as="p" variant="body" className={styles.summaryValue}>
-                {formatUsd(dashboardSummary.netWorth)}
-              </Typography>
-            </div>
-            <div className={styles.summaryItem}>
-              <Typography as="span" variant="caption" muted>
-                Net APY
-              </Typography>
-              <Typography as="p" variant="body" className={styles.summaryValue}>
-                {formatPercent(dashboardSummary.averageApy)}
-              </Typography>
-            </div>
-            <div className={styles.summaryItem}>
-              <Typography as="span" variant="caption" muted>
-                Health factor
-              </Typography>
-              <Typography as="p" variant="body" className={styles.summaryValue}>
-                {formatPercent(dashboardSummary.borrowUtilization)}
-              </Typography>
-            </div>
-            <div className={styles.summaryItem}>
-              <Typography as="span" variant="caption" muted>
-                Unclaimed rewards
-              </Typography>
-              <Typography as="p" variant="body" className={styles.summaryValue}>
-                {formatAmount(dashboardSummary.lendingRewards)}
-              </Typography>
-            </div>
-            <div className={styles.claimArea}>
+        <div className={styles.summaryGrid}>
+          <MetricTile
+            title="Net worth"
+            value={formatUsd(dashboardSummary.netWorth)}
+            media={
+              <Icon size={18} viewBox="0 0 24 24" aria-label="Net worth icon">
+                <path
+                  d="M17.67,22.5H6.33A4.83,4.83,0,0,1,1.5,17.67h0a4.83,4.83,0,0,1,1.24-3.23l7.35-8.17h3.82l7.35,8.17a4.83,4.83,0,0,1,1.24,3.23h0A4.83,4.83,0,0,1,17.67,22.5Z"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.91"
+                  strokeLinecap="square"
+                  strokeMiterlimit="10"
+                />
+                <path
+                  d="M15.82,1.5l-.39,2A3.49,3.49,0,0,1,12,6.27h0A3.49,3.49,0,0,1,8.57,3.46l-.39-2Z"
+                  stroke="currentColor"
+                  fill="none"
+                  strokeWidth="1.91"
+                  strokeLinecap="square"
+                  strokeMiterlimit="10"
+                />
+                <path
+                  d="M10.09,17.73h2.39a1.43,1.43,0,0,0,1.43-1.43h0a1.43,1.43,0,0,0-1.43-1.44h-1a1.43,1.43,0,0,1-1.43-1.43h0A1.43,1.43,0,0,1,11.52,12h2.39"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.91"
+                  strokeLinecap="square"
+                  strokeMiterlimit="10"
+                />
+                <line x1="18.68" y1="3.41" x2="14.86" y2="5.32" stroke="currentColor" strokeWidth="1.91" strokeLinecap="square" strokeMiterlimit="10" />
+                <line x1="19.64" y1="6.27" x2="13.91" y2="6.27" stroke="currentColor" strokeWidth="1.91" strokeLinecap="square" strokeMiterlimit="10" />
+                <line x1="12" y1="11.05" x2="12" y2="12" stroke="currentColor" strokeWidth="1.91" strokeLinecap="square" strokeMiterlimit="10" />
+                <line x1="12" y1="17.73" x2="12" y2="18.68" stroke="currentColor" strokeWidth="1.91" strokeLinecap="square" strokeMiterlimit="10" />
+              </Icon>
+            }
+          />
+          <MetricTile
+            title="Net APY"
+            value={formatPercent(dashboardSummary.averageApy)}
+            media={
+              <Icon size={18} viewBox="0 0 24 24" aria-label="Net APY icon">
+                <path
+                  d="M18.68,14.86H16.44a5.72,5.72,0,0,0-10.35-.95H5.8a4.3,4.3,0,1,0,0,8.59H18.68a3.82,3.82,0,0,0,0-7.64Z"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeMiterlimit="10"
+                  strokeWidth="1.91"
+                />
+                <path
+                  d="M9.14,1.5H11a4.77,4.77,0,0,1,4.77,4.77v0a0,0,0,0,1,0,0H13.91A4.77,4.77,0,0,1,9.14,1.5v0A0,0,0,0,1,9.14,1.5Z"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeMiterlimit="10"
+                  strokeWidth="1.91"
+                />
+                <path
+                  d="M20.59,1.5H22.5a0,0,0,0,1,0,0v0a4.77,4.77,0,0,1-4.77,4.77H15.82a0,0,0,0,1,0,0v0A4.77,4.77,0,0,1,20.59,1.5Z"
+                  transform="translate(38.32 7.77) rotate(-180)"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeMiterlimit="10"
+                  strokeWidth="1.91"
+                />
+                <line
+                  x1="15.82"
+                  y1="13.91"
+                  x2="15.82"
+                  y2="6.27"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeMiterlimit="10"
+                  strokeWidth="1.91"
+                />
+              </Icon>
+            }
+          />
+          <MetricTile
+            title="Health factor"
+            value={formatPercent(dashboardSummary.borrowUtilization)}
+            media={
+              <Icon size={18} viewBox="0 0 32 32" aria-label="Health factor icon">
+                <path
+                  d="M29.125 10.375h-7.5v-7.5c0-1.036-0.839-1.875-1.875-1.875h-7.5c-1.036 0-1.875 0.84-1.875 1.875v7.5h-7.5c-1.036 0-1.875 0.84-1.875 1.875v7.5c0 1.036 0.84 1.875 1.875 1.875h7.5v7.5c0 1.036 0.84 1.875 1.875 1.875h7.5c1.036 0 1.875-0.84 1.875-1.875v-7.5h7.5c1.035 0 1.875-0.839 1.875-1.875v-7.5c0-1.036-0.84-1.875-1.875-1.875z"
+                  fill="currentColor"
+                />
+              </Icon>
+            }
+          />
+          <MetricTile
+            title="Unclaimed rewards"
+            value={formatAmount(dashboardSummary.lendingRewards)}
+            media={
+              <Icon size={18} viewBox="0 0 512 512" aria-label="Unclaimed rewards icon">
+                <rect x="208.372" y="95.256" width="95.256" height="35.721" fill="currentColor" />
+                <path
+                  d="M410.791,23.815H101.209C45.402,23.815,0,69.217,0,125.024s45.402,101.209,101.209,101.209h32.692c2.78,8.16,5.757,15.983,8.939,23.408c12.477,29.114,27.794,52.039,45.525,68.14c7.236,6.57,14.818,11.956,22.709,16.183c-9.165,14.095-11.029,31.584-5.584,47.059h-38.792v107.163h178.605V381.023h-38.793c5.445-15.474,3.582-32.964-5.583-47.059c7.891-4.227,15.473-9.613,22.709-16.183c17.732-16.101,33.049-39.026,45.525-68.14c3.182-7.424,6.158-15.248,8.939-23.408h32.692c55.807,0,101.209-45.402,101.209-101.209S466.597,23.815,410.791,23.815z M101.209,190.512c-36.11,0-65.488-29.378-65.488-65.488s29.378-65.488,65.488-65.488h6.173c1.118,47.317,6.676,91.933,16.182,130.977H101.209z M309.581,416.745v35.721H202.419v-35.721H309.581z M243.37,350.535c6.964-6.966,18.295-6.964,25.258,0c6.964,6.963,6.964,18.294,0,25.258c-6.964,6.964-18.294,6.964-25.258,0C236.406,368.829,236.406,357.499,243.37,350.535z M256,309.582c-63.003,0-109.401-104.1-112.903-250.046h225.807C365.401,205.482,319.003,309.582,256,309.582z M410.791,190.512h-22.353c9.504-39.044,15.062-83.66,16.182-130.977h6.171c36.11,0,65.488,29.378,65.488,65.488S446.901,190.512,410.791,190.512z"
+                  fill="currentColor"
+                />
+              </Icon>
+            }
+            actions={
               <ClaimButton
                 isLoading={busyOp === "claimLendingRewards"}
                 disabled={!wallet.isConnected || busyOp !== null || dashboardSummary.lendingRewards <= 0}
                 onClick={() => void claimLendingRewards()}
               />
-            </div>
-          </div>
-        </Card>
+            }
+          />
+        </div>
       </Section>
 
       <div className={styles.positionsColumns}>

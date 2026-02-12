@@ -48,6 +48,12 @@
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 }
 
+.metricTilesDemo {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
 .inputsGrid {
   display: grid;
   gap: var(--space-4);

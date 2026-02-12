@@ -24,6 +24,7 @@ import {
   InputGroup,
   Link,
   Modal,
+  MetricTile,
   NumberInput,
   PageContainer,
   PageHeader,
@@ -299,6 +300,43 @@ export function UiKitPage() {
               </>
             }
           />
+          <div className={styles.metricTilesDemo}>
+            <MetricTile
+              title="Total supplied"
+              value="$12.45M"
+              media={
+                <Icon size={18} aria-label="Total supplied icon">
+                  <path
+                    d="M4 14.5h12M6 11.5l2.2-3.1 2.3 1.8 2.5-4.2"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <circle cx="8.2" cy="8.4" r="1" fill="currentColor" />
+                  <circle cx="10.5" cy="10.2" r="1" fill="currentColor" />
+                  <circle cx="13" cy="6" r="1" fill="currentColor" />
+                </Icon>
+              }
+            />
+            <MetricTile
+              title="Claimable rewards"
+              value="348.12 VELK"
+              tone="subtle"
+              media={
+                <Icon size={18} aria-label="Claimable rewards icon">
+                  <path
+                    d="M10 3.8 12 7.7l4.3.6-3.1 2.9.8 4.2-4-2.1-4 2.1.8-4.2L3.7 8.3 8 7.7Z"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinejoin="round"
+                  />
+                </Icon>
+              }
+            />
+          </div>
           <Table<MarketRow>
             columns={[
               {

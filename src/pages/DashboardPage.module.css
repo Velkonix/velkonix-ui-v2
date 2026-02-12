@@ -6,25 +6,8 @@
 .summaryGrid {
   display: grid;
   gap: var(--space-3);
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  align-items: end;
-}
-
-.summaryItem {
-  display: grid;
-  gap: var(--space-1);
-}
-
-.summaryValue {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-tight);
-}
-
-.claimArea {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: stretch;
 }
 
 .positionsColumns {
@@ -78,11 +61,6 @@
 @media (max-width: 1024px) {
   .summaryGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .claimArea {
-    grid-column: 1 / -1;
-    justify-content: flex-start;
   }
 
   .positionsColumn {
