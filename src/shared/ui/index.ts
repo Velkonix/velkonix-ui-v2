@@ -38,6 +38,8 @@ export { AppLayout } from "./layout/AppLayout";
 export { BackButton } from "./layout/BackButton";
 export { Footer } from "./layout/Footer";
 export { Header } from "./layout/Header";
+export { HeaderNavItem } from "./layout/HeaderNavItem";
+export { DashboardNavIcon, MarketsNavIcon, StakingNavIcon } from "./layout/HeaderNavIcons";
 export { NavMenu } from "./layout/NavMenu";
 export { PageContainer } from "./layout/PageContainer";
 export { PageHeader } from "./layout/PageHeader";

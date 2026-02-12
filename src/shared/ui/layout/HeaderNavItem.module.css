@@ -1,0 +1,265 @@
+.item {
+  --beam-opacity: 0.06;
+  --beam-spread: 132px;
+  --beam-rise: 84px;
+  --hero-glow-strong-rgb: 245, 252, 255;
+  --hero-glow-soft-rgb: 240, 250, 255;
+  position: relative;
+  display: inline-grid;
+  justify-items: start;
+  gap: 4px;
+  padding: var(--space-1) var(--space-2) var(--space-2);
+  color: rgba(255, 255, 255, 0.72);
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  text-shadow: none;
+  overflow: visible;
+  transition: color 160ms ease, text-shadow 160ms ease, filter 180ms ease;
+}
+
+.content {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: currentColor;
+}
+
+.icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.label {
+  color: currentColor;
+  line-height: 1;
+}
+
+.spotlightLine {
+  position: relative;
+  width: 100%;
+  min-width: 90px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  border: 1px solid rgba(var(--hero-glow-strong-rgb), 0.42);
+  box-shadow:
+    0 0 0 1px rgba(var(--hero-glow-strong-rgb), 0.12) inset,
+    0 0 6px rgba(var(--hero-glow-soft-rgb), 0.14),
+    0 0 14px rgba(var(--accent-glow-rgb), 0.17),
+    0 0 26px rgba(var(--accent-active-rgb), 0.13);
+}
+
+.spotlightLine::before {
+  content: "";
+  position: absolute;
+  inset: -7px;
+  z-index: -1;
+  border-radius: 999px;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle at 50% 52%,
+      rgba(var(--accent-glow-rgb), 0.21),
+      rgba(var(--accent-glow-rgb), 0.09) 45%,
+      transparent 76%
+    ),
+    radial-gradient(circle at 50% 50%, rgba(var(--hero-glow-soft-rgb), 0.14), transparent 70%);
+  filter: blur(6px);
+  opacity: 0.42;
+}
+
+.spotlightLine::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  z-index: -1;
+  border-radius: 999px;
+  pointer-events: none;
+  border: 1px solid rgba(var(--hero-glow-soft-rgb), 0.36);
+  box-shadow:
+    0 0 5px rgba(var(--hero-glow-soft-rgb), 0.16) inset,
+    0 0 9px rgba(var(--accent-glow-rgb), 0.14) inset;
+}
+
+.spotlightBeam {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: var(--beam-spread);
+  height: var(--beam-rise);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.spotlightBeam::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 1px;
+  top: 0;
+  background:
+    radial-gradient(
+      130% 120% at 50% 100%,
+      rgba(var(--accent-glow-rgb), calc(var(--beam-opacity) * 1.35)) 0%,
+      rgba(var(--accent-glow-rgb), calc(var(--beam-opacity) * 1.05)) 24%,
+      rgba(var(--accent-primary-rgb), calc(var(--beam-opacity) * 0.58)) 52%,
+      rgba(var(--accent-primary-rgb), calc(var(--beam-opacity) * 0.22)) 72%,
+      rgba(var(--accent-primary-rgb), 0) 100%
+    ),
+    radial-gradient(
+      74% 82% at 36% 96%,
+      rgba(var(--accent-glow-rgb), calc(var(--beam-opacity) * 0.5)) 0%,
+      rgba(var(--accent-primary-rgb), 0) 100%
+    ),
+    radial-gradient(
+      76% 84% at 64% 96%,
+      rgba(var(--accent-glow-rgb), calc(var(--beam-opacity) * 0.5)) 0%,
+      rgba(var(--accent-primary-rgb), 0) 100%
+    );
+  filter: blur(10px);
+  transition: opacity 180ms ease, filter 180ms ease, transform 180ms ease;
+}
+
+.spotlightBeam::after {
+  content: none;
+}
+
+.item:not(.active):hover {
+  --beam-opacity: 0.17;
+  color: #fff;
+  text-shadow:
+    0 0 6px rgba(var(--accent-glow-rgb), 0.14),
+    0 0 12px rgba(var(--accent-glow-rgb), 0.06);
+}
+
+.item:not(.active):hover .spotlightLine {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 0 0 1px rgba(245, 252, 255, 0.34) inset,
+    0 0 7px rgba(245, 252, 255, 0.2),
+    0 0 14px rgba(var(--accent-glow-rgb), 0.2),
+    0 0 26px rgba(var(--accent-active-rgb), 0.14);
+}
+
+.item:not(.active):hover .spotlightLine::before {
+  opacity: 0.56;
+}
+
+.item:not(.active):hover .spotlightLine::after {
+  border-color: rgba(255, 255, 255, 0.78);
+  box-shadow:
+    0 0 7px rgba(245, 252, 255, 0.26) inset,
+    0 0 12px rgba(var(--accent-glow-rgb), 0.2) inset;
+}
+
+.item:not(.active):hover .spotlightBeam::before {
+  filter: blur(11px);
+  transform: scale(1.015);
+}
+
+.item:not(.active):hover .spotlightBeam::after {
+  content: none;
+}
+
+.item:focus-visible {
+  outline: none;
+  color: #fff;
+  text-shadow:
+    0 0 7px rgba(var(--accent-glow-rgb), 0.22),
+    0 0 14px rgba(var(--accent-glow-rgb), 0.12);
+}
+
+.item:focus-visible .spotlightLine {
+  border-color: rgba(var(--hero-glow-soft-rgb), 0.74);
+  box-shadow:
+    0 0 0 2px rgba(var(--hero-glow-soft-rgb), 0.21),
+    0 0 0 4px rgba(var(--accent-glow-rgb), 0.1),
+    0 0 8px rgba(var(--hero-glow-soft-rgb), 0.17),
+    0 0 18px rgba(var(--accent-glow-rgb), 0.2),
+    0 0 32px rgba(var(--accent-active-rgb), 0.13);
+}
+
+.item:focus-visible .spotlightBeam::after {
+  content: none;
+}
+
+.active {
+  --beam-opacity: 0.4;
+  --beam-spread: 148px;
+  --beam-rise: 104px;
+  color: rgba(255, 255, 255, 0.72);
+  text-shadow:
+    0 0 10px rgba(var(--accent-glow-rgb), 0.26),
+    0 0 18px rgba(var(--accent-glow-rgb), 0.14);
+}
+
+.item.active:hover,
+.item.active:visited,
+.item.active:active {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.active .spotlightLine {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.92);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.36) inset,
+    0 0 8px rgba(245, 252, 255, 0.26),
+    0 0 17px rgba(var(--accent-glow-rgb), 0.22),
+    0 0 30px rgba(var(--accent-active-rgb), 0.16);
+}
+
+.active .spotlightLine::before {
+  opacity: 0.6;
+}
+
+.active .spotlightLine::after {
+  border-color: rgba(255, 255, 255, 0.78);
+  box-shadow:
+    0 0 7px rgba(245, 252, 255, 0.26) inset,
+    0 0 12px rgba(var(--accent-glow-rgb), 0.2) inset;
+}
+
+.active .spotlightBeam::before {
+  filter: blur(12px);
+  transform: scale(1.03);
+}
+
+.active .spotlightBeam::after {
+  content: none;
+}
+
+@media (max-width: 768px) {
+  .item {
+    width: 100%;
+    min-height: var(--touch-target-min);
+    padding: var(--space-2) var(--space-1) var(--space-3);
+  }
+
+  .spotlightLine {
+    min-width: 0;
+    width: min(182px, 58%);
+  }
+
+  .item {
+    --beam-spread: 126px;
+    --beam-rise: 72px;
+  }
+
+  .active {
+    --beam-spread: 136px;
+    --beam-rise: 82px;
+  }
+}

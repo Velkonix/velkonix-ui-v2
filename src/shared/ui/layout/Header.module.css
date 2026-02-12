@@ -5,13 +5,7 @@
   align-items: center;
   gap: var(--space-4);
   padding: var(--space-4) var(--space-6);
-  background: linear-gradient(
-    180deg,
-    rgba(var(--bg-primary-rgb), 0.85),
-    rgba(var(--bg-secondary-rgb), 0.8)
-  );
-  backdrop-filter: blur(10px);
-  box-shadow: inset 0 -1px 0 rgba(var(--border-subtle-rgb), 0.6);
+  background: transparent;
 }
 
 .logo {
@@ -62,26 +56,120 @@
 
 .mobileMenuButton {
   display: none;
+  position: relative;
   align-items: center;
   justify-content: center;
   width: var(--touch-target-min);
   height: var(--touch-target-min);
-  border: 1px solid rgba(var(--border-accent-rgb), 0.35);
+  border: 1px solid rgba(228, 243, 255, 0.42);
   border-radius: var(--radius-md);
-  background: linear-gradient(180deg, rgba(var(--bg-tertiary-rgb), 0.9), rgba(var(--bg-secondary-rgb), 0.95));
+  background:
+    linear-gradient(
+      180deg,
+      rgba(217, 243, 255, 0.12),
+      rgba(190, 226, 244, 0.03) 45%,
+      rgba(180, 214, 236, 0.1)
+    ),
+    linear-gradient(120deg, rgba(var(--accent-glow-rgb), 0.1), rgba(var(--accent-active-rgb), 0.07));
   color: var(--text-primary);
-  box-shadow: inset 0 0 0 1px rgba(var(--border-subtle-rgb), 0.6);
+  box-shadow:
+    0 0 0 1px rgba(230, 246, 255, 0.12) inset,
+    0 0 6px rgba(228, 246, 255, 0.14),
+    0 0 14px rgba(var(--accent-glow-rgb), 0.17),
+    0 0 26px rgba(var(--accent-active-rgb), 0.13);
   cursor: pointer;
+  isolation: isolate;
+  overflow: visible;
+  transition:
+    background 0.22s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease,
+    transform 0.18s ease;
+}
+
+.mobileMenuButton::before {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  z-index: -1;
+  border-radius: calc(var(--radius-md) + 8px);
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle at 50% 52%,
+      rgba(var(--accent-glow-rgb), 0.2),
+      rgba(var(--accent-glow-rgb), 0.08) 45%,
+      transparent 76%
+    ),
+    radial-gradient(circle at 50% 50%, rgba(221, 245, 255, 0.12), transparent 70%);
+  filter: blur(6px);
+  opacity: 0.3;
+}
+
+.mobileMenuButton::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  z-index: -1;
+  border-radius: calc(var(--radius-md) - 3px);
+  pointer-events: none;
+  border: 1px solid rgba(226, 245, 255, 0.36);
+  box-shadow:
+    0 0 5px rgba(230, 247, 255, 0.16) inset,
+    0 0 9px rgba(var(--accent-glow-rgb), 0.14) inset;
 }
 
 .mobileMenuButton:hover {
-  border-color: rgba(var(--accent-primary-rgb), 0.45);
-  box-shadow: var(--glow-soft);
+  border-color: rgba(255, 255, 255, 0.9);
+  transform: translateY(-1px) scale(1.01);
+  box-shadow:
+    0 0 0 1px rgba(245, 252, 255, 0.34) inset,
+    0 0 7px rgba(245, 252, 255, 0.2),
+    0 0 14px rgba(var(--accent-glow-rgb), 0.2),
+    0 0 26px rgba(var(--accent-active-rgb), 0.14);
+}
+
+.mobileMenuButton:hover::before {
+  opacity: 0.48;
+}
+
+.mobileMenuButton:hover::after {
+  border-color: rgba(255, 255, 255, 0.78);
+  box-shadow:
+    0 0 7px rgba(245, 252, 255, 0.26) inset,
+    0 0 12px rgba(var(--accent-glow-rgb), 0.2) inset;
 }
 
 .mobileMenuButton:focus-visible {
   outline: none;
-  box-shadow: var(--glow-soft);
+  border-color: rgba(233, 247, 255, 0.74);
+  box-shadow:
+    0 0 0 2px rgba(197, 235, 255, 0.21),
+    0 0 0 4px rgba(var(--accent-glow-rgb), 0.1),
+    0 0 8px rgba(233, 248, 255, 0.17),
+    0 0 18px rgba(var(--accent-glow-rgb), 0.21),
+    0 0 32px rgba(var(--accent-active-rgb), 0.13);
+}
+
+.mobileMenuButton:focus-visible::before {
+  opacity: 0.5;
+}
+
+.mobileMenuButton[aria-expanded="true"] {
+  border-color: rgba(255, 255, 255, 0.92);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.36) inset,
+    0 0 8px rgba(245, 252, 255, 0.26),
+    0 0 17px rgba(var(--accent-glow-rgb), 0.22),
+    0 0 30px rgba(var(--accent-active-rgb), 0.16);
+}
+
+.mobileMenuButton[aria-expanded="true"]::before {
+  opacity: 0.56;
+}
+
+.mobileMenuButton:active {
+  transform: translateY(0) scale(0.995);
 }
 
 .mobileMenuIcon,
@@ -96,6 +184,22 @@
 
 .mobileMenuIcon {
   position: relative;
+  z-index: 1;
+  color: #fff;
+  text-shadow:
+    0 0 1px rgba(245, 252, 255, 0.22),
+    0 0 3px rgba(240, 250, 255, 0.18),
+    0 0 6px rgba(240, 250, 255, 0.13),
+    0 0 10px rgba(var(--accent-glow-rgb), 0.17);
+}
+
+.mobileMenuButton:hover .mobileMenuIcon,
+.mobileMenuButton:focus-visible .mobileMenuIcon,
+.mobileMenuButton[aria-expanded="true"] .mobileMenuIcon {
+  text-shadow:
+    0 0 1px rgba(255, 255, 255, 0.4),
+    0 0 4px rgba(255, 255, 255, 0.28),
+    0 0 8px rgba(var(--accent-glow-rgb), 0.2);
 }
 
 .mobileMenuIcon::before,

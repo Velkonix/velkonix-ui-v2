@@ -24,72 +24,6 @@
   isolation: isolate;
 }
 
-.shell::before {
-  content: "";
-  position: absolute;
-  inset: -14%;
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0.68;
-  background-image:
-    radial-gradient(circle at 14% 22%, rgba(236, 250, 255, 0.3) 0 1px, transparent 2.5px),
-    radial-gradient(circle at 78% 18%, rgba(var(--accent-glow-rgb), 0.24) 0 1.2px, transparent 2.8px),
-    radial-gradient(circle at 66% 66%, rgba(248, 253, 255, 0.28) 0 1px, transparent 2.6px),
-    radial-gradient(circle at 34% 76%, rgba(var(--accent-active-rgb), 0.22) 0 1.1px, transparent 2.8px),
-    radial-gradient(circle at 88% 58%, rgba(244, 252, 255, 0.22) 0 0.9px, transparent 2.2px),
-    radial-gradient(circle at 22% 48%, rgba(var(--accent-glow-rgb), 0.25) 0 1.2px, transparent 2.7px),
-    radial-gradient(circle at 10% 62%, rgba(240, 251, 255, 0.26) 0 0.9px, transparent 2.4px),
-    radial-gradient(circle at 58% 14%, rgba(var(--accent-active-rgb), 0.2) 0 1.1px, transparent 2.6px),
-    radial-gradient(circle at 74% 82%, rgba(238, 250, 255, 0.24) 0 1px, transparent 2.5px),
-    radial-gradient(circle at 44% 38%, rgba(var(--accent-glow-rgb), 0.22) 0 1.1px, transparent 2.6px);
-  background-size:
-    220px 220px,
-    260px 240px,
-    230px 220px,
-    280px 260px,
-    210px 210px,
-    250px 230px,
-    240px 220px,
-    270px 250px,
-    235px 225px,
-    255px 235px;
-  filter: blur(0.15px) saturate(1.2) brightness(1.1);
-  animation: dustDriftNear 34s ease-in-out infinite alternate;
-}
-
-.shell::after {
-  content: "";
-  position: absolute;
-  inset: -18%;
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0.5;
-  background-image:
-    radial-gradient(circle at 20% 16%, rgba(255, 255, 255, 0.28) 0 0.8px, transparent 2.2px),
-    radial-gradient(circle at 84% 34%, rgba(var(--accent-glow-rgb), 0.22) 0 1px, transparent 2.4px),
-    radial-gradient(circle at 40% 52%, rgba(236, 249, 255, 0.2) 0 0.9px, transparent 2.3px),
-    radial-gradient(circle at 14% 78%, rgba(var(--accent-active-rgb), 0.2) 0 0.9px, transparent 2.5px),
-    radial-gradient(circle at 70% 84%, rgba(250, 254, 255, 0.2) 0 0.8px, transparent 2.1px),
-    radial-gradient(circle at 52% 24%, rgba(var(--accent-glow-rgb), 0.2) 0 1px, transparent 2.3px),
-    radial-gradient(circle at 30% 30%, rgba(246, 253, 255, 0.2) 0 0.8px, transparent 2.1px),
-    radial-gradient(circle at 62% 70%, rgba(var(--accent-active-rgb), 0.18) 0 0.9px, transparent 2.4px),
-    radial-gradient(circle at 8% 42%, rgba(238, 250, 255, 0.2) 0 0.8px, transparent 2.1px),
-    radial-gradient(circle at 92% 62%, rgba(var(--accent-glow-rgb), 0.18) 0 0.9px, transparent 2.2px);
-  background-size:
-    320px 300px,
-    360px 330px,
-    340px 320px,
-    380px 350px,
-    300px 280px,
-    335px 315px,
-    310px 290px,
-    350px 330px,
-    305px 285px,
-    345px 325px;
-  filter: blur(0.3px) saturate(1.14) brightness(1.08);
-  animation: dustDriftFar 46s linear infinite alternate;
-}
-
 .heroCenter {
   position: relative;
   z-index: 2;
@@ -116,42 +50,7 @@
   align-self: center;
 }
 
-@keyframes dustDriftNear {
-  0% {
-    transform: translate3d(-2.5%, -1.8%, 0) scale(1);
-    opacity: 0.38;
-  }
-  50% {
-    transform: translate3d(1.2%, 1.4%, 0) scale(1.03);
-    opacity: 0.54;
-  }
-  100% {
-    transform: translate3d(3.1%, -0.9%, 0) scale(1.05);
-    opacity: 0.46;
-  }
-}
-
-@keyframes dustDriftFar {
-  0% {
-    transform: translate3d(3.8%, -2.2%, 0) scale(1.02);
-    opacity: 0.24;
-  }
-  50% {
-    transform: translate3d(-1.6%, 1.8%, 0) scale(1);
-    opacity: 0.36;
-  }
-  100% {
-    transform: translate3d(-3.2%, 2.6%, 0) scale(1.04);
-    opacity: 0.28;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .shell::before,
-  .shell::after {
-    animation: none;
-  }
-
   .heroTitle,
   .heroTitle::before,
   .flickerLetter {

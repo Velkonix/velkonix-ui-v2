@@ -43,7 +43,7 @@ export function ToastPopup({
         {children}
       </Toast>
       <button type="button" className={styles.closeButton} onClick={onClose} aria-label="Close notification">
-        x
+        ×
       </button>
       <div className={styles.progressTrack} aria-hidden="true">
         <div className={styles.progressBar} style={{ animationDuration: `${durationMs}ms` }} />

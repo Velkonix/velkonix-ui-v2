@@ -7,6 +7,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-5);
+  overflow-y: auto;
   z-index: var(--z-modal);
 }
 
@@ -72,8 +73,7 @@
 
 .body {
   color: var(--text-primary);
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: visible;
   min-height: 0;
   min-width: 0;
 }

@@ -1,4 +1,10 @@
 .status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  text-align: center;
+  line-height: 1;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-size: var(--font-size-xs);

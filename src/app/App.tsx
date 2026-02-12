@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 
 import { AssetPage } from "../pages/AssetPage";
@@ -6,7 +7,17 @@ import { HomePage } from "../pages/HomePage";
 import { MarketsPage } from "../pages/MarketsPage";
 import { StakingPage } from "../pages/StakingPage";
 import { UiKitPage } from "../pages/UiKitPage";
-import { AppLayout, Footer, Header, Link, WalletConnectButton } from "../shared/ui";
+import {
+  AppLayout,
+  DashboardNavIcon,
+  Footer,
+  Header,
+  HeaderNavItem,
+  Link,
+  MarketsNavIcon,
+  StakingNavIcon,
+  WalletConnectButton,
+} from "../shared/ui";
 import styles from "./App.module.css";
 
 type AppProps = {
@@ -20,17 +31,17 @@ function MockAppShell() {
   const location = useLocation();
   const isRootPage = location.pathname === "/";
 
-  const navLink = (to: string, label: string) => (
-    <Link
+  const navItem = (to: string, label: string, icon: ReactNode) => (
+    <HeaderNavItem
       href={to}
-      className={location.pathname.startsWith(to) ? styles.activeNavLink : styles.navLink}
+      label={label}
+      icon={icon}
+      isActive={location.pathname.startsWith(to)}
       onClick={(event) => {
         event.preventDefault();
         navigate(to);
       }}
-    >
-      {label}
-    </Link>
+    />
   );
 
   return (
@@ -45,9 +56,9 @@ function MockAppShell() {
             }
             nav={
               <div className={styles.navLinks}>
-                {navLink("/markets", "Markets")}
-                {navLink("/dashboard", "Dashboard")}
-                {navLink("/staking", "Staking")}
+                {navItem("/markets", "Markets", <MarketsNavIcon />)}
+                {navItem("/dashboard", "Dashboard", <DashboardNavIcon />)}
+                {navItem("/staking", "Staking", <StakingNavIcon />)}
               </div>
             }
             actions={<WalletConnectButton />}
@@ -99,5 +110,11 @@ export default function App({ mockMode = false }: AppProps) {
     );
   }
 
-  return <BrowserRouter><MockAppShell /></BrowserRouter>;
+  return (
+    <div className="app">
+      <BrowserRouter>
+        <MockAppShell />
+      </BrowserRouter>
+    </div>
+  );
 }

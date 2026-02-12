@@ -267,6 +267,7 @@ export function DashboardPage() {
                     render: (row) => (
                       <div className={styles.switchCell}>
                         <Switch
+                          variant="collateral"
                           checked={row.isCollateral}
                           disabled={!wallet.isConnected || busyOp !== null}
                           onChange={(event) =>

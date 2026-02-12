@@ -226,6 +226,7 @@ export function MockModePage() {
             />
             <Input label="Amount" value={amount} onChange={(event) => setAmount(event.target.value)} />
             <Switch
+              variant="collateral"
               label="Use as collateral"
               checked={supplies.find((item) => item.assetId === selectedAsset)?.isCollateral ?? false}
               disabled={busyOp !== null || !wallet.isConnected}

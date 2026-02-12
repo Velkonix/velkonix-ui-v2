@@ -242,7 +242,7 @@ export function UiKitPage() {
             />
           </div>
           <div className={styles.row}>
-            <Switch label="Collateral toggle" />
+            <Switch label="Collateral toggle" variant="collateral" />
             <Checkbox label="Agree to terms" />
           </div>
           <Tabs
