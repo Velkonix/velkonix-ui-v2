@@ -207,7 +207,6 @@
 .pitchSecondary {
   color: var(--text-primary);
   opacity: 0.3;
-  font-size: calc(var(--font-size-2xs) * 0.9);
   text-shadow: 0 2px 12px rgba(var(--surface-lowlight-rgb), 0.4);
 }
 

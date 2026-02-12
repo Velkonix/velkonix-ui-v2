@@ -1,0 +1,32 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <radialGradient id="textGradient" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#b9d8f6"/>
+      <stop offset="100%" stop-color="#dcedff"/>
+    </radialGradient>
+  </defs>
+
+  <rect x="2" y="2" width="60" height="60" rx="14" ry="14" fill="#070c14"/>
+
+  <g
+     font-family="Arial Black, Helvetica, sans-serif"
+     font-weight="900"
+     font-size="21.25"
+     text-anchor="middle"
+     fill="url(#textGradient)"
+     stroke="#e6f3ff"
+     stroke-width="0.75"
+     filter="url(#glow)"
+  >
+    <text x="32" y="27.75">VE</text>
+    <text x="32" y="47.75">LK</text>
+  </g>
+</svg>

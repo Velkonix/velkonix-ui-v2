@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import logo from "../../logo-wordmark.svg";
 
 import { AssetPage } from "../pages/AssetPage";
 import { DashboardPage } from "../pages/DashboardPage";
@@ -51,7 +52,7 @@ function MockAppShell() {
           <Header
             logo={
               <Link href="/" className={styles.logoLink}>
-                <span className={styles.logo}>Velkonix</span>
+                <img src={logo} alt="Velkonix" className={styles.logo} />
               </Link>
             }
             nav={

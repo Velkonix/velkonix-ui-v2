@@ -1,9 +1,13 @@
 .logo {
-  letter-spacing: 0.02em;
+  display: block;
+  width: auto;
+  height: 52px;
 }
 
 .logoLink {
   color: var(--text-primary);
+  display: inline-flex;
+  align-items: center;
 }
 
 .navLinks {
