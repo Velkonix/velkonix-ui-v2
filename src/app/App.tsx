@@ -1,6 +1,10 @@
 import type { ReactNode } from "react";
 import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../logo-wordmark.svg";
+import discordLogo from "../assets/discord-11.svg";
+import gitbookLogo from "../assets/gitbook.svg";
+import githubLogo from "../assets/github-icon-1.svg";
+import xLogo from "../assets/x-logo.svg";
 
 import { AssetPage } from "../pages/AssetPage";
 import { DashboardPage } from "../pages/DashboardPage";
@@ -68,23 +72,23 @@ function MockAppShell() {
       }
       footer={
         <Footer
+          className={styles.iconOnlyFooter}
           links={
             <div className={styles.footerLinks}>
               <Link href="https://x.com" target="_blank" rel="noreferrer">
-                X
+                <img src={xLogo} alt="X" className={styles.xLogo} />
               </Link>
-              <Link href="https://discord.com" target="_blank" rel="noreferrer">
-                Discord
+              <Link href="https://discord.gg/XHPxKQwe" target="_blank" rel="noreferrer">
+                <img src={discordLogo} alt="Discord" className={styles.discordLogo} />
               </Link>
-              <Link href="https://github.com" target="_blank" rel="noreferrer">
-                GitHub
+              <Link href="https://github.com/Velkonix" target="_blank" rel="noreferrer">
+                <img src={githubLogo} alt="GitHub" className={styles.githubLogo} />
               </Link>
               <Link href="https://docs.github.com" target="_blank" rel="noreferrer">
-                GitBook
+                <img src={gitbookLogo} alt="GitBook" className={styles.gitbookLogo} />
               </Link>
             </div>
           }
-          label="Velkonix"
         />
       }
     >

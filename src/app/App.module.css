@@ -19,6 +19,38 @@
 .footerLinks {
   display: inline-flex;
   gap: var(--space-3);
+  align-items: center;
+  justify-content: center;
+}
+
+.iconOnlyFooter {
+  justify-content: center;
+  background: transparent;
+  box-shadow: none;
+}
+
+.xLogo {
+  display: block;
+  width: auto;
+  height: 14px;
+}
+
+.discordLogo {
+  display: block;
+  width: auto;
+  height: 14px;
+}
+
+.githubLogo {
+  display: block;
+  width: auto;
+  height: 14px;
+}
+
+.gitbookLogo {
+  display: block;
+  width: auto;
+  height: 14px;
 }
 
 @media (max-width: 768px) {
@@ -32,5 +64,9 @@
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-2) var(--space-3);
+  }
+
+  .iconOnlyFooter {
+    align-items: center;
   }
 }
