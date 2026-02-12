@@ -16,6 +16,8 @@ type TableProps<Row> = {
   getRowKey: (row: Row) => string;
   onRowClick?: (row: Row) => void;
   className?: string;
+  hideHeader?: boolean;
+  borderless?: boolean;
 };
 
 export function Table<Row>({
@@ -24,19 +26,23 @@ export function Table<Row>({
   getRowKey,
   onRowClick,
   className,
+  hideHeader = false,
+  borderless = false,
 }: TableProps<Row>) {
   return (
-    <div className={classNames(styles.wrapper, className)}>
+    <div className={classNames(styles.wrapper, borderless && styles.borderless, className)}>
       <table className={styles.table}>
-        <thead>
-          <tr>
-            {columns.map((column) => (
-              <th key={column.key} className={styles[column.align ?? "left"]}>
-                {column.title}
-              </th>
-            ))}
-          </tr>
-        </thead>
+        {!hideHeader ? (
+          <thead>
+            <tr>
+              {columns.map((column) => (
+                <th key={column.key} className={styles[column.align ?? "left"]}>
+                  {column.title}
+                </th>
+              ))}
+            </tr>
+          </thead>
+        ) : null}
         <tbody>
           {rows.map((row) => (
             <tr

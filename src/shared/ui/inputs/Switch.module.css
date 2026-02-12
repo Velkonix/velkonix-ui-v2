@@ -21,7 +21,7 @@
   height: 20px;
   display: inline-flex;
   align-items: center;
-  padding: 2px;
+  padding: calc(var(--space-1) / 2);
   border-radius: var(--radius-pill);
   border: 1px solid rgba(var(--border-subtle-rgb), 0.74);
   background: linear-gradient(180deg, rgba(var(--bg-secondary-rgb), 0.96), rgba(var(--bg-tertiary-rgb), 0.86));

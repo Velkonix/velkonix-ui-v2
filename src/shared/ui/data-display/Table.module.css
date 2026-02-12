@@ -9,6 +9,11 @@
   background: transparent;
 }
 
+.borderless {
+  box-shadow: none;
+  border-radius: 0;
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;

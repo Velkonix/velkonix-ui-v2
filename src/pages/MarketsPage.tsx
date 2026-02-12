@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type MouseEvent, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { useLendingController, type MarketSortKey } from "../features/lending";
+import { useLendingController, type MarketRow, type MarketSortKey } from "../features/lending";
 import {
   ApyCell,
   AssetCell,
@@ -24,16 +24,41 @@ type ApyModalState = {
   apy: number;
 } | null;
 
+type MobileMetricRow = {
+  key: string;
+  label: string;
+  value: ReactNode;
+};
+
 const formatAmount = (value: number): string => value.toLocaleString();
 const formatUsd = (value: number): string =>
   `$${value.toLocaleString(undefined, {
     maximumFractionDigits: 0,
   })}`;
+const MOBILE_MEDIA_QUERY = "(max-width: 768px)";
 
 export function MarketsPage() {
   const navigate = useNavigate();
   const { marketRows, setSort, sortDirection, sortKey } = useLendingController();
   const [apyModal, setApyModal] = useState<ApyModalState>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const mediaQueryList = window.matchMedia(MOBILE_MEDIA_QUERY);
+    const syncIsMobile = () => {
+      setIsMobile(mediaQueryList.matches);
+    };
+    syncIsMobile();
+    mediaQueryList.addEventListener("change", syncIsMobile);
+
+    return () => {
+      mediaQueryList.removeEventListener("change", syncIsMobile);
+    };
+  }, []);
 
   const marketSummary = useMemo(() => {
     const totalMarketSize = marketRows.reduce((sum, row) => sum + row.totalSupplied, 0);
@@ -63,6 +88,73 @@ export function MarketsPage() {
       ) : null}
     </button>
   );
+
+  const openApyModal = (
+    event: MouseEvent<HTMLButtonElement>,
+    row: MarketRow,
+    metric: "supply" | "borrow"
+  ) => {
+    event.stopPropagation();
+    setApyModal({
+      assetSymbol: row.symbol,
+      metric,
+      apy: metric === "supply" ? row.supplyApy : row.borrowApy,
+    });
+  };
+
+  const renderMobileMetricsTable = (row: MarketRow) => {
+    const mobileMetricRows: MobileMetricRow[] = [
+      {
+        key: "totalSupplied",
+        label: "Total Supplied",
+        value: <ValueCell>{formatAmount(row.totalSupplied)}</ValueCell>,
+      },
+      {
+        key: "supplyApy",
+        label: "Supply APY",
+        value: (
+          <button type="button" className={styles.apyButton} onClick={(event) => openApyModal(event, row, "supply")}>
+            <ApyCell>{row.supplyApy.toFixed(2)}%</ApyCell>
+          </button>
+        ),
+      },
+      {
+        key: "totalBorrowed",
+        label: "Total Borrowed",
+        value: <ValueCell>{formatAmount(row.totalBorrowed)}</ValueCell>,
+      },
+      {
+        key: "borrowApy",
+        label: "Borrow APY",
+        value: (
+          <button type="button" className={styles.apyButton} onClick={(event) => openApyModal(event, row, "borrow")}>
+            <ApyCell>{row.borrowApy.toFixed(2)}%</ApyCell>
+          </button>
+        ),
+      },
+    ];
+
+    return (
+      <Table
+        className={styles.mobileMetricsTable}
+        columns={[
+          {
+            key: "label",
+            title: "Metric",
+            render: (metricRow) => <ValueCell tone="muted">{metricRow.label}</ValueCell>,
+          },
+          {
+            key: "value",
+            title: "Value",
+            align: "right",
+            render: (metricRow) => metricRow.value,
+          },
+        ]}
+        rows={mobileMetricRows}
+        getRowKey={(metricRow) => metricRow.key}
+      />
+    );
+  };
 
   return (
     <PageContainer className={styles.page}>
@@ -124,10 +216,35 @@ export function MarketsPage() {
       </Section>
 
       <Section>
-        <Card>
-          {marketRows.length === 0 ? (
+        {marketRows.length === 0 ? (
+          <Card>
             <EmptyState title="No markets available" description="Try again after data provider is ready." />
-          ) : (
+          </Card>
+        ) : isMobile ? (
+          <div className={styles.mobileList}>
+            {marketRows.map((row) => (
+              <Card
+                key={row.id}
+                className={styles.mobileAssetPanel}
+                onClick={() => navigate(`/asset/${row.id}`)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    navigate(`/asset/${row.id}`);
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+              >
+                <div className={styles.mobileAssetHeader}>
+                  <AssetCell symbol={row.symbol} name={row.name} />
+                </div>
+                {renderMobileMetricsTable(row)}
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <Card>
             <Table
               columns={[
                 {
@@ -149,14 +266,7 @@ export function MarketsPage() {
                     <button
                       type="button"
                       className={styles.apyButton}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        setApyModal({
-                          assetSymbol: row.symbol,
-                          metric: "supply",
-                          apy: row.supplyApy,
-                        });
-                      }}
+                      onClick={(event) => openApyModal(event, row, "supply")}
                     >
                       <ApyCell>{row.supplyApy.toFixed(2)}%</ApyCell>
                     </button>
@@ -176,14 +286,7 @@ export function MarketsPage() {
                     <button
                       type="button"
                       className={styles.apyButton}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        setApyModal({
-                          assetSymbol: row.symbol,
-                          metric: "borrow",
-                          apy: row.borrowApy,
-                        });
-                      }}
+                      onClick={(event) => openApyModal(event, row, "borrow")}
                     >
                       <ApyCell>{row.borrowApy.toFixed(2)}%</ApyCell>
                     </button>
@@ -194,8 +297,8 @@ export function MarketsPage() {
               getRowKey={(row) => row.id}
               onRowClick={(row) => navigate(`/asset/${row.id}`)}
             />
-          )}
-        </Card>
+          </Card>
+        )}
       </Section>
 
       <Modal

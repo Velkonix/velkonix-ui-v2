@@ -4,20 +4,18 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useLendingController } from "../features/lending";
 import {
   ActionButton,
-  AmountInput,
   AssetCell,
+  AmountInput,
   BackButton,
   Card,
   Divider,
   ErrorState,
+  InfoTableCard,
   Modal,
   PageContainer,
-  PageHeader,
   Section,
-  Table,
   ToastPopup,
   Typography,
-  ValueCell,
   WalletBalanceCard,
 } from "../shared/ui";
 import styles from "./AssetPage.module.css";
@@ -124,13 +122,7 @@ export function AssetPage() {
       <div className={styles.backRow}>
         <BackButton onClick={() => navigate("/markets")}>Back to Markets</BackButton>
       </div>
-      <PageHeader
-        title={
-          <div className={styles.assetTitle}>
-            <AssetCell symbol={asset.symbol} name={asset.name} variant="hero" />
-          </div>
-        }
-      />
+      <AssetCell className={styles.assetTitle} symbol={asset.symbol} name={asset.name} iconUrl={asset.iconUrl} />
 
       {toast ? (
         <ToastPopup tone={toast.tone} title={toast.title} durationMs={5000} onClose={clearToast}>
@@ -146,39 +138,11 @@ export function AssetPage() {
       <div className={styles.layout}>
         <div className={styles.infoColumn}>
           <Section>
-            <Card>
-              <Table
-                columns={[
-                  { key: "metric", title: "Supply info" },
-                  {
-                    key: "value",
-                    title: "Value",
-                    align: "right",
-                    render: (row) => <ValueCell>{row.value}</ValueCell>,
-                  },
-                ]}
-                rows={supplyRows}
-                getRowKey={(row) => row.metric}
-              />
-            </Card>
+            <InfoTableCard title="Supply info" rows={supplyRows} getRowKey={(row) => row.metric} />
           </Section>
 
           <Section>
-            <Card>
-              <Table
-                columns={[
-                  { key: "metric", title: "Borrow info" },
-                  {
-                    key: "value",
-                    title: "Value",
-                    align: "right",
-                    render: (row) => <ValueCell>{row.value}</ValueCell>,
-                  },
-                ]}
-                rows={borrowRows}
-                getRowKey={(row) => row.metric}
-              />
-            </Card>
+            <InfoTableCard title="Borrow info" rows={borrowRows} getRowKey={(row) => row.metric} />
           </Section>
         </div>
 

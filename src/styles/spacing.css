@@ -1,0 +1,36 @@
+:root {
+  /* Spacing policy: use semantic tokens for gap/margin/padding.
+     Allowed exceptions: safe-area env(...) values, visually-hidden offsets, decorative pseudo-element insets. */
+  --space-1: 4.5px;
+  --space-2: 9px;
+  --space-3: 13.5px;
+  --space-4: 18px;
+  --space-5: 22.5px;
+  --space-6: 27px;
+  --space-7: 36px;
+  --space-8: 45px;
+  --space-9: 54px;
+  --space-10: 72px;
+  --space-half: 2.25px;
+  --space-tight: 6.75px;
+
+  --layout-page-gap: var(--space-5);
+  --layout-page-gap-showcase: var(--space-7);
+  --layout-summary-gap: var(--space-4);
+  --layout-section-gap: var(--space-7);
+  --layout-modal-content-gap: var(--space-3);
+  --layout-columns-gap: var(--space-5);
+  --layout-panel-gap: var(--space-4);
+
+  --hero-gap-min: var(--space-3);
+  --hero-gap-max: var(--space-7);
+  --hero-center-gap-max: var(--space-6);
+  --hero-action-offset-min: var(--space-2);
+  --hero-action-offset-max: var(--space-5);
+  --hero-pitch-offset-min: var(--space-half);
+  --hero-pitch-offset-max: var(--space-2);
+
+  --container-gutter-desktop: var(--space-4);
+  --container-gutter-mobile: var(--space-3);
+  --touch-target-min: 44px;
+}

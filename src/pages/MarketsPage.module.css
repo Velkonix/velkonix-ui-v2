@@ -1,11 +1,11 @@
 .page {
   display: grid;
-  gap: var(--space-6);
+  gap: var(--layout-page-gap);
 }
 
 .summaryGrid {
   display: grid;
-  gap: var(--space-4);
+  gap: var(--layout-summary-gap);
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
@@ -18,7 +18,7 @@
 .sortButton {
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: var(--space-1);
   border: none;
   background: transparent;
   color: var(--text-muted);
@@ -65,7 +65,68 @@
 
 .modalContent {
   display: grid;
-  gap: var(--space-2);
+  gap: var(--layout-modal-content-gap);
+}
+
+.mobileList {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.mobileAssetPanel {
+  width: 100%;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
+}
+
+.mobileAssetPanel:hover {
+  transform: translateY(-1px) scale(1.01);
+  border-color: rgba(255, 255, 255, 0.84);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.28) inset,
+    0 0 8px rgba(245, 252, 255, 0.2),
+    0 0 18px rgba(var(--accent-glow-rgb), 0.16);
+}
+
+.mobileAssetPanel:focus-visible {
+  outline: none;
+  box-shadow: var(--glow-soft);
+}
+
+.mobileMetricsTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.mobileAssetHeader {
+  padding-bottom: var(--space-2);
+}
+
+.mobileMetricsTable {
+  margin-top: var(--space-1);
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.mobileMetricsTable thead {
+  display: none;
+}
+
+.mobileMetricsTable .apyButton {
+  min-height: 0;
+  padding: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobileAssetPanel,
+  .mobileAssetPanel:hover {
+    transition: none;
+    transform: none;
+  }
 }
 
 @media (max-width: 768px) {

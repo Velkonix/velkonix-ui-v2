@@ -3,7 +3,7 @@
   margin: 0 auto;
   padding: var(--space-9) var(--container-gutter-desktop);
   display: grid;
-  gap: var(--space-7);
+  gap: var(--layout-section-gap);
 }
 
 @media (max-width: 768px) {

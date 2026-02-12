@@ -1,6 +1,6 @@
 .page {
   display: grid;
-  gap: var(--space-4);
+  gap: var(--layout-page-gap);
 }
 
 .metricsColumn {

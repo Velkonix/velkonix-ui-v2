@@ -1,25 +1,25 @@
 .page {
   display: grid;
-  gap: var(--space-5);
+  gap: var(--layout-page-gap);
 }
 
 .summaryGrid {
   display: grid;
-  gap: var(--space-3);
+  gap: var(--layout-summary-gap);
   grid-template-columns: repeat(4, minmax(0, 1fr));
   align-items: stretch;
 }
 
 .positionsColumns {
   display: flex;
-  gap: var(--space-5);
+  gap: var(--layout-columns-gap);
   flex-wrap: wrap;
   align-items: flex-start;
 }
 
 .positionsColumn {
-  flex: 1 1 calc((100% - var(--space-5)) / 2);
-  max-width: calc((100% - var(--space-5)) / 2);
+  flex: 1 1 calc((100% - var(--layout-columns-gap)) / 2);
+  max-width: calc((100% - var(--layout-columns-gap)) / 2);
   min-width: 0;
 }
 
@@ -30,7 +30,7 @@
 
 .modalContent {
   display: grid;
-  gap: var(--space-3);
+  gap: var(--layout-modal-content-gap);
 }
 
 .txOverview {

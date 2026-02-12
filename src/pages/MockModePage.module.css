@@ -1,40 +1,40 @@
 .page {
   display: grid;
-  gap: 16px;
+  gap: var(--space-4);
 }
 
 .controls {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
 }
 
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .grid {
   display: grid;
-  gap: 12px;
+  gap: var(--space-3);
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
 .txList {
   display: grid;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .txRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 8px;
-  border: 1px solid var(--vk-color-border-muted);
-  border-radius: var(--vk-radius-md);
+  gap: var(--space-3);
+  padding: var(--space-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
 }
 
 .txId {
@@ -44,6 +44,6 @@
 }
 
 .error {
-  color: var(--vk-color-error);
-  margin-bottom: 8px;
+  color: var(--error);
+  margin-bottom: var(--space-2);
 }

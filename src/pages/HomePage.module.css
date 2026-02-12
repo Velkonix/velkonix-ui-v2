@@ -15,7 +15,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: clamp(14px, 2.4vw, 28px);
+  gap: clamp(var(--hero-gap-min), 2.4vw, var(--hero-gap-max));
   padding: 0;
   border-radius: 0;
   background: transparent;
@@ -35,7 +35,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  gap: clamp(14px, 2.4vw, 26px);
+  gap: clamp(var(--hero-gap-min), 2.4vw, var(--hero-center-gap-max));
 }
 
 .titleWrap {
@@ -45,7 +45,7 @@
 
 .centerAction {
   position: relative;
-  margin-top: clamp(10px, 2.2vh, 22px);
+  margin-top: clamp(var(--hero-action-offset-min), 2.2vh, var(--hero-action-offset-max));
   z-index: 4;
   align-self: center;
 }
@@ -190,8 +190,8 @@
 
 .pitch {
   display: grid;
-  gap: 9px;
-  margin-top: clamp(2px, 1vh, 8px);
+  gap: var(--space-2);
+  margin-top: clamp(var(--hero-pitch-offset-min), 1vh, var(--hero-pitch-offset-max));
 }
 
 .pitchPrimary,
@@ -228,7 +228,7 @@
   }
 
   .centerAction {
-    margin-top: clamp(8px, 2vh, 18px);
+    margin-top: clamp(var(--hero-action-offset-min), 2vh, var(--space-4));
   }
 
 }

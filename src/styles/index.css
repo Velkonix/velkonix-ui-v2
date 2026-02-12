@@ -1,3 +1,5 @@
+@import "./spacing.css";
+
 *,
 *::before,
 *::after {
@@ -109,17 +111,6 @@
   --line-height-tight: 1.2;
   --line-height-base: 1.5;
 
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 20px;
-  --space-6: 24px;
-  --space-7: 32px;
-  --space-8: 40px;
-  --space-9: 48px;
-  --space-10: 64px;
-
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
@@ -139,9 +130,6 @@
   --breakpoint-md: 768px;
   --breakpoint-lg: 1024px;
   --breakpoint-xl: 1280px;
-  --container-gutter-desktop: var(--space-4);
-  --container-gutter-mobile: var(--space-3);
-  --touch-target-min: 44px;
 }
 
 [data-theme="green"] {

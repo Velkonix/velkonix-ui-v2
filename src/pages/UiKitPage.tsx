@@ -20,6 +20,7 @@ import {
   Header,
   Icon,
   IconButton,
+  InfoTableCard,
   Input,
   InputGroup,
   Link,
@@ -77,6 +78,13 @@ type MarketRow = {
 const markets: MarketRow[] = [
   { asset: "ETH", name: "Ethereum", supplied: "$12.4M", apy: "3.2%" },
   { asset: "USDC", name: "USD Coin", supplied: "$8.1M", apy: "2.1%" },
+];
+
+const infoRows = [
+  { metric: "Supply APY", value: "3.20%" },
+  { metric: "Total supplied", value: "12,400.00 ETH" },
+  { metric: "Utilization Rate", value: "65.32%" },
+  { metric: "Max LTV", value: "75.00%" },
 ];
 
 export function UiKitPage() {
@@ -360,6 +368,7 @@ export function UiKitPage() {
             rows={markets}
             getRowKey={(row) => row.asset}
           />
+          <InfoTableCard title="Your supplies" rows={infoRows} getRowKey={(row) => row.metric} />
         </Card>
       </Section>
 

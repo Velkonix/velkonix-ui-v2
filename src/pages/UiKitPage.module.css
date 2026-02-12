@@ -1,6 +1,6 @@
 .page {
   display: grid;
-  gap: var(--space-7);
+  gap: var(--layout-page-gap-showcase);
 }
 
 .pageHeader h1 {
@@ -36,7 +36,7 @@
   display: inline-flex;
   align-items: baseline;
   gap: var(--space-1);
-  padding: 6px 10px;
+  padding: var(--space-1) var(--space-2);
   border-radius: 10px;
   border: 1px solid var(--border-subtle);
   background: var(--bg-secondary);
