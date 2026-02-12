@@ -3,20 +3,9 @@
   gap: var(--space-4);
 }
 
-.summaryGrid {
+.metricsColumn {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-3);
-}
-
-.summaryItem {
-  display: grid;
-  gap: var(--space-1);
-}
-
-.summaryValue {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
+  gap: var(--space-5);
 }
 
 .tabPanel {
@@ -60,7 +49,7 @@
   display: flex;
   gap: var(--space-4);
   flex-wrap: wrap;
-  align-items: stretch;
+  align-items: flex-start;
 }
 
 .mainColumn {
@@ -71,16 +60,6 @@
 .leftColumn {
   display: grid;
   gap: var(--space-4);
-  grid-template-rows: auto 1fr;
-}
-
-.actionsColumn {
-  align-self: stretch;
-}
-
-.claimCard,
-.actionsCard {
-  height: 100%;
 }
 
 .queueActions {
@@ -91,31 +70,14 @@
 }
 
 @media (max-width: 1024px) {
-  .summaryGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .rewardsGrid {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 768px) {
-  .summaryGrid {
-    grid-template-columns: 1fr;
-  }
-
   .mainColumn {
     flex-basis: 100%;
-  }
-
-  .leftColumn {
-    grid-template-rows: auto;
-  }
-
-  .claimCard,
-  .actionsCard {
-    height: auto;
   }
 
   .buttonRow > button {

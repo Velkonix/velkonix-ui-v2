@@ -7,6 +7,7 @@ import {
   Card,
   ClaimButton,
   EmptyState,
+  MetricTile,
   PageContainer,
   PageHeader,
   PanelHeader,
@@ -19,7 +20,6 @@ import {
   TxStatus,
   Typography,
   ValueCell,
-  WalletBalanceCard,
 } from "../shared/ui";
 import styles from "./StakingPage.module.css";
 
@@ -115,41 +115,24 @@ export function StakingPage() {
       <div className={styles.mainRow}>
         <div className={`${styles.mainColumn} ${styles.leftColumn}`}>
           <Section>
-            <Card>
-              <div className={styles.summaryGrid}>
-                <div className={styles.summaryItem}>
-                  <Typography as="span" variant="caption" muted>
-                    Total staked
-                  </Typography>
-                  <Typography as="p" variant="body" className={styles.summaryValue}>
-                    {formatAmount(stakingState.staked)}
-                  </Typography>
-                </div>
-                <div className={styles.summaryItem}>
-                  <Typography as="span" variant="caption" muted>
-                    APR
-                  </Typography>
-                  <Typography as="p" variant="body" className={styles.summaryValue}>
-                    {stakingState.apr.toFixed(2)}%
-                  </Typography>
-                </div>
-              </div>
-            </Card>
-          </Section>
-          <Section>
-            <Card className={styles.claimCard}>
-              <PanelHeader title="Claim rewards" />
-              <WalletBalanceCard
-                label="Unclaimed rewards"
+            <div className={styles.metricsColumn}>
+              <MetricTile title="Total staked" value={`${formatAmount(stakingState.staked)} xVELK`} tone="subtle" />
+              <MetricTile title="APR" value={`${stakingState.apr.toFixed(2)}%`} tone="subtle" />
+              <MetricTile title="Pending rebase" value={`${formatAmount(stakingState.pendingRebase)} xVELK`} tone="subtle" />
+              <MetricTile
+                title="Unclaimed rewards"
                 value={`${formatAmount(stakingState.rewards)} xVELK`}
-                icon="reward"
+                tone="subtle"
+                actions={
+                  <ClaimButton
+                    size="sm"
+                    isLoading={busyOp === "claimStakingRewards"}
+                    disabled={!wallet.isConnected || busyOp !== null || stakingState.rewards <= 0}
+                    onClick={() => void claimStakingRewards()}
+                  />
+                }
               />
-              <ClaimButton
-                isLoading={busyOp === "claimStakingRewards"}
-                disabled={!wallet.isConnected || busyOp !== null || stakingState.rewards <= 0}
-                onClick={() => void claimStakingRewards()}
-              />
-            </Card>
+            </div>
           </Section>
         </div>
 

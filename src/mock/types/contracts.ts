@@ -41,6 +41,7 @@ export interface StakingState {
   staked: number;
   rewards: number;
   apr: number;
+  pendingRebase: number;
   instantExitPenaltyBps: number;
   exitQueue: ExitQueueItem[];
 }

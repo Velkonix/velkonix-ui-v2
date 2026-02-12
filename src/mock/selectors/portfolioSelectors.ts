@@ -10,6 +10,7 @@ const toStakingState = (state: MockDbState, user: Address): StakingState => {
       staked: 0,
       rewards: 0,
       apr: 0,
+      pendingRebase: 0,
       instantExitPenaltyBps: 0,
       exitQueue: [],
     };
@@ -20,6 +21,7 @@ const toStakingState = (state: MockDbState, user: Address): StakingState => {
     staked: staking.staked,
     rewards: staking.rewards,
     apr: staking.apr,
+    pendingRebase: staking.rewardsPoolBalance,
     instantExitPenaltyBps: staking.instantExitPenaltyBps,
     exitQueue: staking.queue
       .filter((item) => item.status === "queued" || item.status === "ready")

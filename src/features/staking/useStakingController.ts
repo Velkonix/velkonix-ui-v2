@@ -57,6 +57,7 @@ export function useStakingController() {
             staked: 0,
             rewards: 0,
             apr: 0,
+            pendingRebase: 0,
             instantExitPenaltyBps: 0,
             exitQueue: [],
           },
