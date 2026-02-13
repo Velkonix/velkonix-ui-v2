@@ -8,29 +8,20 @@
   justify-content: flex-start;
 }
 
+.assetHeaderRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
 .assetTitle {
   width: fit-content;
 }
 
-.assetTitle > span {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-}
-
-.assetTitle > span img {
-  width: 27px;
-  height: 27px;
-}
-
-.assetTitle > div > div:first-child {
-  font-size: calc(var(--font-size-sm) * 1.5);
-  line-height: 1.15;
-}
-
-.assetTitle > div > div:last-child {
-  font-size: calc(var(--font-size-xs) * 1.5);
-  line-height: 1.2;
+.reserveSizeMetric {
+  padding-left: var(--space-4);
+  border-left: 1px solid var(--border-subtle);
 }
 
 .layout {
@@ -43,6 +34,19 @@
 .infoColumn {
   display: grid;
   gap: var(--space-6);
+}
+
+.infoCard {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.rateChart {
+  width: 100%;
+}
+
+.infoTable {
+  margin-top: calc(var(--space-2) * -1);
 }
 
 .actionsColumn {
@@ -124,6 +128,10 @@
 }
 
 @media (max-width: 768px) {
+  .infoCard {
+    gap: var(--space-3);
+  }
+
   .actionRow {
     flex-wrap: wrap;
   }

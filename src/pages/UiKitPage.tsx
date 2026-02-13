@@ -26,6 +26,7 @@ import {
   Link,
   Modal,
   MetricTile,
+  MetricText,
   NumberInput,
   PageContainer,
   PageHeader,
@@ -38,6 +39,7 @@ import {
   Spinner,
   Switch,
   Table,
+  TimeSeriesChart,
   Tabs,
   Toast,
   Tooltip,
@@ -74,6 +76,19 @@ const infoRows = [
   { metric: "Utilization Rate", value: "65.32%" },
   { metric: "Max LTV", value: "75.00%" },
 ];
+
+const chartSeries = Array.from({ length: 400 }, (_, index) => {
+  const now = Date.now();
+  const dayMs = 24 * 60 * 60 * 1000;
+  const timestamp = now - (399 - index) * dayMs;
+  const waveA = Math.sin(index / 18) * 110;
+  const waveB = Math.cos(index / 37) * 70;
+  const trend = index * 2.2;
+  return {
+    date: timestamp,
+    value: 5_000 + trend + waveA + waveB,
+  };
+});
 
 export function UiKitPage() {
   const [activeTab, setActiveTab] = useState("convert");
@@ -325,6 +340,19 @@ export function UiKitPage() {
               }
             />
           </div>
+          <div className={styles.metricTextDemo}>
+            <MetricText
+              title="Ethereum"
+              value="ETH"
+              icon={
+                <Icon size={16} aria-label="ETH icon">
+                  <circle cx="8" cy="8" r="6" fill="currentColor" />
+                </Icon>
+              }
+              iconAlt="Ethereum icon"
+            />
+            <MetricText title="Reserve size" value="4,218.00 ETH" />
+          </div>
           <Table<MarketRow>
             columns={[
               {
@@ -349,6 +377,16 @@ export function UiKitPage() {
             getRowKey={(row) => row.asset}
           />
           <InfoTableCard title="Your supplies" rows={infoRows} getRowKey={(row) => row.metric} />
+        </Card>
+        <Card title="Time series chart" subtitle="Neon style UI Kit line chart with simple interactions.">
+          <div className={styles.chartDemo}>
+            <TimeSeriesChart
+              data={chartSeries}
+              ariaLabel="UI kit time series"
+              emptyTitle="Нет данных в демо-серии"
+              emptyDescription="Добавьте хотя бы одну точку для отображения графика."
+            />
+          </div>
         </Card>
       </Section>
 

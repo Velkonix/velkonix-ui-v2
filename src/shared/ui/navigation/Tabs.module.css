@@ -1,7 +1,6 @@
 .tabs {
   display: flex;
   gap: var(--space-4);
-  border-bottom: 1px solid rgba(var(--border-subtle-rgb), 0.5);
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;

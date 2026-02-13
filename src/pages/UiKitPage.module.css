@@ -54,6 +54,16 @@
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 }
 
+.metricTextDemo {
+  display: flex;
+  align-items: center;
+  margin-top: var(--space-3);
+}
+
+.chartDemo {
+  width: 100%;
+}
+
 .inputsGrid {
   display: grid;
   gap: var(--space-4);

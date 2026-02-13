@@ -4,18 +4,22 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useLendingController } from "../features/lending";
 import {
   ActionButton,
-  AssetCell,
   AmountInput,
   BackButton,
   Card,
   Divider,
   ErrorState,
-  InfoTableCard,
   Modal,
+  MetricText,
+  PanelHeader,
   PageContainer,
   Section,
+  Table,
+  Tabs,
+  TimeSeriesChart,
   ToastPopup,
   Typography,
+  ValueCell,
   WalletBalanceCard,
 } from "../shared/ui";
 import { formatNumber } from "../shared/lib/numberFormat";
@@ -26,16 +30,40 @@ type PositionRow = {
   value: string;
 };
 
+type InfoTabId = "supply" | "borrow";
+
 const formatTokenAmount = (value: number, symbol: string): string => `${formatNumber(value)} ${symbol}`;
 const formatHealthFactor = (value: number): string => formatNumber(value, { decimals: 2, compact: false });
 const formatPercent = (value: number): string => `${formatNumber(value, { decimals: 2, compact: false })}%`;
 const formatInputAmount = (value: number): string => formatNumber(value, { decimals: 4, compact: false, useGrouping: false });
+const RATE_SERIES_LENGTH = 120;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+const seedFromString = (value: string): number =>
+  Array.from(value).reduce((accumulator, char, index) => accumulator + char.charCodeAt(0) * (index + 1), 0);
+
+const buildSyntheticRateSeries = (baseRate: number, seedKey: string): Array<{ date: number; value: number }> => {
+  const seed = seedFromString(seedKey);
+  const now = Date.now();
+  return Array.from({ length: RATE_SERIES_LENGTH }, (_, index) => {
+    const progress = index / Math.max(1, RATE_SERIES_LENGTH - 1);
+    const waveA = Math.sin(index / 11 + seed * 0.01) * 0.28;
+    const waveB = Math.cos(index / 23 + seed * 0.03) * 0.16;
+    const trend = (progress - 0.5) * 0.2;
+    const value = Math.max(0, baseRate + waveA + waveB + trend);
+    return {
+      date: now - (RATE_SERIES_LENGTH - 1 - index) * DAY_MS,
+      value,
+    };
+  });
+};
 
 export function AssetPage() {
   const navigate = useNavigate();
   const { assetId = "" } = useParams<{ assetId: string }>();
   const [supplyAmount, setSupplyAmount] = useState("100");
   const [borrowAmount, setBorrowAmount] = useState("50");
+  const [activeInfoTab, setActiveInfoTab] = useState<InfoTabId>("supply");
   const [isSupplyModalOpen, setIsSupplyModalOpen] = useState(false);
   const [isBorrowModalOpen, setIsBorrowModalOpen] = useState(false);
 
@@ -77,6 +105,7 @@ export function AssetPage() {
   const walletBalance = getWalletBalanceForAsset(asset.id);
   const availableToSupply = walletBalance;
   const availableToBorrow = Math.max(0, asset.totalSupplied - asset.totalBorrowed);
+  const reserveSize = Math.max(0, asset.totalSupplied - asset.totalBorrowed);
   const exceedsSupplyLimit = normalizedSupplyAmount > availableToSupply;
   const exceedsBorrowLimit = normalizedBorrowAmount > availableToBorrow;
   const currentSupplied = supplyPosition?.balance ?? 0;
@@ -107,13 +136,34 @@ export function AssetPage() {
     ],
     [asset]
   );
+  const supplyRateSeries = useMemo(() => buildSyntheticRateSeries(asset.supplyApy, `${asset.id}-supply`), [asset.id, asset.supplyApy]);
+  const borrowRateSeries = useMemo(() => buildSyntheticRateSeries(asset.borrowApy, `${asset.id}-borrow`), [asset.id, asset.borrowApy]);
+  const activeRows = activeInfoTab === "supply" ? supplyRows : borrowRows;
+  const activeSeries = activeInfoTab === "supply" ? supplyRateSeries : borrowRateSeries;
+  const activeTabLabel = activeInfoTab === "supply" ? "Supply" : "Borrow";
+  const activeRateTitle = activeInfoTab === "supply" ? "Supply Rate" : "Borrow Rate";
 
   return (
     <PageContainer className={styles.page}>
       <div className={styles.backRow}>
         <BackButton onClick={() => navigate("/markets")}>Back to Markets</BackButton>
       </div>
-      <AssetCell className={styles.assetTitle} symbol={asset.symbol} name={asset.name} iconUrl={asset.iconUrl} />
+      <div className={styles.assetHeaderRow}>
+        <MetricText
+          title={asset.name}
+          value={asset.symbol}
+          className={styles.assetTitle}
+          icon={asset.iconUrl ? <img src={asset.iconUrl} alt={asset.symbol} /> : asset.symbol.slice(0, 1)}
+          iconAlt={`${asset.symbol} icon`}
+        />
+        <MetricText
+          title="Reserve size"
+          value={formatTokenAmount(reserveSize, asset.symbol)}
+          className={styles.reserveSizeMetric}
+          role="status"
+          aria-label="Reserve size"
+        />
+      </div>
 
       {toast ? (
         <ToastPopup tone={toast.tone} title={toast.title} durationMs={5000} onClose={clearToast}>
@@ -129,11 +179,42 @@ export function AssetPage() {
       <div className={styles.layout}>
         <div className={styles.infoColumn}>
           <Section>
-            <InfoTableCard title="Supply info" rows={supplyRows} getRowKey={(row) => row.metric} />
-          </Section>
-
-          <Section>
-            <InfoTableCard title="Borrow info" rows={borrowRows} getRowKey={(row) => row.metric} />
+            <Card className={styles.infoCard}>
+              <PanelHeader title="Asset info" />
+              <Tabs
+                items={[
+                  { id: "supply", label: "Supply info" },
+                  { id: "borrow", label: "Borrow info" },
+                ]}
+                activeId={activeInfoTab}
+                onChange={(id) => setActiveInfoTab(id as InfoTabId)}
+              />
+              <div className={styles.rateChart}>
+                <TimeSeriesChart
+                  data={activeSeries}
+                  title={activeRateTitle}
+                  ariaLabel={`${asset.symbol} ${activeTabLabel} Rate chart`}
+                  height={200}
+                  valueFormatter={formatPercent}
+                />
+              </div>
+              <Table
+                className={styles.infoTable}
+                hideHeader
+                borderless
+                columns={[
+                  { key: "metric", title: "Metric" },
+                  {
+                    key: "value",
+                    title: "Value",
+                    align: "right",
+                    render: (row) => <ValueCell>{row.value}</ValueCell>,
+                  },
+                ]}
+                rows={activeRows}
+                getRowKey={(row) => row.metric}
+              />
+            </Card>
           </Section>
         </div>
 

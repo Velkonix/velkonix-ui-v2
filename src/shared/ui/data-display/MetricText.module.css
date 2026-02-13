@@ -1,0 +1,45 @@
+.root {
+  display: inline-grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.rootWithIcon {
+  grid-template-columns: 42px minmax(0, 1fr);
+  align-items: center;
+  column-gap: var(--space-3);
+}
+
+.icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--bg-tertiary), var(--bg-secondary));
+  box-shadow:
+    var(--surface-ring-subtle),
+    inset 0 1px 0 rgba(var(--surface-highlight-rgb), 0.12);
+  color: var(--text-primary);
+}
+
+.icon img {
+  width: 27px;
+  height: 27px;
+}
+
+.content {
+  display: inline-grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.value {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--text-primary);
+}
