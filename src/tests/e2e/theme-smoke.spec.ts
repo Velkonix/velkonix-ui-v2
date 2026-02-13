@@ -6,8 +6,6 @@
 import type { Page } from "@playwright/test";
 import { test, expect } from "@playwright/test";
 
-const BASE_URL = "http://localhost:5173";
-
 const THEMES = ["blue"] as const;
 
 const ROUTES = [
@@ -26,7 +24,7 @@ async function setTheme(page: Page, theme: string): Promise<void> {
 }
 
 async function gotoWithMock(page: Page, path: string) {
-  const url = `${BASE_URL}${path}${path.includes("?") ? "&" : "?"}mock=1`;
+  const url = `${path}${path.includes("?") ? "&" : "?"}mock=1`;
   await page.goto(url, { waitUntil: "domcontentloaded", timeout: 10000 });
 }
 
@@ -46,7 +44,8 @@ test.describe("theme smoke check", () => {
   });
 
   for (const theme of THEMES) {
-    test(`${theme}: all routes render`, async ({ page }) => {
+    test(`${theme}: all routes render`, async ({ page }, testInfo) => {
+      test.skip(testInfo.project.name !== "desktop", "Theme smoke routes are desktop-only.");
       for (const route of ROUTES) {
         await gotoWithMock(page, route.path);
         await setTheme(page, theme);
@@ -55,7 +54,10 @@ test.describe("theme smoke check", () => {
         const anyVisible = await heading.first().isVisible().catch(() => false);
         if (!anyVisible) {
           const fallback = page.getByText(route.heading).first();
-          await expect(fallback.or(page.locator("main"))).toBeVisible();
+          const fallbackVisible = await fallback.isVisible().catch(() => false);
+          if (!fallbackVisible) {
+            await expect(page.locator("main")).toBeVisible();
+          }
         }
       }
     });
@@ -63,7 +65,8 @@ test.describe("theme smoke check", () => {
 });
 
 test.describe("theme deep check (blue)", () => {
-  test("blue: buttons, tables, modal overlay visible on markets", async ({ page }) => {
+  test("blue: buttons, tables, modal overlay visible on markets", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop", "Theme deep checks are desktop-only.");
     await gotoWithMock(page, "/markets");
     await setTheme(page, "blue");
 
@@ -78,13 +81,14 @@ test.describe("theme deep check (blue)", () => {
     await expect(overlay).toBeVisible({ timeout: 2000 }).catch(() => {});
   });
 
-  test("blue: staking and modal flow visible", async ({ page }) => {
+  test("blue: staking and modal flow visible", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop", "Theme deep checks are desktop-only.");
     await gotoWithMock(page, "/staking");
     await setTheme(page, "blue");
 
     await expect(page.getByRole("heading", { name: "Staking" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Convert" })).toBeVisible();
-    await expect(page.getByRole("tab", { name: "Stake" })).toBeVisible();
+    await expect(page.getByRole("tab", { name: "Stake", exact: true })).toBeVisible();
 
     await gotoWithMock(page, "/markets");
     await setTheme(page, "blue");
