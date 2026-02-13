@@ -5,7 +5,7 @@
   -webkit-overflow-scrolling: touch;
   scrollbar-gutter: stable both-edges;
   border-radius: var(--radius-md);
-  box-shadow: inset 0 0 0 1px rgba(var(--border-subtle-rgb), 0.4);
+  box-shadow: none;
   background: transparent;
 }
 
