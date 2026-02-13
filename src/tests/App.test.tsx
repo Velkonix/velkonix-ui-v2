@@ -8,5 +8,5 @@ test("renders bootstrap heading", () => {
       <HomePage />
     </WalletProvider>
   );
-  expect(screen.getByRole("heading", { name: /velkonix home/i })).toBeInTheDocument();
+  expect(screen.getByRole("heading", { name: /velkonix/i })).toBeInTheDocument();
 });

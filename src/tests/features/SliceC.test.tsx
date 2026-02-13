@@ -61,10 +61,12 @@ describe("Slice C", () => {
     await user.click(screen.getByRole("tab", { name: "Exit" }));
     await user.clear(screen.getByRole("textbox", { name: "Exit amount" }));
     await user.type(screen.getByRole("textbox", { name: "Exit amount" }), "100");
-    await user.click(screen.getByRole("button", { name: "Instant Exit" }));
+    await user.click(screen.getByRole("checkbox", { name: "Instant" }));
+    await user.click(screen.getByRole("button", { name: /Loss .* and Exit/i }));
     await waitFor(() => expect(screen.getByText("INSTANTEXIT success")).toBeInTheDocument(), { timeout: 8_000 });
 
     await user.click(screen.getByRole("tab", { name: "Exit" }));
+    await user.click(screen.getByRole("checkbox", { name: "Instant" }));
     await user.clear(screen.getByRole("textbox", { name: "Exit amount" }));
     await user.type(screen.getByRole("textbox", { name: "Exit amount" }), "50");
     await user.click(screen.getByRole("button", { name: "Request Exit" }));

@@ -27,7 +27,12 @@ export function MetricTile({
 }: MetricTileProps) {
   return (
     <div
-      className={classNames(styles.root, actions && styles.rootWithActions, tone === "subtle" && styles.toneSubtle, className)}
+      className={classNames(
+        styles.root,
+        actions ? styles.rootWithActions : undefined,
+        tone === "subtle" ? styles.toneSubtle : undefined,
+        className
+      )}
       data-tone={tone}
       {...props}
     >

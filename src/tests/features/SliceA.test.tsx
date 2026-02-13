@@ -61,7 +61,7 @@ describe("Slice A", () => {
 
     await user.click(screen.getByRole("button", { name: "Close" }));
     await user.click(rowsAfterSort[1]);
-    await waitFor(() => expect(screen.getByRole("heading", { name: /WETH/i })).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("Wrapped Ether")).toBeInTheDocument());
   });
 
   test("runs supply and borrow actions and surfaces pending/failed states", async () => {

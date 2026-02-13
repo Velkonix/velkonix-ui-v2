@@ -153,7 +153,7 @@ export function AssetPage() {
           title={asset.name}
           value={asset.symbol}
           className={styles.assetTitle}
-          icon={asset.iconUrl ? <img src={asset.iconUrl} alt={asset.symbol} /> : asset.symbol.slice(0, 1)}
+          icon={asset.icon ? asset.icon.slice(0, 1).toUpperCase() : asset.symbol.slice(0, 1)}
           iconAlt={`${asset.symbol} icon`}
         />
         <MetricText

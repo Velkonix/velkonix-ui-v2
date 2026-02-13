@@ -1,0 +1,118 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - banner [ref=e5]:
+    - link "Velkonix" [ref=e7] [cursor=pointer]:
+      - /url: /
+      - img "Velkonix" [ref=e8]
+    - generic [ref=e9]:
+      - button "0x7abe...b3b7" [disabled] [ref=e11]:
+        - generic [ref=e12]: 0x7abe...b3b7
+      - button "Open navigation menu" [ref=e13] [cursor=pointer]
+  - main [ref=e15]:
+    - generic [ref=e16]:
+      - generic [ref=e18]:
+        - heading "Markets" [level=2] [ref=e19]
+        - paragraph [ref=e20]: lend and borrow with predictable rules
+      - generic [ref=e23]:
+        - generic [ref=e24]:
+          - img "Total market size icon" [ref=e26]
+          - generic [ref=e28]:
+            - generic [ref=e29]: Total market size
+            - paragraph [ref=e30]: $2.06M
+        - generic [ref=e31]:
+          - img "Total available icon" [ref=e33]
+          - generic [ref=e36]:
+            - generic [ref=e37]: Total available
+            - paragraph [ref=e38]: $1.64M
+        - generic [ref=e39]:
+          - img "Total borrows icon" [ref=e41]
+          - generic [ref=e43]:
+            - generic [ref=e44]: Total borrows
+            - paragraph [ref=e45]: $412K
+      - generic [ref=e48]:
+        - button "U USDC USD Coin Total Supplied 1.25M Supply APY 4.20% Total Borrowed 410K Borrow APY 6.70%" [ref=e49] [cursor=pointer]:
+          - generic [ref=e50]:
+            - generic [ref=e52]:
+              - generic [ref=e53]: U
+              - generic [ref=e54]:
+                - generic [ref=e55]: USDC
+                - generic [ref=e56]: USD Coin
+            - table [ref=e58]:
+              - rowgroup [ref=e59]:
+                - row "Total Supplied 1.25M" [ref=e60]:
+                  - cell "Total Supplied" [ref=e61]
+                  - cell "1.25M" [ref=e62]
+                - row "Supply APY 4.20%" [ref=e63]:
+                  - cell "Supply APY" [ref=e64]
+                  - cell "4.20%" [ref=e65]:
+                    - button "4.20%" [ref=e66]
+                - row "Total Borrowed 410K" [ref=e67]:
+                  - cell "Total Borrowed" [ref=e68]
+                  - cell "410K" [ref=e69]
+                - row "Borrow APY 6.70%" [ref=e70]:
+                  - cell "Borrow APY" [ref=e71]
+                  - cell "6.70%" [ref=e72]:
+                    - button "6.70%" [ref=e73]
+        - button "V VELK Velkonix Token Total Supplied 800K Supply APY 0% Total Borrowed 0 Borrow APY 0%" [ref=e74] [cursor=pointer]:
+          - generic [ref=e75]:
+            - generic [ref=e77]:
+              - generic [ref=e78]: V
+              - generic [ref=e79]:
+                - generic [ref=e80]: VELK
+                - generic [ref=e81]: Velkonix Token
+            - table [ref=e83]:
+              - rowgroup [ref=e84]:
+                - row "Total Supplied 800K" [ref=e85]:
+                  - cell "Total Supplied" [ref=e86]
+                  - cell "800K" [ref=e87]
+                - row "Supply APY 0%" [ref=e88]:
+                  - cell "Supply APY" [ref=e89]
+                  - cell "0%" [ref=e90]:
+                    - button "0%" [ref=e91]
+                - row "Total Borrowed 0" [ref=e92]:
+                  - cell "Total Borrowed" [ref=e93]
+                  - cell "0" [ref=e94]
+                - row "Borrow APY 0%" [ref=e95]:
+                  - cell "Borrow APY" [ref=e96]
+                  - cell "0%" [ref=e97]:
+                    - button "0%" [ref=e98]
+        - button "W WETH Wrapped Ether Total Supplied 5.10K Supply APY 2.40% Total Borrowed 1.68K Borrow APY 3.80%" [ref=e99] [cursor=pointer]:
+          - generic [ref=e100]:
+            - generic [ref=e102]:
+              - generic [ref=e103]: W
+              - generic [ref=e104]:
+                - generic [ref=e105]: WETH
+                - generic [ref=e106]: Wrapped Ether
+            - table [ref=e108]:
+              - rowgroup [ref=e109]:
+                - row "Total Supplied 5.10K" [ref=e110]:
+                  - cell "Total Supplied" [ref=e111]
+                  - cell "5.10K" [ref=e112]
+                - row "Supply APY 2.40%" [ref=e113]:
+                  - cell "Supply APY" [ref=e114]
+                  - cell "2.40%" [ref=e115]:
+                    - button "2.40%" [ref=e116]
+                - row "Total Borrowed 1.68K" [ref=e117]:
+                  - cell "Total Borrowed" [ref=e118]
+                  - cell "1.68K" [ref=e119]
+                - row "Borrow APY 3.80%" [ref=e120]:
+                  - cell "Borrow APY" [ref=e121]
+                  - cell "3.80%" [ref=e122]:
+                    - button "3.80%" [ref=e123]
+  - contentinfo [ref=e124]:
+    - generic [ref=e126]:
+      - link "X" [ref=e127] [cursor=pointer]:
+        - /url: https://x.com
+        - img "X" [ref=e128]
+      - link "Discord" [ref=e129] [cursor=pointer]:
+        - /url: https://discord.gg/XHPxKQwe
+        - img "Discord" [ref=e130]
+      - link "GitHub" [ref=e131] [cursor=pointer]:
+        - /url: https://github.com/Velkonix
+        - img "GitHub" [ref=e132]
+      - link "GitBook" [ref=e133] [cursor=pointer]:
+        - /url: https://docs.github.com
+        - img "GitBook" [ref=e134]
+```

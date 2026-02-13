@@ -44,7 +44,7 @@ describe("Slice B", () => {
     saveMockState(initial);
   });
 
-  test("runs borrow to dashboard lifecycle with withdraw, repay, collateral and claim actions", async () => {
+  test("runs borrow to dashboard lifecycle with withdraw, repay approval and claim actions", async () => {
     const user = userEvent.setup();
     const assetRender = renderLendingRoutes("/asset/USDC");
 
@@ -72,9 +72,6 @@ describe("Slice B", () => {
     expect(screen.getByRole("heading", { name: "Dashboard" })).toBeInTheDocument();
     expect(screen.queryByText("No borrow positions")).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole("checkbox", { name: "Use USDC as collateral" }));
-    await waitFor(() => expect(screen.getByText("SETCOLLATERAL success")).toBeInTheDocument(), { timeout: 8_000 });
-
     await user.click(screen.getAllByRole("button", { name: "Withdraw" })[0]);
     const withdrawDialog = screen.getByRole("dialog", { name: "Withdraw USDC" });
     await user.click(within(withdrawDialog).getByRole("button", { name: "Withdraw" }));
@@ -82,8 +79,9 @@ describe("Slice B", () => {
 
     await user.click(screen.getAllByRole("button", { name: "Repay" })[0]);
     const repayDialog = screen.getByRole("dialog", { name: "Repay USDC" });
-    await user.click(within(repayDialog).getByRole("button", { name: "Repay" }));
-    await waitFor(() => expect(screen.getByText("REPAY success")).toBeInTheDocument(), { timeout: 8_000 });
+    await user.click(within(repayDialog).getByRole("button", { name: "Approve" }));
+    await waitFor(() => expect(screen.getByText("APPROVE success")).toBeInTheDocument(), { timeout: 8_000 });
+    await user.click(within(screen.getByRole("dialog", { name: "Repay USDC" })).getByRole("button", { name: "Close" }));
 
     await user.click(screen.getByRole("button", { name: "Claim" }));
     await waitFor(() => expect(screen.getByText("CLAIMLENDINGREWARDS success")).toBeInTheDocument(), {

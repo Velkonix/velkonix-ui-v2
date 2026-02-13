@@ -376,7 +376,7 @@ export function UiKitPage() {
             rows={markets}
             getRowKey={(row) => row.asset}
           />
-          <InfoTableCard title="Your supplies" rows={infoRows} getRowKey={(row) => row.metric} />
+          <InfoTableCard title="Your supplies" rows={infoRows} getRowKey={(row) => String(row.metric)} />
         </Card>
         <Card title="Time series chart" subtitle="Neon style UI Kit line chart with simple interactions.">
           <div className={styles.chartDemo}>

@@ -1,0 +1,110 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e4]:
+    - banner [ref=e5]:
+      - link "Velkonix" [ref=e7] [cursor=pointer]:
+        - /url: /
+        - img "Velkonix" [ref=e8]
+      - generic [ref=e9]:
+        - button "Connect Wallet" [ref=e11] [cursor=pointer]:
+          - generic [ref=e12]: Connect Wallet
+        - button "Open navigation menu" [ref=e13] [cursor=pointer]
+    - main [ref=e15]:
+      - generic [ref=e16]:
+        - button "← Back to Markets" [ref=e18] [cursor=pointer]
+        - generic [ref=e19]:
+          - generic [ref=e20]:
+            - img "USDC icon" [ref=e21]: U
+            - generic [ref=e22]:
+              - generic [ref=e23]: USD Coin
+              - generic [ref=e24]: USDC
+          - status "Reserve size" [ref=e25]:
+            - generic [ref=e26]:
+              - generic [ref=e27]: Reserve size
+              - generic [ref=e28]: 840K USDC
+        - generic [ref=e29]:
+          - generic [ref=e34]:
+            - paragraph [ref=e36]: Asset info
+            - tablist [ref=e37]:
+              - tab "Supply info" [selected] [ref=e38] [cursor=pointer]
+              - tab "Borrow info" [ref=e39] [cursor=pointer]
+            - generic [ref=e41]:
+              - generic [ref=e42]:
+                - generic [ref=e43]: Supply Rate
+                - tablist "Период графика" [ref=e44]:
+                  - tab "Week" [ref=e45] [cursor=pointer]
+                  - tab "Month" [selected] [ref=e46] [cursor=pointer]
+                  - tab "Year" [ref=e47] [cursor=pointer]
+                  - tab "Max" [ref=e48] [cursor=pointer]
+              - img "USDC Supply Rate chart" [ref=e51]:
+                - generic [ref=e58]:
+                  - generic [ref=e59]:
+                    - generic [ref=e61]: Jan 19
+                    - generic [ref=e63]: Jan 27
+                    - generic [ref=e65]: Feb 4
+                    - generic [ref=e67]: Feb 13
+                  - generic [ref=e68]:
+                    - generic [ref=e70]: 4.35%
+                    - generic [ref=e72]: 4.45%
+                    - generic [ref=e74]: 4.55%
+                    - generic [ref=e76]: 4.65%
+                    - generic [ref=e78]: 4.74%
+            - table [ref=e80]:
+              - rowgroup [ref=e81]:
+                - row "Supply APY 4.20%" [ref=e82]:
+                  - cell "Supply APY" [ref=e83]
+                  - cell "4.20%" [ref=e84]
+                - row "Total supplied 1.25M USDC" [ref=e85]:
+                  - cell "Total supplied" [ref=e86]
+                  - cell "1.25M USDC" [ref=e87]
+                - row "Utilization Rate 32.80%" [ref=e88]:
+                  - cell "Utilization Rate" [ref=e89]
+                  - cell "32.80%" [ref=e90]
+                - row "Max LTV 80.00%" [ref=e91]:
+                  - cell "Max LTV" [ref=e92]
+                  - cell "80.00%" [ref=e93]
+                - row "Liquidation threshold 85.00%" [ref=e94]:
+                  - cell "Liquidation threshold" [ref=e95]
+                  - cell "85.00%" [ref=e96]
+                - row "Liquidation penalty 5.00%" [ref=e97]:
+                  - cell "Liquidation penalty" [ref=e98]
+                  - cell "5.00%" [ref=e99]
+          - complementary [ref=e100]:
+            - generic [ref=e104]:
+              - generic [ref=e105]:
+                - img "Wallet icon" [ref=e107]
+                - generic [ref=e111]:
+                  - generic [ref=e112]: Wallet balance
+                  - paragraph [ref=e113]: 0 USDC
+              - separator [ref=e114]
+              - generic [ref=e115]:
+                - generic [ref=e116]:
+                  - paragraph [ref=e117]: Available to supply
+                  - paragraph [ref=e118]: 0 USDC
+                - button "Supply" [disabled] [ref=e119]:
+                  - generic [ref=e120]: Supply
+              - generic [ref=e121]:
+                - generic [ref=e122]:
+                  - paragraph [ref=e123]: Available to borrow
+                  - paragraph [ref=e124]: 840K USDC
+                - button "Borrow" [disabled] [ref=e125]:
+                  - generic [ref=e126]: Borrow
+              - paragraph [ref=e127]: Connect wallet to start supply and borrow operations.
+    - contentinfo [ref=e128]:
+      - generic [ref=e130]:
+        - link "X" [ref=e131] [cursor=pointer]:
+          - /url: https://x.com
+          - img "X" [ref=e132]
+        - link "Discord" [ref=e133] [cursor=pointer]:
+          - /url: https://discord.gg/XHPxKQwe
+          - img "Discord" [ref=e134]
+        - link "GitHub" [ref=e135] [cursor=pointer]:
+          - /url: https://github.com/Velkonix
+          - img "GitHub" [ref=e136]
+        - link "GitBook" [ref=e137] [cursor=pointer]:
+          - /url: https://docs.github.com
+          - img "GitBook" [ref=e138]
+  - generic [ref=e139]: 4.35%
+```
