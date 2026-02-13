@@ -5,35 +5,13 @@ import { MockEngineProvider } from "./app/providers/MockEngineProvider";
 import { WalletProvider } from "./app/providers/WalletProvider";
 import "./styles/index.css";
 
-const SUPPORTED_THEMES = [
-  "amber",
-  "green",
-  "blue",
-  "classic-defi-trust",
-  "institutional-blue",
-  "dark-tech-finance",
-  "trust-growth",
-  "minimal-institutional",
-  "premium-defi",
-  "crypto-infrastructure",
-  "calm-trust",
-  "modern-bank-web3",
-  "velkonix-signature",
-] as const;
-type ThemeName = (typeof SUPPORTED_THEMES)[number];
-
-function resolveThemeName(value: string | undefined): ThemeName {
-  return SUPPORTED_THEMES.includes(value as ThemeName) ? (value as ThemeName) : "blue";
-}
-
 const root = document.getElementById("root");
 const forceMockFromQuery =
   typeof window !== "undefined" && new URLSearchParams(window.location.search).get("mock") === "1";
 const isMockMode = import.meta.env.VITE_MOCK_MODE === "true" || forceMockFromQuery;
-const activeTheme = resolveThemeName(import.meta.env.VITE_THEME);
 
 if (typeof document !== "undefined") {
-  document.documentElement.setAttribute("data-theme", activeTheme);
+  document.documentElement.setAttribute("data-theme", "blue");
 }
 
 if (typeof document !== "undefined") {

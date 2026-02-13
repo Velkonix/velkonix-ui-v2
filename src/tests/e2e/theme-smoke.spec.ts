@@ -1,5 +1,5 @@
 /**
- * Visual smoke check for newly added themes.
+ * Visual smoke check for the active blue theme.
  * Run against http://localhost:5173 with: npx playwright test theme-smoke --project=desktop
  * Requires dev server on 5173 with ?mock=1 for full routes.
  */
@@ -8,16 +8,7 @@ import { test, expect } from "@playwright/test";
 
 const BASE_URL = "http://localhost:5173";
 
-const THEMES = [
-  "green",
-  "trust-growth",
-  "minimal-institutional",
-  "premium-defi",
-  "crypto-infrastructure",
-  "calm-trust",
-  "modern-bank-web3",
-  "velkonix-signature",
-] as const;
+const THEMES = ["blue"] as const;
 
 const ROUTES = [
   { path: "/", heading: /Velkonix|Connect Wallet/i },
@@ -71,10 +62,10 @@ test.describe("theme smoke check", () => {
   }
 });
 
-test.describe("theme deep check (trust-growth, velkonix-signature)", () => {
-  test("trust-growth: buttons, tables, modal overlay visible", async ({ page }) => {
+test.describe("theme deep check (blue)", () => {
+  test("blue: buttons, tables, modal overlay visible on markets", async ({ page }) => {
     await gotoWithMock(page, "/markets");
-    await setTheme(page, "trust-growth");
+    await setTheme(page, "blue");
 
     await expect(page.getByRole("heading", { name: "Markets" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Sort by Total Supplied" })).toBeVisible();
@@ -87,16 +78,16 @@ test.describe("theme deep check (trust-growth, velkonix-signature)", () => {
     await expect(overlay).toBeVisible({ timeout: 2000 }).catch(() => {});
   });
 
-  test("velkonix-signature: buttons, tables, modal overlay visible", async ({ page }) => {
+  test("blue: staking and modal flow visible", async ({ page }) => {
     await gotoWithMock(page, "/staking");
-    await setTheme(page, "velkonix-signature");
+    await setTheme(page, "blue");
 
     await expect(page.getByRole("heading", { name: "Staking" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Convert" })).toBeVisible();
     await expect(page.getByRole("tab", { name: "Stake" })).toBeVisible();
 
     await gotoWithMock(page, "/markets");
-    await setTheme(page, "velkonix-signature");
+    await setTheme(page, "blue");
     await page.getByRole("button", { name: "4.20%" }).first().click();
     await expect(page.getByRole("dialog")).toBeVisible();
   });
