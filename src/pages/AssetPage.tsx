@@ -18,6 +18,7 @@ import {
   Typography,
   WalletBalanceCard,
 } from "../shared/ui";
+import { formatNumber } from "../shared/lib/numberFormat";
 import styles from "./AssetPage.module.css";
 
 type PositionRow = {
@@ -25,20 +26,10 @@ type PositionRow = {
   value: string;
 };
 
-const formatTokenAmount = (value: number, symbol: string): string =>
-  `${value.toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })} ${symbol}`;
-
-const formatHealthFactor = (value: number): string => {
-  if (!Number.isFinite(value)) {
-    return "∞";
-  }
-  return value.toFixed(2);
-};
-
-const formatPercent = (value: number): string => `${value.toFixed(2)}%`;
+const formatTokenAmount = (value: number, symbol: string): string => `${formatNumber(value)} ${symbol}`;
+const formatHealthFactor = (value: number): string => formatNumber(value, { decimals: 2, compact: false });
+const formatPercent = (value: number): string => `${formatNumber(value, { decimals: 2, compact: false })}%`;
+const formatInputAmount = (value: number): string => formatNumber(value, { decimals: 4, compact: false, useGrouping: false });
 
 export function AssetPage() {
   const navigate = useNavigate();
@@ -202,8 +193,8 @@ export function AssetPage() {
             placeholder="0.00"
             assetLabel={asset.symbol}
             balanceLabel="Available"
-            balanceValue={availableToSupply.toFixed(4)}
-            maxValue={availableToSupply.toFixed(4)}
+            balanceValue={formatInputAmount(availableToSupply)}
+            maxValue={formatInputAmount(availableToSupply)}
           />
           <div className={styles.txOverview}>
             <Typography as="p" variant="label" className={styles.txOverviewTitle}>
@@ -213,7 +204,7 @@ export function AssetPage() {
               <Typography as="span" muted>
                 Supply APY
               </Typography>
-              <Typography as="span">{asset.supplyApy.toFixed(2)}%</Typography>
+              <Typography as="span">{formatPercent(asset.supplyApy)}</Typography>
             </div>
             <div className={styles.txOverviewRow}>
               <Typography as="span" muted>
@@ -253,8 +244,8 @@ export function AssetPage() {
             placeholder="0.00"
             assetLabel={asset.symbol}
             balanceLabel="Available to borrow"
-            balanceValue={availableToBorrow.toFixed(4)}
-            maxValue={availableToBorrow.toFixed(4)}
+            balanceValue={formatInputAmount(availableToBorrow)}
+            maxValue={formatInputAmount(availableToBorrow)}
           />
           <div className={styles.txOverview}>
             <Typography as="p" variant="label" className={styles.txOverviewTitle}>
@@ -264,7 +255,7 @@ export function AssetPage() {
               <Typography as="span" muted>
                 Borrow APY
               </Typography>
-              <Typography as="span">{asset.borrowApy.toFixed(2)}%</Typography>
+              <Typography as="span">{formatPercent(asset.borrowApy)}</Typography>
             </div>
             <div className={styles.txOverviewRow}>
               <Typography as="span" muted>

@@ -23,6 +23,7 @@ import {
   WalletConnectButton,
   WalletMenu,
 } from "../shared/ui";
+import { formatNumber } from "../shared/lib/numberFormat";
 import styles from "./MockModePage.module.css";
 
 type AssetRow = {
@@ -37,6 +38,9 @@ const parseAmount = (value: string): number => {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : 0;
 };
+
+const formatAmount = (value: number): string => formatNumber(value);
+const formatPercent = (value: number): string => `${formatNumber(value, { decimals: 2, compact: false })}%`;
 
 type ToastTone = "success" | "error" | "info";
 
@@ -195,19 +199,19 @@ export function MockModePage() {
                 key: "supplied",
                 title: "Total Supplied",
                 align: "right",
-                render: (row) => <ValueCell>{row.supplied.toLocaleString()}</ValueCell>,
+                render: (row) => <ValueCell>{formatAmount(row.supplied)}</ValueCell>,
               },
               {
                 key: "borrowed",
                 title: "Total Borrowed",
                 align: "right",
-                render: (row) => <ValueCell>{row.borrowed.toLocaleString()}</ValueCell>,
+                render: (row) => <ValueCell>{formatAmount(row.borrowed)}</ValueCell>,
               },
               {
                 key: "apy",
                 title: "Supply APY",
                 align: "right",
-                render: (row) => <ApyCell>{row.supplyApy.toFixed(2)}%</ApyCell>,
+                render: (row) => <ApyCell>{formatPercent(row.supplyApy)}</ApyCell>,
               },
             ]}
             rows={rows}
@@ -290,7 +294,7 @@ export function MockModePage() {
             ) : (
               supplies.map((supply) => (
                 <Typography key={supply.assetId}>
-                  {supply.assetId}: {supply.balance.toFixed(2)} ({supply.apy.toFixed(2)}% APY)
+                  {supply.assetId}: {formatAmount(supply.balance)} ({formatPercent(supply.apy)} APY)
                 </Typography>
               ))
             )}
@@ -301,7 +305,7 @@ export function MockModePage() {
             ) : (
               borrows.map((borrow) => (
                 <Typography key={borrow.assetId}>
-                  {borrow.assetId}: {borrow.debt.toFixed(2)} ({borrow.apy.toFixed(2)}% APY)
+                  {borrow.assetId}: {formatAmount(borrow.debt)} ({formatPercent(borrow.apy)} APY)
                 </Typography>
               ))
             )}
@@ -321,8 +325,8 @@ export function MockModePage() {
       <Section title="Staking (Convert / Stake / Rewards / Exit)">
         <Card>
           <Typography>
-            Staked: {stakingState.staked.toFixed(2)} | Rewards: {stakingState.rewards.toFixed(2)} | APR:{" "}
-            {stakingState.apr.toFixed(2)}%
+            Staked: {formatAmount(stakingState.staked)} | Rewards: {formatAmount(stakingState.rewards)} | APR:{" "}
+            {formatPercent(stakingState.apr)}
           </Typography>
           <div className={styles.actions}>
             <ActionButton

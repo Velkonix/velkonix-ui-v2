@@ -22,6 +22,7 @@ import {
   Typography,
   ValueCell,
 } from "../shared/ui";
+import { formatNumber } from "../shared/lib/numberFormat";
 import styles from "./StakingPage.module.css";
 
 type StakingTabId = "convert" | "stake" | "unstake" | "exit";
@@ -35,11 +36,8 @@ type QueueRow = {
   status: "queued" | "ready" | "executed" | "cancelled";
 };
 
-const formatAmount = (value: number): string =>
-  value.toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
+const formatAmount = (value: number): string => formatNumber(value);
+const formatPercent = (value: number): string => `${formatNumber(value, { decimals: 2, compact: false })}%`;
 
 const formatDateTime = (value: number): string =>
   new Date(value).toLocaleString(undefined, {
@@ -136,7 +134,7 @@ export function StakingPage() {
               />
               <MetricTile
                 title="APR"
-                value={`${stakingState.apr.toFixed(2)}%`}
+                value={formatPercent(stakingState.apr)}
                 tone="subtle"
                 media={
                   <Icon size={18} viewBox="0 0 24 24" aria-label="APR icon">

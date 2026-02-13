@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { HTMLAttributes } from "react";
+import { createPortal } from "react-dom";
 
 import { classNames } from "../utilities/classNames";
 import { Toast } from "./Toast";
@@ -37,7 +38,7 @@ export function ToastPopup({
     return () => window.clearTimeout(timer);
   }, [durationMs]);
 
-  return (
+  const popup = (
     <div className={classNames(styles.container, className)} role="status" aria-live="polite" {...props}>
       <Toast tone={tone} title={title} className={styles.toast}>
         {children}
@@ -50,4 +51,6 @@ export function ToastPopup({
       </div>
     </div>
   );
+
+  return createPortal(popup, document.body);
 }

@@ -3,7 +3,7 @@
   right: var(--space-4);
   bottom: var(--space-4);
   width: min(360px, calc(100vw - (var(--space-4) * 2)));
-  z-index: 1000;
+  z-index: var(--z-toast);
   overflow: visible;
   border-radius: 12px;
 }

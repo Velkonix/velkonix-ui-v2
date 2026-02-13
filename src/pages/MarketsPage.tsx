@@ -16,6 +16,7 @@ import {
   Table,
   ValueCell,
 } from "../shared/ui";
+import { formatNumber } from "../shared/lib/numberFormat";
 import styles from "./MarketsPage.module.css";
 
 type ApyModalState = {
@@ -30,11 +31,9 @@ type MobileMetricRow = {
   value: ReactNode;
 };
 
-const formatAmount = (value: number): string => value.toLocaleString();
-const formatUsd = (value: number): string =>
-  `$${value.toLocaleString(undefined, {
-    maximumFractionDigits: 0,
-  })}`;
+const formatAmount = (value: number): string => formatNumber(value);
+const formatUsd = (value: number): string => `$${formatNumber(value)}`;
+const formatPercent = (value: number): string => `${formatNumber(value, { decimals: 2, compact: false })}%`;
 const MOBILE_MEDIA_QUERY = "(max-width: 768px)";
 
 export function MarketsPage() {
@@ -114,7 +113,7 @@ export function MarketsPage() {
         label: "Supply APY",
         value: (
           <button type="button" className={styles.apyButton} onClick={(event) => openApyModal(event, row, "supply")}>
-            <ApyCell>{row.supplyApy.toFixed(2)}%</ApyCell>
+            <ApyCell>{formatPercent(row.supplyApy)}</ApyCell>
           </button>
         ),
       },
@@ -128,7 +127,7 @@ export function MarketsPage() {
         label: "Borrow APY",
         value: (
           <button type="button" className={styles.apyButton} onClick={(event) => openApyModal(event, row, "borrow")}>
-            <ApyCell>{row.borrowApy.toFixed(2)}%</ApyCell>
+            <ApyCell>{formatPercent(row.borrowApy)}</ApyCell>
           </button>
         ),
       },
@@ -268,7 +267,7 @@ export function MarketsPage() {
                       className={styles.apyButton}
                       onClick={(event) => openApyModal(event, row, "supply")}
                     >
-                      <ApyCell>{row.supplyApy.toFixed(2)}%</ApyCell>
+                      <ApyCell>{formatPercent(row.supplyApy)}</ApyCell>
                     </button>
                   ),
                 },
@@ -288,7 +287,7 @@ export function MarketsPage() {
                       className={styles.apyButton}
                       onClick={(event) => openApyModal(event, row, "borrow")}
                     >
-                      <ApyCell>{row.borrowApy.toFixed(2)}%</ApyCell>
+                      <ApyCell>{formatPercent(row.borrowApy)}</ApyCell>
                     </button>
                   ),
                 },
@@ -309,7 +308,7 @@ export function MarketsPage() {
         {apyModal ? (
           <div className={styles.modalContent}>
             <ValueCell tone="muted">Current APY</ValueCell>
-            <ApyCell>{apyModal.apy.toFixed(2)}%</ApyCell>
+            <ApyCell>{formatPercent(apyModal.apy)}</ApyCell>
           </div>
         ) : null}
       </Modal>

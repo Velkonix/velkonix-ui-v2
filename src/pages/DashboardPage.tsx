@@ -22,6 +22,7 @@ import {
   Typography,
   ValueCell,
 } from "../shared/ui";
+import { formatNumber } from "../shared/lib/numberFormat";
 import styles from "./DashboardPage.module.css";
 
 type WithdrawModalState = {
@@ -44,25 +45,11 @@ type CollateralModalState = {
   nextEnabled: boolean;
 } | null;
 
-const formatAmount = (value: number): string =>
-  value.toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-
-const formatUsd = (value: number): string =>
-  `$${value.toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
-
-const formatPercent = (value: number): string => `${value.toFixed(2)}%`;
-const formatHealthFactor = (value: number): string => {
-  if (!Number.isFinite(value)) {
-    return "∞";
-  }
-  return value.toFixed(2);
-};
+const formatAmount = (value: number): string => formatNumber(value);
+const formatUsd = (value: number): string => `$${formatNumber(value)}`;
+const formatPercent = (value: number): string => `${formatNumber(value, { decimals: 2, compact: false })}%`;
+const formatHealthFactor = (value: number): string => formatNumber(value, { decimals: 2, compact: false });
+const formatInputAmount = (value: number): string => formatNumber(value, { decimals: 4, compact: false, useGrouping: false });
 const computeHealthFactor = (totalSupplied: number, totalBorrowed: number): number =>
   totalBorrowed > 0 ? totalSupplied / totalBorrowed : Number.POSITIVE_INFINITY;
 
@@ -368,7 +355,7 @@ export function DashboardPage() {
                             symbol: row.symbol,
                             maxAmount: row.balance,
                           });
-                          setWithdrawAmount(row.balance.toFixed(4));
+                          setWithdrawAmount(formatInputAmount(row.balance));
                         }}
                       />
                     ),
@@ -429,7 +416,7 @@ export function DashboardPage() {
                             symbol: row.symbol,
                             maxDebt: row.debt,
                           });
-                          setRepayAmount(row.debt.toFixed(4));
+                          setRepayAmount(formatInputAmount(row.debt));
                         }}
                       />
                     ),
@@ -510,8 +497,8 @@ export function DashboardPage() {
               placeholder="0.00"
               assetLabel={withdrawModal.symbol}
               balanceLabel="Available"
-              balanceValue={withdrawModal.maxAmount.toFixed(4)}
-              maxValue={withdrawModal.maxAmount.toFixed(4)}
+              balanceValue={formatInputAmount(withdrawModal.maxAmount)}
+              maxValue={formatInputAmount(withdrawModal.maxAmount)}
             />
             <div className={styles.txOverview}>
               <Typography as="p" variant="label" className={styles.txOverviewTitle}>
@@ -564,8 +551,8 @@ export function DashboardPage() {
               placeholder="0.00"
               assetLabel={repayModal.symbol}
               balanceLabel="Available to repay"
-              balanceValue={repayAvailable.toFixed(4)}
-              maxValue={repayAvailable.toFixed(4)}
+              balanceValue={formatInputAmount(repayAvailable)}
+              maxValue={formatInputAmount(repayAvailable)}
             />
             <div className={styles.txOverview}>
               <Typography as="p" variant="label" className={styles.txOverviewTitle}>
