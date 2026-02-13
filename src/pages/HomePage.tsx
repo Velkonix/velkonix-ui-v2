@@ -43,7 +43,7 @@ export function HomePage() {
   const flickerSet = new Set(flickerIndices);
 
   const openPage = () => {
-    window.location.assign("/markets?mock=1");
+    window.location.assign("/markets");
   };
 
   return (

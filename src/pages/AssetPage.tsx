@@ -22,6 +22,7 @@ import {
   ValueCell,
   WalletBalanceCard,
 } from "../shared/ui";
+import { getAssetIconBySymbol } from "../shared/lib/assetIcons";
 import { formatNumber } from "../shared/lib/numberFormat";
 import styles from "./AssetPage.module.css";
 
@@ -72,6 +73,7 @@ export function AssetPage() {
     busyOp,
     lastError,
     toast,
+    isLoading,
     getAssetById,
     getSupplyForAsset,
     getBorrowForAsset,
@@ -93,6 +95,80 @@ export function AssetPage() {
   const parsedBorrowAmount = Number(borrowAmount);
   const normalizedBorrowAmount = Number.isFinite(parsedBorrowAmount) && parsedBorrowAmount > 0 ? parsedBorrowAmount : 0;
 
+  const requiresApproval = normalizedSupplyAmount > 0 && allowance < normalizedSupplyAmount;
+  const walletBalance = asset ? getWalletBalanceForAsset(asset.id) : 0;
+  const availableToSupply = walletBalance;
+  const availableToBorrow = Math.max(0, (asset?.totalSupplied ?? 0) - (asset?.totalBorrowed ?? 0));
+  const reserveSize = Math.max(0, (asset?.totalSupplied ?? 0) - (asset?.totalBorrowed ?? 0));
+  const exceedsSupplyLimit = normalizedSupplyAmount > availableToSupply;
+  const exceedsBorrowLimit = normalizedBorrowAmount > availableToBorrow;
+  const currentSupplied = supplyPosition?.balance ?? 0;
+  const currentDebt = borrowPosition?.debt ?? 0;
+  const supplyHealthFactor = currentDebt > 0 ? (currentSupplied + normalizedSupplyAmount) / currentDebt : Number.POSITIVE_INFINITY;
+  const borrowHealthFactor =
+    currentDebt + normalizedBorrowAmount > 0 ? currentSupplied / (currentDebt + normalizedBorrowAmount) : Number.POSITIVE_INFINITY;
+  const utilizationRate = asset && asset.totalSupplied > 0 ? (asset.totalBorrowed / asset.totalSupplied) * 100 : 0;
+
+  const supplyRows = useMemo<PositionRow[]>(
+    () =>
+      asset
+        ? [
+            { metric: "Supply APY", value: formatPercent(asset.supplyApy) },
+            { metric: "Total supplied", value: formatTokenAmount(asset.totalSupplied, asset.symbol) },
+            { metric: "Utilization Rate", value: formatPercent(utilizationRate) },
+            { metric: "Max LTV", value: formatPercent(asset.maxLtv ?? 0) },
+            { metric: "Liquidation threshold", value: formatPercent(asset.liquidationThreshold ?? 0) },
+            { metric: "Liquidation penalty", value: formatPercent(asset.liquidationPenalty ?? 0) },
+          ]
+        : [],
+    [asset, utilizationRate]
+  );
+
+  const borrowRows = useMemo<PositionRow[]>(
+    () =>
+      asset
+        ? [
+            { metric: "Borrow APY", value: formatPercent(asset.borrowApy) },
+            { metric: "Total borrowed", value: formatTokenAmount(asset.totalBorrowed, asset.symbol) },
+            { metric: "Borrow cap", value: formatTokenAmount(asset.borrowCap ?? 0, asset.symbol) },
+            { metric: "Reserve factor", value: formatPercent(asset.reserveFactor ?? 0) },
+          ]
+        : [],
+    [asset]
+  );
+  const supplyRateSeries = useMemo(
+    () => (asset ? buildSyntheticRateSeries(asset.supplyApy, `${asset.id}-supply`) : []),
+    [asset?.id, asset?.supplyApy]
+  );
+  const borrowRateSeries = useMemo(
+    () => (asset ? buildSyntheticRateSeries(asset.borrowApy, `${asset.id}-borrow`) : []),
+    [asset?.id, asset?.borrowApy]
+  );
+  const activeRows = activeInfoTab === "supply" ? supplyRows : borrowRows;
+  const activeSeries = activeInfoTab === "supply" ? supplyRateSeries : borrowRateSeries;
+  const activeTabLabel = activeInfoTab === "supply" ? "Supply" : "Borrow";
+  const activeRateTitle = activeInfoTab === "supply" ? "Supply Rate" : "Borrow Rate";
+
+  if (isLoading) {
+    return (
+      <PageContainer>
+        <Typography muted>Loading asset data...</Typography>
+      </PageContainer>
+    );
+  }
+
+  if (wallet.mode === "real" && wallet.isConnected && wallet.isWrongNetwork) {
+    return (
+      <PageContainer>
+        <ErrorState
+          title="Wrong network"
+          description={`Switch wallet network to chain ${wallet.expectedChainId ?? "configured network"} to open asset details.`}
+        />
+        <ActionButton label="Switch network" onClick={() => void wallet.switchNetwork()} />
+      </PageContainer>
+    );
+  }
+
   if (!asset) {
     return (
       <PageContainer>
@@ -101,47 +177,7 @@ export function AssetPage() {
     );
   }
 
-  const requiresApproval = normalizedSupplyAmount > 0 && allowance < normalizedSupplyAmount;
-  const walletBalance = getWalletBalanceForAsset(asset.id);
-  const availableToSupply = walletBalance;
-  const availableToBorrow = Math.max(0, asset.totalSupplied - asset.totalBorrowed);
-  const reserveSize = Math.max(0, asset.totalSupplied - asset.totalBorrowed);
-  const exceedsSupplyLimit = normalizedSupplyAmount > availableToSupply;
-  const exceedsBorrowLimit = normalizedBorrowAmount > availableToBorrow;
-  const currentSupplied = supplyPosition?.balance ?? 0;
-  const currentDebt = borrowPosition?.debt ?? 0;
-  const supplyHealthFactor = currentDebt > 0 ? (currentSupplied + normalizedSupplyAmount) / currentDebt : Number.POSITIVE_INFINITY;
-  const borrowHealthFactor =
-    currentDebt + normalizedBorrowAmount > 0 ? currentSupplied / (currentDebt + normalizedBorrowAmount) : Number.POSITIVE_INFINITY;
-  const utilizationRate = asset.totalSupplied > 0 ? (asset.totalBorrowed / asset.totalSupplied) * 100 : 0;
-
-  const supplyRows = useMemo<PositionRow[]>(
-    () => [
-      { metric: "Supply APY", value: formatPercent(asset.supplyApy) },
-      { metric: "Total supplied", value: formatTokenAmount(asset.totalSupplied, asset.symbol) },
-      { metric: "Utilization Rate", value: formatPercent(utilizationRate) },
-      { metric: "Max LTV", value: formatPercent(asset.maxLtv ?? 0) },
-      { metric: "Liquidation threshold", value: formatPercent(asset.liquidationThreshold ?? 0) },
-      { metric: "Liquidation penalty", value: formatPercent(asset.liquidationPenalty ?? 0) },
-    ],
-    [asset, utilizationRate]
-  );
-
-  const borrowRows = useMemo<PositionRow[]>(
-    () => [
-      { metric: "Borrow APY", value: formatPercent(asset.borrowApy) },
-      { metric: "Total borrowed", value: formatTokenAmount(asset.totalBorrowed, asset.symbol) },
-      { metric: "Borrow cap", value: formatTokenAmount(asset.borrowCap ?? 0, asset.symbol) },
-      { metric: "Reserve factor", value: formatPercent(asset.reserveFactor ?? 0) },
-    ],
-    [asset]
-  );
-  const supplyRateSeries = useMemo(() => buildSyntheticRateSeries(asset.supplyApy, `${asset.id}-supply`), [asset.id, asset.supplyApy]);
-  const borrowRateSeries = useMemo(() => buildSyntheticRateSeries(asset.borrowApy, `${asset.id}-borrow`), [asset.id, asset.borrowApy]);
-  const activeRows = activeInfoTab === "supply" ? supplyRows : borrowRows;
-  const activeSeries = activeInfoTab === "supply" ? supplyRateSeries : borrowRateSeries;
-  const activeTabLabel = activeInfoTab === "supply" ? "Supply" : "Borrow";
-  const activeRateTitle = activeInfoTab === "supply" ? "Supply Rate" : "Borrow Rate";
+  const assetIconUrl = getAssetIconBySymbol(asset.symbol);
 
   return (
     <PageContainer className={styles.page}>
@@ -153,7 +189,7 @@ export function AssetPage() {
           title={asset.name}
           value={asset.symbol}
           className={styles.assetTitle}
-          icon={asset.icon ? asset.icon.slice(0, 1).toUpperCase() : asset.symbol.slice(0, 1)}
+          icon={assetIconUrl ? <img src={assetIconUrl} alt={`${asset.symbol} icon`} /> : asset.symbol.slice(0, 1)}
           iconAlt={`${asset.symbol} icon`}
         />
         <MetricText

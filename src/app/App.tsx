@@ -12,6 +12,7 @@ import { HomePage } from "../pages/HomePage";
 import { MarketsPage } from "../pages/MarketsPage";
 import { StakingPage } from "../pages/StakingPage";
 import { UiKitPage } from "../pages/UiKitPage";
+import { useWallet } from "./providers/WalletProvider";
 import {
   AppLayout,
   DashboardNavIcon,
@@ -25,15 +26,12 @@ import {
 } from "../shared/ui";
 import styles from "./App.module.css";
 
-type AppProps = {
-  mockMode?: boolean;
-};
-
 const isDev = import.meta.env.DEV;
 
-function MockAppShell() {
+function AppShell() {
   const navigate = useNavigate();
   const location = useLocation();
+  const wallet = useWallet();
   const isRootPage = location.pathname === "/";
 
   const navItem = (to: string, label: string, icon: ReactNode) => (
@@ -99,26 +97,20 @@ function MockAppShell() {
         <Route path="/staking" element={<StakingPage />} />
         <Route path="/asset/:assetId" element={<AssetPage />} />
         {isDev ? <Route path="/ui-kit" element={<UiKitPage />} /> : null}
+        {wallet.mode === "real" && wallet.isConnected && wallet.isWrongNetwork ? (
+          <Route path="*" element={<Navigate to="/markets" replace />} />
+        ) : null}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AppLayout>
   );
 }
 
-export default function App({ mockMode = false }: AppProps) {
-  if (!mockMode) {
-    const isUiKitPath = typeof window !== "undefined" && window.location.pathname === "/ui-kit";
-    return (
-      <div className="app">
-        {isDev && isUiKitPath ? <UiKitPage /> : <HomePage />}
-      </div>
-    );
-  }
-
+export default function App() {
   return (
     <div className="app">
       <BrowserRouter>
-        <MockAppShell />
+        <AppShell />
       </BrowserRouter>
     </div>
   );

@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useWallet } from "../app/providers/WalletProvider";
 import { useMockEngine } from "../app/providers/MockEngineProvider";
 import type { Address, AssetId, MockTxResult } from "../mock";
+import { sendE2EDebugEvent } from "../shared/lib/e2eIngest";
 import {
   ActionButton,
   ApproveButton,
@@ -63,21 +64,14 @@ export function MockModePage() {
   const user = wallet.address as Address | null;
 
   useEffect(() => {
-    if (typeof fetch !== "function") {
-      return;
-    }
-    fetch("http://127.0.0.1:7242/ingest/79658062-1f9f-451c-9869-7f640578985d", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        runId: "e2e-debug-1",
-        hypothesisId: "H3",
-        location: "src/pages/MockModePage.tsx:50",
-        message: "MockModePage mounted",
-        data: { user },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
+    sendE2EDebugEvent({
+      runId: "e2e-debug-1",
+      hypothesisId: "H3",
+      location: "src/pages/MockModePage.tsx:50",
+      message: "MockModePage mounted",
+      data: { user },
+      timestamp: Date.now(),
+    });
   }, [user]);
 
   useEffect(() => {

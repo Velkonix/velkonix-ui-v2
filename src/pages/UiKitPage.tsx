@@ -50,6 +50,7 @@ import {
   WalletConnectButton,
   WalletMenu,
 } from "../shared/ui";
+import { sendE2EDebugEvent } from "../shared/lib/e2eIngest";
 import styles from "./UiKitPage.module.css";
 
 const THEME_OPTIONS = [
@@ -101,21 +102,14 @@ export function UiKitPage() {
   }, [activeTheme]);
 
   useEffect(() => {
-    if (typeof fetch !== "function") {
-      return;
-    }
-    fetch("http://127.0.0.1:7242/ingest/79658062-1f9f-451c-9869-7f640578985d", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        runId: "e2e-debug-1",
-        hypothesisId: "H4",
-        location: "src/pages/UiKitPage.tsx:65",
-        message: "UiKitPage mounted",
-        data: { reason: "mock branch not selected" },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
+    sendE2EDebugEvent({
+      runId: "e2e-debug-1",
+      hypothesisId: "H4",
+      location: "src/pages/UiKitPage.tsx:65",
+      message: "UiKitPage mounted",
+      data: { reason: "mock branch not selected" },
+      timestamp: Date.now(),
+    });
   }, []);
 
   const headerDemoNav = (

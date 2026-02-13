@@ -10,6 +10,23 @@ export function WalletConnectButton({ className, onClick, disabled, ...props }: 
   const wallet = useWallet();
 
   if (wallet.isConnected) {
+    if (wallet.isWrongNetwork) {
+      return (
+        <Button
+          className={`${styles.button} ${className ?? ""}`}
+          variant="secondary"
+          disabled={disabled || wallet.isConnecting}
+          isLoading={wallet.isConnecting}
+          onClick={async () => {
+            await wallet.switchNetwork();
+          }}
+          {...props}
+        >
+          Switch Network
+        </Button>
+      );
+    }
+
     return (
       <Button className={`${styles.button} ${className ?? ""}`} variant="secondary" disabled {...props}>
         {wallet.shortAddress ?? wallet.address ?? "Wallet connected"}
@@ -27,7 +44,11 @@ export function WalletConnectButton({ className, onClick, disabled, ...props }: 
         if (event.defaultPrevented) {
           return;
         }
-        await wallet.connect();
+        try {
+          await wallet.connect();
+        } catch (error) {
+          console.error("Wallet connection failed", error);
+        }
       }}
       {...props}
     >

@@ -1,45 +1,92 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "@rainbow-me/rainbowkit/styles.css";
 import { RainbowKitProvider, getDefaultConfig } from "@rainbow-me/rainbowkit";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useCallback, useMemo } from "react";
 import type { ReactNode } from "react";
-import { useAccount, useConnect, useDisconnect, WagmiProvider } from "wagmi";
-import { mainnet, sepolia } from "wagmi/chains";
+import { WagmiProvider, http, useAccount, useChainId, useConnect, useDisconnect, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
+import { arbitrumSepolia } from "wagmi/chains";
 
+import { getActiveNetworkConfig } from "../../config/networks";
 import type { WalletAddress } from "../../shared/lib/wallet";
 import { WalletContext, createWalletContextValue } from "./walletContext";
 
-const WALLETCONNECT_PROJECT_ID = "demo";
+const WALLETCONNECT_PROJECT_ID = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID ?? "demo";
 const walletQueryClient = new QueryClient();
+const activeNetwork = getActiveNetworkConfig();
+const ACTIVE_CHAIN = arbitrumSepolia;
+const ACTIVE_RPC_URL = import.meta.env.VITE_ARBITRUM_SEPOLIA_RPC_URL?.trim() || ACTIVE_CHAIN.rpcUrls.default.http[0];
+
+if (ACTIVE_CHAIN.id !== activeNetwork.chainId) {
+  throw new Error(`Unsupported wallet chainId ${activeNetwork.chainId}.`);
+}
+
 const wagmiConfig = getDefaultConfig({
   appName: "Velkonix UI",
   projectId: WALLETCONNECT_PROJECT_ID,
-  chains: [mainnet, sepolia],
+  chains: [ACTIVE_CHAIN],
+  transports: {
+    [ACTIVE_CHAIN.id]: http(ACTIVE_RPC_URL),
+  },
   ssr: false,
 });
 
 function RealWalletContextProvider({ children }: { children: ReactNode }) {
   const { address } = useAccount();
-  const { connectAsync, connectors, isPending } = useConnect();
+  const chainId = useChainId();
+  const { isPending } = useConnect();
   const { disconnectAsync } = useDisconnect();
+  const publicClient = usePublicClient({ chainId: activeNetwork.chainId });
+  const { data: walletClient } = useWalletClient({ chainId: activeNetwork.chainId });
+  const { switchChainAsync } = useSwitchChain();
+  const { openConnectModal, connectModalOpen } = useConnectModal();
 
   const connect = useCallback(async () => {
-    const connector = connectors.find((item) => item.type === "injected" && item.ready) ?? connectors[0];
-    if (!connector) {
-      throw new Error("No wallet connector available");
+    if (!openConnectModal) {
+      throw new Error("Connect modal is unavailable");
     }
-    await connectAsync({ connector });
-  }, [connectAsync, connectors]);
+    openConnectModal();
+  }, [openConnectModal]);
 
   const disconnect = useCallback(async () => {
     await disconnectAsync();
   }, [disconnectAsync]);
 
+  const switchNetwork = useCallback(async () => {
+    await switchChainAsync({ chainId: activeNetwork.chainId });
+  }, [switchChainAsync]);
+
   const normalizedAddress = (address as WalletAddress | undefined) ?? null;
+  const normalizedChainId = typeof chainId === "number" ? chainId : null;
+  const isWrongNetwork = normalizedAddress !== null && normalizedChainId !== activeNetwork.chainId;
 
   const value = useMemo(
-    () => createWalletContextValue("real", normalizedAddress, isPending, connect, disconnect),
-    [connect, disconnect, isPending, normalizedAddress]
+    () =>
+      createWalletContextValue(
+        "real",
+        normalizedAddress,
+        isPending || connectModalOpen,
+        normalizedChainId,
+        activeNetwork.chainId,
+        isWrongNetwork,
+        publicClient ?? null,
+        walletClient ?? null,
+        connect,
+        disconnect,
+        switchNetwork
+      ),
+    [
+      connect,
+      disconnect,
+      connectModalOpen,
+      isPending,
+      normalizedAddress,
+      normalizedChainId,
+      isWrongNetwork,
+      publicClient,
+      walletClient,
+      switchNetwork,
+    ]
   );
 
   return <WalletContext.Provider value={value}>{children}</WalletContext.Provider>;

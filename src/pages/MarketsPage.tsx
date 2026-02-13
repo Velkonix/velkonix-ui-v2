@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { useLendingController, type MarketRow, type MarketSortKey } from "../features/lending";
 import {
+  ActionButton,
   ApyCell,
   AssetCell,
   Card,
@@ -13,6 +14,7 @@ import {
   PageContainer,
   PageHeader,
   Section,
+  Skeleton,
   Table,
   ValueCell,
 } from "../shared/ui";
@@ -38,7 +40,7 @@ const MOBILE_MEDIA_QUERY = "(max-width: 768px)";
 
 export function MarketsPage() {
   const navigate = useNavigate();
-  const { marketRows, setSort, sortDirection, sortKey } = useLendingController();
+  const { wallet, marketRows, setSort, sortDirection, sortKey, isLoading } = useLendingController();
   const [apyModal, setApyModal] = useState<ApyModalState>(null);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -215,6 +217,24 @@ export function MarketsPage() {
       </Section>
 
       <Section>
+        {wallet.mode === "real" && wallet.isConnected && wallet.isWrongNetwork ? (
+          <Card>
+            <EmptyState
+              title="Wrong network"
+              description={`Switch wallet network to chain ${wallet.expectedChainId ?? "configured network"} to view markets.`}
+            />
+            <ActionButton label="Switch network" onClick={() => void wallet.switchNetwork()} />
+          </Card>
+        ) : null}
+        {isLoading ? (
+          <Card>
+            <Skeleton height={40} />
+            <Skeleton height={40} />
+            <Skeleton height={40} />
+          </Card>
+        ) : null}
+        {!isLoading ? (
+          <>
         {marketRows.length === 0 ? (
           <Card>
             <EmptyState title="No markets available" description="Try again after data provider is ready." />
@@ -298,6 +318,8 @@ export function MarketsPage() {
             />
           </Card>
         )}
+          </>
+        ) : null}
       </Section>
 
       <Modal

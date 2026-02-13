@@ -1,4 +1,5 @@
 import { createContext, useContext } from "react";
+import type { PublicClient, WalletClient } from "viem";
 
 import { formatWalletAddress, type WalletAddress } from "../../shared/lib/wallet";
 
@@ -10,24 +11,42 @@ export type WalletContextValue = {
   shortAddress: string | null;
   isConnected: boolean;
   isConnecting: boolean;
+  chainId: number | null;
+  expectedChainId: number | null;
+  isWrongNetwork: boolean;
+  publicClient: PublicClient | null;
+  walletClient: WalletClient | null;
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
+  switchNetwork: () => Promise<void>;
 };
 
 export const createWalletContextValue = (
   mode: WalletMode,
   address: WalletAddress | null,
   isConnecting: boolean,
+  chainId: number | null,
+  expectedChainId: number | null,
+  isWrongNetwork: boolean,
+  publicClient: PublicClient | null,
+  walletClient: WalletClient | null,
   connect: () => Promise<void>,
-  disconnect: () => Promise<void>
+  disconnect: () => Promise<void>,
+  switchNetwork: () => Promise<void>
 ): WalletContextValue => ({
   mode,
   address,
   shortAddress: formatWalletAddress(address),
   isConnected: address !== null,
   isConnecting,
+  chainId,
+  expectedChainId,
+  isWrongNetwork,
+  publicClient,
+  walletClient,
   connect,
   disconnect,
+  switchNetwork,
 });
 
 export const WalletContext = createContext<WalletContextValue | null>(null);

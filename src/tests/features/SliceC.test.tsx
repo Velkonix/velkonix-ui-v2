@@ -46,6 +46,7 @@ describe("Slice C", () => {
 
     expect(screen.getByRole("heading", { name: "Staking" })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Connect test wallet" }));
+    await user.click(screen.getByRole("tab", { name: "Convert" }));
 
     await user.clear(screen.getByRole("textbox", { name: "Convert amount" }));
     await user.type(screen.getByRole("textbox", { name: "Convert amount" }), "500");

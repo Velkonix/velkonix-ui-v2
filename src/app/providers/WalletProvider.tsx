@@ -18,6 +18,12 @@ const disconnectedRealWallet = createWalletContextValue(
   "real",
   null,
   false,
+  null,
+  null,
+  false,
+  null,
+  null,
+  async () => {},
   async () => {},
   async () => {}
 );
@@ -45,7 +51,20 @@ function MockWalletStateProvider({ children }: { children: ReactNode }) {
   const activeAddress = isSessionConnected ? persistedAddress : null;
 
   const value = useMemo(
-    () => createWalletContextValue("mock", activeAddress, isConnecting, connect, disconnect),
+    () =>
+      createWalletContextValue(
+        "mock",
+        activeAddress,
+        isConnecting,
+        null,
+        null,
+        false,
+        null,
+        null,
+        connect,
+        disconnect,
+        async () => {}
+      ),
     [activeAddress, connect, disconnect, isConnecting]
   );
 

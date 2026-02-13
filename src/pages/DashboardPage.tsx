@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useLendingController } from "../features/lending";
 import {
@@ -16,6 +16,7 @@ import {
   PanelHeader,
   PanelHeaderStat,
   Section,
+  Spinner,
   Switch,
   Table,
   ToastPopup,
@@ -59,6 +60,7 @@ export function DashboardPage() {
     busyOp,
     lastError,
     toast,
+    isLoading,
     dashboardSupplies,
     dashboardBorrows,
     dashboardSummary,
@@ -75,6 +77,8 @@ export function DashboardPage() {
   const [withdrawModal, setWithdrawModal] = useState<WithdrawModalState>(null);
   const [repayModal, setRepayModal] = useState<RepayModalState>(null);
   const [collateralModal, setCollateralModal] = useState<CollateralModalState>(null);
+  const [isCollateralTxPending, setIsCollateralTxPending] = useState(false);
+  const [isWithdrawTxPending, setIsWithdrawTxPending] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState("0");
   const [repayAmount, setRepayAmount] = useState("0");
 
@@ -130,6 +134,32 @@ export function DashboardPage() {
   );
   const collateralDisableBlocked = collateralModal !== null && !collateralModal.nextEnabled && collateralHealthFactorAfter < 1;
 
+  useEffect(() => {
+    if (!isCollateralTxPending || busyOp === "setCollateral") {
+      return;
+    }
+    if (busyOp !== null) {
+      return;
+    }
+    if (toast?.tone === "success" && toast.title === "SETCOLLATERAL success") {
+      setCollateralModal(null);
+    }
+    setIsCollateralTxPending(false);
+  }, [busyOp, isCollateralTxPending, toast]);
+
+  useEffect(() => {
+    if (!isWithdrawTxPending || busyOp === "withdraw") {
+      return;
+    }
+    if (busyOp !== null) {
+      return;
+    }
+    if (toast?.tone === "success" && toast.title === "WITHDRAW success") {
+      setWithdrawModal(null);
+    }
+    setIsWithdrawTxPending(false);
+  }, [busyOp, isWithdrawTxPending, toast]);
+
   const suppliesBalance = useMemo(() => dashboardSupplies.reduce((sum, row) => sum + row.balance, 0), [dashboardSupplies]);
   const suppliesWeightedApy = useMemo(() => {
     if (suppliesBalance <= 0) {
@@ -149,7 +179,13 @@ export function DashboardPage() {
   }, [dashboardBorrows, borrowsBalance]);
 
   return (
-    <PageContainer className={styles.page}>
+    <PageContainer className={styles.page} aria-busy={isLoading}>
+      {isLoading ? (
+        <div className={styles.loadingOverlay} role="status" aria-live="polite">
+          <Spinner size="lg" aria-hidden="true" />
+          <Typography muted>Loading dashboard data...</Typography>
+        </div>
+      ) : null}
       <PageHeader
         title="Dashboard"
         subtitle="your positions and protocol exposure"
@@ -170,6 +206,15 @@ export function DashboardPage() {
       ) : null}
 
       <Section>
+        {wallet.mode === "real" && wallet.isConnected && wallet.isWrongNetwork ? (
+          <Card>
+            <EmptyState
+              title="Wrong network"
+              description={`Switch wallet network to chain ${wallet.expectedChainId ?? "configured network"} to view dashboard.`}
+            />
+            <ActionButton label="Switch network" onClick={() => void wallet.switchNetwork()} />
+          </Card>
+        ) : null}
         <div className={styles.summaryGrid}>
           <MetricTile
             title="Net worth"
@@ -434,7 +479,10 @@ export function DashboardPage() {
         isOpen={collateralModal !== null}
         size="xs"
         title={collateralModal ? `${collateralModal.nextEnabled ? "Enable" : "Disable"} ${collateralModal.symbol} collateral` : ""}
-        onClose={() => setCollateralModal(null)}
+        onClose={() => {
+          setCollateralModal(null);
+          setIsCollateralTxPending(false);
+        }}
       >
         {collateralModal ? (
           <div className={styles.modalContent}>
@@ -476,7 +524,10 @@ export function DashboardPage() {
               }
               isLoading={busyOp === "setCollateral"}
               disabled={!wallet.isConnected || busyOp !== null || collateralDisableBlocked}
-              onClick={() => void setCollateral(collateralModal.assetId, collateralModal.nextEnabled)}
+              onClick={() => {
+                setIsCollateralTxPending(true);
+                void setCollateral(collateralModal.assetId, collateralModal.nextEnabled);
+              }}
             />
           </div>
         ) : null}
@@ -486,7 +537,10 @@ export function DashboardPage() {
         isOpen={withdrawModal !== null}
         size="xs"
         title={withdrawModal ? `Withdraw ${withdrawModal.symbol}` : ""}
-        onClose={() => setWithdrawModal(null)}
+        onClose={() => {
+          setWithdrawModal(null);
+          setIsWithdrawTxPending(false);
+        }}
       >
         {withdrawModal ? (
           <div className={styles.modalContent}>
@@ -530,7 +584,10 @@ export function DashboardPage() {
               label={busyOp === "withdraw" ? "Withdrawing..." : "Withdraw"}
               isLoading={busyOp === "withdraw"}
               disabled={!wallet.isConnected || busyOp !== null || normalizedWithdrawAmount <= 0 || withdrawExceedsLimit}
-              onClick={() => void withdraw(withdrawModal.assetId, withdrawAmount)}
+              onClick={() => {
+                setIsWithdrawTxPending(true);
+                void withdraw(withdrawModal.assetId, withdrawAmount);
+              }}
             />
           </div>
         ) : null}
