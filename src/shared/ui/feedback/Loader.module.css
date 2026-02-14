@@ -1,0 +1,56 @@
+.loader {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: var(--space-3);
+  min-height: 180px;
+  width: 100%;
+  padding: var(--space-5) var(--space-4);
+}
+
+.spinnerShell {
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 28%, rgba(var(--accent-hover-rgb), 0.2), transparent 58%),
+    linear-gradient(180deg, rgba(var(--bg-secondary-rgb), 0.9), rgba(var(--bg-tertiary-rgb), 0.86));
+  box-shadow:
+    var(--surface-ring-subtle),
+    var(--glow-soft);
+}
+
+.label {
+  letter-spacing: 0.01em;
+}
+
+.sm .spinnerShell {
+  width: 34px;
+  height: 34px;
+}
+
+.md .spinnerShell {
+  width: 42px;
+  height: 42px;
+}
+
+.lg .spinnerShell {
+  width: 56px;
+  height: 56px;
+}
+
+.fullPage {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-dropdown);
+  background:
+    radial-gradient(circle at 50% 12%, rgba(var(--accent-glow-rgb), 0.12), transparent 48%),
+    rgba(var(--bg-primary-rgb), var(--surface-alpha-95));
+  backdrop-filter: blur(3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fullPage {
+    backdrop-filter: none;
+  }
+}

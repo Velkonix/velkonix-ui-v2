@@ -9,6 +9,7 @@ const config: Config = {
   moduleNameMapper: {
     "\\.module\\.css$": "<rootDir>/src/tests/styleMock.ts",
     "\\.css$": "<rootDir>/src/tests/styleMock.ts",
+    "\\.(svg|png|jpg|jpeg|gif|webp|avif)$": "<rootDir>/src/tests/fileMock.ts",
   },
 };
 

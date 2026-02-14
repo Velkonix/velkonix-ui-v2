@@ -63,6 +63,22 @@
   box-shadow: var(--glow-soft);
 }
 
+.dualValue {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  line-height: 1.2;
+}
+
+.usdValue {
+  font-weight: var(--font-weight-semibold);
+}
+
+.nativeValue {
+  font-size: 0.86em;
+}
+
 .modalContent {
   display: grid;
   gap: var(--layout-modal-content-gap);

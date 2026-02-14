@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { useLendingController } from "../features/lending";
 import {
@@ -9,6 +10,7 @@ import {
   ClaimButton,
   EmptyState,
   Icon,
+  Loader,
   MetricTile,
   Modal,
   PageContainer,
@@ -16,7 +18,6 @@ import {
   PanelHeader,
   PanelHeaderStat,
   Section,
-  Spinner,
   Switch,
   Table,
   ToastPopup,
@@ -29,7 +30,9 @@ import styles from "./DashboardPage.module.css";
 type WithdrawModalState = {
   assetId: string;
   symbol: string;
+  supplyBalance: number;
   maxAmount: number;
+  isCollateral: boolean;
 } | null;
 
 type RepayModalState = {
@@ -48,13 +51,34 @@ type CollateralModalState = {
 
 const formatAmount = (value: number): string => formatNumber(value);
 const formatUsd = (value: number): string => `$${formatNumber(value)}`;
+const formatUsdOrNa = (value: number | null): string => (value === null ? "N/A" : formatUsd(value));
 const formatPercent = (value: number): string => `${formatNumber(value, { decimals: 2, compact: false })}%`;
-const formatHealthFactor = (value: number): string => formatNumber(value, { decimals: 2, compact: false });
-const formatInputAmount = (value: number): string => formatNumber(value, { decimals: 4, compact: false, useGrouping: false });
+const getHealthPercent = (healthFactor: number): number => {
+  if (!Number.isFinite(healthFactor)) {
+    return 100;
+  }
+  if (healthFactor <= 1) {
+    return 0;
+  }
+  // Maps HF in [1..+inf] to [0..100], where HF=1 is liquidation edge.
+  const normalized = (1 - 1 / healthFactor) * 100;
+  return Math.max(0, Math.min(100, normalized));
+};
+const formatHealthFactor = (value: number): string =>
+  Number.isFinite(value) ? formatNumber(value, { decimals: 2, compact: false }) : "∞";
+const formatHealthFactorWithPercent = (value: number): string => {
+  const numeric = Number.isFinite(value) ? formatNumber(value, { decimals: 2, compact: false }) : "∞";
+  const healthPercent = formatNumber(getHealthPercent(value), { decimals: 2, compact: false });
+  return `${numeric} (${healthPercent}%)`;
+};
+const formatInputAmount = (value: number): string => formatNumber(value, { compact: false, useGrouping: false });
 const computeHealthFactor = (totalSupplied: number, totalBorrowed: number): number =>
   totalBorrowed > 0 ? totalSupplied / totalBorrowed : Number.POSITIVE_INFINITY;
+const getAvailableLiquidity = (totalSupplied: number, totalBorrowed: number): number =>
+  Math.max(0, totalSupplied - totalBorrowed);
 
 export function DashboardPage() {
+  const navigate = useNavigate();
   const {
     wallet,
     busyOp,
@@ -64,6 +88,8 @@ export function DashboardPage() {
     dashboardSupplies,
     dashboardBorrows,
     dashboardSummary,
+    userAccountMetrics,
+    getAssetById,
     getAllowanceForAsset,
     getWalletBalanceForAsset,
     approve,
@@ -79,12 +105,15 @@ export function DashboardPage() {
   const [collateralModal, setCollateralModal] = useState<CollateralModalState>(null);
   const [isCollateralTxPending, setIsCollateralTxPending] = useState(false);
   const [isWithdrawTxPending, setIsWithdrawTxPending] = useState(false);
-  const [withdrawAmount, setWithdrawAmount] = useState("0");
-  const [repayAmount, setRepayAmount] = useState("0");
+  const [isRepayTxPending, setIsRepayTxPending] = useState(false);
+  const [withdrawAmount, setWithdrawAmount] = useState("");
+  const [repayAmount, setRepayAmount] = useState("");
 
   const parsedWithdrawAmount = Number(withdrawAmount);
   const normalizedWithdrawAmount = Number.isFinite(parsedWithdrawAmount) && parsedWithdrawAmount > 0 ? parsedWithdrawAmount : 0;
   const withdrawExceedsLimit = withdrawModal !== null && normalizedWithdrawAmount > withdrawModal.maxAmount;
+  const withdrawBlockedByUtilization =
+    withdrawModal !== null && withdrawModal.maxAmount < withdrawModal.supplyBalance;
 
   const repayWalletBalance = useMemo(
     () => (repayModal ? getWalletBalanceForAsset(repayModal.assetId) : 0),
@@ -105,33 +134,77 @@ export function DashboardPage() {
   const requiresRepayApproval = repayModal !== null && normalizedRepayAmount > 0 && repayAllowance < normalizedRepayAmount;
 
   const withdrawAmountApplied = withdrawModal ? Math.min(normalizedWithdrawAmount, withdrawModal.maxAmount) : 0;
-  const withdrawRemainingSupplyBefore = withdrawModal?.maxAmount ?? 0;
+  const withdrawRemainingSupplyBefore = withdrawModal?.supplyBalance ?? 0;
   const withdrawRemainingSupplyAfter = Math.max(0, withdrawRemainingSupplyBefore - withdrawAmountApplied);
-  const withdrawHealthFactorBefore = computeHealthFactor(dashboardSummary.totalSupplied, dashboardSummary.totalBorrowed);
-  const withdrawHealthFactorAfter = computeHealthFactor(
-    Math.max(0, dashboardSummary.totalSupplied - withdrawAmountApplied),
-    dashboardSummary.totalBorrowed
-  );
-
   const repayAmountApplied = repayModal ? Math.min(normalizedRepayAmount, repayModal.maxDebt) : 0;
   const repayRemainingDebtBefore = repayModal?.maxDebt ?? 0;
   const repayRemainingDebtAfter = Math.max(0, repayRemainingDebtBefore - repayAmountApplied);
-  const repayHealthFactorBefore = computeHealthFactor(dashboardSummary.totalSupplied, dashboardSummary.totalBorrowed);
-  const repayHealthFactorAfter = computeHealthFactor(
-    dashboardSummary.totalSupplied,
-    Math.max(0, dashboardSummary.totalBorrowed - repayAmountApplied)
-  );
-
-  const collateralSupplied = useMemo(
-    () => dashboardSupplies.reduce((sum, item) => sum + (item.isCollateral ? item.balance : 0), 0),
-    [dashboardSupplies]
-  );
-  const collateralHealthFactorBefore = computeHealthFactor(collateralSupplied, dashboardSummary.totalBorrowed);
-  const collateralDelta = collateralModal ? (collateralModal.nextEnabled ? collateralModal.supplyBalance : -collateralModal.supplyBalance) : 0;
-  const collateralHealthFactorAfter = computeHealthFactor(
-    Math.max(0, collateralSupplied + collateralDelta),
+  const fallbackHealthFactor = computeHealthFactor(
+    dashboardSupplies.reduce((sum, item) => sum + (item.isCollateral ? item.balance : 0), 0),
     dashboardSummary.totalBorrowed
   );
+  const canUseRealHealthFactor =
+    wallet.mode === "real" && userAccountMetrics !== null && userAccountMetrics.baseCurrencyUnit > 0;
+  const getAssetUsdPrice = (assetId: string): number | null => {
+    const asset = getAssetById(assetId);
+    if (!asset?.oraclePrice || !Number.isFinite(asset.oraclePrice) || asset.oraclePrice <= 0) {
+      return null;
+    }
+    return asset.oraclePrice;
+  };
+  const toBaseAmount = (assetId: string, tokenAmount: number): number => {
+    if (!canUseRealHealthFactor) {
+      return 0;
+    }
+    const price = getAssetUsdPrice(assetId);
+    if (price === null) {
+      return 0;
+    }
+    return tokenAmount * price * userAccountMetrics.baseCurrencyUnit;
+  };
+  const projectHealthFactor = (collateralDeltaBase: number, debtDeltaBase: number): number => {
+    if (!canUseRealHealthFactor) {
+      return Number.POSITIVE_INFINITY;
+    }
+    const totalDebtAfter = Math.max(0, userAccountMetrics.totalDebtBase + debtDeltaBase);
+    if (totalDebtAfter <= 0) {
+      return Number.POSITIVE_INFINITY;
+    }
+    const totalCollateralAfter = Math.max(0, userAccountMetrics.totalCollateralBase + collateralDeltaBase);
+    return (totalCollateralAfter * (userAccountMetrics.currentLiquidationThreshold / 10_000)) / totalDebtAfter;
+  };
+
+  const withdrawHealthFactorBefore = canUseRealHealthFactor
+    ? (userAccountMetrics.healthFactor ?? Number.POSITIVE_INFINITY)
+    : fallbackHealthFactor;
+  const withdrawHealthFactorAfter = canUseRealHealthFactor
+    ? projectHealthFactor(withdrawModal?.isCollateral ? -toBaseAmount(withdrawModal.assetId, withdrawAmountApplied) : 0, 0)
+    : computeHealthFactor(Math.max(0, dashboardSummary.totalSupplied - withdrawAmountApplied), dashboardSummary.totalBorrowed);
+  const repayHealthFactorBefore = canUseRealHealthFactor
+    ? (userAccountMetrics.healthFactor ?? Number.POSITIVE_INFINITY)
+    : fallbackHealthFactor;
+  const repayHealthFactorAfter = canUseRealHealthFactor
+    ? projectHealthFactor(0, -toBaseAmount(repayModal?.assetId ?? "", repayAmountApplied))
+    : computeHealthFactor(dashboardSummary.totalSupplied, Math.max(0, dashboardSummary.totalBorrowed - repayAmountApplied));
+  const collateralHealthFactorBefore = canUseRealHealthFactor
+    ? (userAccountMetrics.healthFactor ?? Number.POSITIVE_INFINITY)
+    : computeHealthFactor(
+        dashboardSupplies.reduce((sum, item) => sum + (item.isCollateral ? item.balance : 0), 0),
+        dashboardSummary.totalBorrowed
+      );
+  const collateralDeltaBase = collateralModal
+    ? toBaseAmount(collateralModal.assetId, collateralModal.nextEnabled ? collateralModal.supplyBalance : -collateralModal.supplyBalance)
+    : 0;
+  const collateralHealthFactorAfter = canUseRealHealthFactor
+    ? projectHealthFactor(collateralDeltaBase, 0)
+    : computeHealthFactor(
+        Math.max(
+          0,
+          dashboardSupplies.reduce((sum, item) => sum + (item.isCollateral ? item.balance : 0), 0) +
+            (collateralModal ? (collateralModal.nextEnabled ? collateralModal.supplyBalance : -collateralModal.supplyBalance) : 0)
+        ),
+        dashboardSummary.totalBorrowed
+      );
   const collateralDisableBlocked = collateralModal !== null && !collateralModal.nextEnabled && collateralHealthFactorAfter < 1;
 
   useEffect(() => {
@@ -160,6 +233,19 @@ export function DashboardPage() {
     setIsWithdrawTxPending(false);
   }, [busyOp, isWithdrawTxPending, toast]);
 
+  useEffect(() => {
+    if (!isRepayTxPending || busyOp === "repay") {
+      return;
+    }
+    if (busyOp !== null) {
+      return;
+    }
+    if (toast?.tone === "success" && toast.title === "REPAY success") {
+      setRepayModal(null);
+    }
+    setIsRepayTxPending(false);
+  }, [busyOp, isRepayTxPending, toast]);
+
   const suppliesBalance = useMemo(() => dashboardSupplies.reduce((sum, row) => sum + row.balance, 0), [dashboardSupplies]);
   const suppliesWeightedApy = useMemo(() => {
     if (suppliesBalance <= 0) {
@@ -181,10 +267,7 @@ export function DashboardPage() {
   return (
     <PageContainer className={styles.page} aria-busy={isLoading}>
       {isLoading ? (
-        <div className={styles.loadingOverlay} role="status" aria-live="polite">
-          <Spinner size="lg" aria-hidden="true" />
-          <Typography muted>Loading dashboard data...</Typography>
-        </div>
+        <Loader fullPage label="Loading dashboard data..." />
       ) : null}
       <PageHeader
         title="Dashboard"
@@ -218,7 +301,7 @@ export function DashboardPage() {
         <div className={styles.summaryGrid}>
           <MetricTile
             title="Net worth"
-            value={formatUsd(dashboardSummary.netWorth)}
+            value={formatUsdOrNa(dashboardSummary.netWorthUsd)}
             media={
               <Icon size={18} viewBox="0 0 24 24" aria-label="Net worth icon">
                 <path
@@ -294,7 +377,11 @@ export function DashboardPage() {
           />
           <MetricTile
             title="Health factor"
-            value={formatPercent(dashboardSummary.borrowUtilization)}
+            value={formatHealthFactorWithPercent(
+              canUseRealHealthFactor
+                ? (userAccountMetrics.healthFactor ?? Number.POSITIVE_INFINITY)
+                : fallbackHealthFactor
+            )}
             media={
               <Icon size={18} viewBox="0 0 32 32" aria-label="Health factor icon">
                 <path
@@ -366,20 +453,21 @@ export function DashboardPage() {
                     title: "Collateral",
                     align: "center",
                     render: (row) => (
-                      <div className={styles.switchCell}>
+                      <div className={styles.switchCell} onClick={(event) => event.stopPropagation()}>
                         <Switch
                           variant="collateral"
                           checked={row.isCollateral}
                           disabled={!wallet.isConnected || busyOp !== null}
-                          onChange={(event) =>
+                          onChange={(event) => {
+                            event.stopPropagation();
                             setCollateralModal({
                               assetId: row.assetId,
                               symbol: row.symbol,
                               supplyBalance: row.balance,
                               isCurrentlyEnabled: row.isCollateral,
                               nextEnabled: event.target.checked,
-                            })
-                          }
+                            });
+                          }}
                           aria-label={`Use ${row.symbol} as collateral`}
                         />
                       </div>
@@ -394,13 +482,18 @@ export function DashboardPage() {
                         label="Withdraw"
                         size="sm"
                         disabled={!wallet.isConnected || busyOp !== null}
-                        onClick={() => {
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          const asset = getAssetById(row.assetId);
+                          const liquidityLimit = asset ? getAvailableLiquidity(asset.totalSupplied, asset.totalBorrowed) : row.balance;
                           setWithdrawModal({
                             assetId: row.assetId,
                             symbol: row.symbol,
-                            maxAmount: row.balance,
+                            supplyBalance: row.balance,
+                            maxAmount: Math.min(row.balance, liquidityLimit),
+                            isCollateral: row.isCollateral,
                           });
-                          setWithdrawAmount(formatInputAmount(row.balance));
+                          setWithdrawAmount("");
                         }}
                       />
                     ),
@@ -408,6 +501,7 @@ export function DashboardPage() {
                 ]}
                 rows={dashboardSupplies}
                 getRowKey={(row) => row.assetId}
+                onRowClick={(row) => navigate(`/asset/${row.assetId}`)}
               />
             )}
           </Card>
@@ -455,13 +549,14 @@ export function DashboardPage() {
                         label="Repay"
                         size="sm"
                         disabled={!wallet.isConnected || busyOp !== null}
-                        onClick={() => {
+                        onClick={(event) => {
+                          event.stopPropagation();
                           setRepayModal({
                             assetId: row.assetId,
                             symbol: row.symbol,
                             maxDebt: row.debt,
                           });
-                          setRepayAmount(formatInputAmount(row.debt));
+                          setRepayAmount("");
                         }}
                       />
                     ),
@@ -469,6 +564,7 @@ export function DashboardPage() {
                 ]}
                 rows={dashboardBorrows}
                 getRowKey={(row) => row.assetId}
+                onRowClick={(row) => navigate(`/asset/${row.assetId}`)}
               />
             )}
           </Card>
@@ -552,7 +648,7 @@ export function DashboardPage() {
               assetLabel={withdrawModal.symbol}
               balanceLabel="Available"
               balanceValue={formatInputAmount(withdrawModal.maxAmount)}
-              maxValue={formatInputAmount(withdrawModal.maxAmount)}
+              maxValue={withdrawModal.maxAmount}
             />
             <div className={styles.txOverview}>
               <Typography as="p" variant="label" className={styles.txOverviewTitle}>
@@ -577,7 +673,9 @@ export function DashboardPage() {
             </div>
             {withdrawExceedsLimit ? (
               <Typography muted role="status">
-                Withdraw amount exceeds supplied balance.
+                {withdrawBlockedByUtilization
+                  ? `Withdraw amount exceeds currently available liquidity in the pool due to utilization. Right now you can withdraw up to ${formatAmount(withdrawModal.maxAmount)} ${withdrawModal.symbol}.`
+                  : "Withdraw amount exceeds supplied balance."}
               </Typography>
             ) : null}
             <ActionButton
@@ -597,7 +695,10 @@ export function DashboardPage() {
         isOpen={repayModal !== null}
         size="xs"
         title={repayModal ? `Repay ${repayModal.symbol}` : ""}
-        onClose={() => setRepayModal(null)}
+        onClose={() => {
+          setRepayModal(null);
+          setIsRepayTxPending(false);
+        }}
       >
         {repayModal ? (
           <div className={styles.modalContent}>
@@ -609,7 +710,7 @@ export function DashboardPage() {
               assetLabel={repayModal.symbol}
               balanceLabel="Available to repay"
               balanceValue={formatInputAmount(repayAvailable)}
-              maxValue={formatInputAmount(repayAvailable)}
+              maxValue={repayAvailable}
             />
             <div className={styles.txOverview}>
               <Typography as="p" variant="label" className={styles.txOverviewTitle}>
@@ -641,7 +742,14 @@ export function DashboardPage() {
               label={busyOp === "approve" ? "Approving..." : busyOp === "repay" ? "Repaying..." : requiresRepayApproval ? "Approve" : "Repay"}
               isLoading={busyOp === "approve" || busyOp === "repay"}
               disabled={!wallet.isConnected || busyOp !== null || normalizedRepayAmount <= 0 || repayExceedsLimit}
-              onClick={() => void (requiresRepayApproval ? approve(repayModal.assetId, repayAmount) : repay(repayModal.assetId, repayAmount))}
+              onClick={() => {
+                if (requiresRepayApproval) {
+                  void approve(repayModal.assetId, repayAmount);
+                  return;
+                }
+                setIsRepayTxPending(true);
+                void repay(repayModal.assetId, repayAmount);
+              }}
             />
           </div>
         ) : null}

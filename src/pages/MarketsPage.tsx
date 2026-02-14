@@ -9,12 +9,12 @@ import {
   Card,
   EmptyState,
   Icon,
+  Loader,
   MetricTile,
   Modal,
   PageContainer,
   PageHeader,
   Section,
-  Skeleton,
   Table,
   ValueCell,
 } from "../shared/ui";
@@ -35,6 +35,7 @@ type MobileMetricRow = {
 
 const formatAmount = (value: number): string => formatNumber(value);
 const formatUsd = (value: number): string => `$${formatNumber(value)}`;
+const formatUsdOrNa = (value: number | null): string => (value === null ? "N/A" : formatUsd(value));
 const formatPercent = (value: number): string => `${formatNumber(value, { decimals: 2, compact: false })}%`;
 const MOBILE_MEDIA_QUERY = "(max-width: 768px)";
 
@@ -62,14 +63,26 @@ export function MarketsPage() {
   }, []);
 
   const marketSummary = useMemo(() => {
-    const totalMarketSize = marketRows.reduce((sum, row) => sum + row.totalSupplied, 0);
-    const totalBorrows = marketRows.reduce((sum, row) => sum + row.totalBorrowed, 0);
-    const totalAvailable = marketRows.reduce((sum, row) => sum + Math.max(row.totalSupplied - row.totalBorrowed, 0), 0);
+    const sumNullable = (values: Array<number | null>): number | null => {
+      if (values.some((value) => value === null)) {
+        return null;
+      }
+      return values.filter((value): value is number => value !== null).reduce((sum, value) => sum + value, 0);
+    };
+    const totalMarketSizeUsd = sumNullable(marketRows.map((row) => row.totalSuppliedUsd));
+    const totalBorrowsUsd = sumNullable(marketRows.map((row) => row.totalBorrowedUsd));
+    const totalAvailableUsd = sumNullable(
+      marketRows.map((row) =>
+        row.totalSuppliedUsd === null || row.totalBorrowedUsd === null
+          ? null
+          : Math.max(row.totalSuppliedUsd - row.totalBorrowedUsd, 0)
+      )
+    );
 
     return {
-      totalMarketSize,
-      totalAvailable,
-      totalBorrows,
+      totalMarketSizeUsd,
+      totalAvailableUsd,
+      totalBorrowsUsd,
     };
   }, [marketRows]);
 
@@ -103,12 +116,21 @@ export function MarketsPage() {
     });
   };
 
+  const renderDualAmount = (tokenValue: number, usdValue: number | null, symbol: string) => (
+    <span className={styles.dualValue}>
+      <ValueCell className={styles.usdValue}>{formatUsdOrNa(usdValue)}</ValueCell>
+      <ValueCell tone="muted" className={styles.nativeValue}>
+        {`${formatAmount(tokenValue)} ${symbol}`}
+      </ValueCell>
+    </span>
+  );
+
   const renderMobileMetricsTable = (row: MarketRow) => {
     const mobileMetricRows: MobileMetricRow[] = [
       {
         key: "totalSupplied",
         label: "Total Supplied",
-        value: <ValueCell>{formatAmount(row.totalSupplied)}</ValueCell>,
+        value: renderDualAmount(row.totalSupplied, row.totalSuppliedUsd, row.symbol),
       },
       {
         key: "supplyApy",
@@ -122,7 +144,7 @@ export function MarketsPage() {
       {
         key: "totalBorrowed",
         label: "Total Borrowed",
-        value: <ValueCell>{formatAmount(row.totalBorrowed)}</ValueCell>,
+        value: renderDualAmount(row.totalBorrowed, row.totalBorrowedUsd, row.symbol),
       },
       {
         key: "borrowApy",
@@ -171,7 +193,7 @@ export function MarketsPage() {
         <div className={styles.summaryGrid}>
           <MetricTile
             title="Total market size"
-            value={formatUsd(marketSummary.totalMarketSize)}
+            value={formatUsdOrNa(marketSummary.totalMarketSizeUsd)}
             media={
               <Icon size={18} aria-label="Total market size icon">
                 <path
@@ -187,7 +209,7 @@ export function MarketsPage() {
           />
           <MetricTile
             title="Total available"
-            value={formatUsd(marketSummary.totalAvailable)}
+            value={formatUsdOrNa(marketSummary.totalAvailableUsd)}
             media={
               <Icon size={18} viewBox="0 0 1024 1024" aria-label="Total available icon">
                 <path
@@ -203,7 +225,7 @@ export function MarketsPage() {
           />
           <MetricTile
             title="Total borrows"
-            value={formatUsd(marketSummary.totalBorrows)}
+            value={formatUsdOrNa(marketSummary.totalBorrowsUsd)}
             media={
               <Icon size={18} viewBox="-3.5 0 19 19" aria-label="Total borrows icon">
                 <path
@@ -227,11 +249,7 @@ export function MarketsPage() {
           </Card>
         ) : null}
         {isLoading ? (
-          <Card>
-            <Skeleton height={40} />
-            <Skeleton height={40} />
-            <Skeleton height={40} />
-          </Card>
+          <Loader label="Loading markets data..." />
         ) : null}
         {!isLoading ? (
           <>
@@ -275,7 +293,7 @@ export function MarketsPage() {
                   key: "totalSupplied",
                   title: titleButton("Total Supplied", "totalSupplied"),
                   align: "right",
-                  render: (row) => <ValueCell>{formatAmount(row.totalSupplied)}</ValueCell>,
+                  render: (row) => renderDualAmount(row.totalSupplied, row.totalSuppliedUsd, row.symbol),
                 },
                 {
                   key: "supplyApy",
@@ -295,7 +313,7 @@ export function MarketsPage() {
                   key: "totalBorrowed",
                   title: titleButton("Total Borrowed", "totalBorrowed"),
                   align: "right",
-                  render: (row) => <ValueCell>{formatAmount(row.totalBorrowed)}</ValueCell>,
+                  render: (row) => renderDualAmount(row.totalBorrowed, row.totalBorrowedUsd, row.symbol),
                 },
                 {
                   key: "borrowApy",

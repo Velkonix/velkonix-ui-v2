@@ -5,11 +5,13 @@ import { getActiveNetworkConfig, getAssetConfigByAddress, validateActiveNetworkC
 import { useMockEngine } from "../../app/providers/MockEngineProvider";
 import { useWallet } from "../../app/providers/WalletProvider";
 import type { Asset, AssetId, MockTxResult, Tx, UserBorrow, UserSupply } from "../../mock";
-import { AAVE_DATA_PROVIDER_ABI, ERC20_ABI, POOL_ABI } from "./aaveAbis";
+import { AAVE_DATA_PROVIDER_ABI, ERC20_ABI, ORACLE_ABI, POOL_ABI } from "./aaveAbis";
 import { bpsToPercent, formatUnitsToNumber, parseAmountToUnits, rayToPercent } from "./aaveMath";
 
 const MOCK_POLL_INTERVAL_MS = 250;
 const ONCHAIN_POLL_INTERVAL_MS = 15_000;
+const HEALTH_FACTOR_SCALE = 1e18;
+const USER_REJECTED_REQUEST_MESSAGE = "User rejected the request.";
 
 const parseAmount = (value: string): number => {
   const parsed = Number(value);
@@ -42,10 +44,22 @@ type AaveState = {
   userSupplies: UserSupply[];
   userBorrows: UserBorrow[];
   walletBalances: Record<string, number>;
+  walletBalancesUsd: Record<string, number | null>;
   allowances: Record<string, number>;
+  userAccountMetrics: UserAccountMetrics | null;
   loading: boolean;
   loadError: string | null;
   hasLoadedOnce: boolean;
+};
+
+export type UserAccountMetrics = {
+  healthFactor: number | null;
+  totalCollateralBase: number;
+  totalDebtBase: number;
+  availableBorrowsBase: number;
+  currentLiquidationThreshold: number;
+  ltv: number;
+  baseCurrencyUnit: number;
 };
 
 export type MarketSortKey = "asset" | "totalSupplied" | "supplyApy" | "totalBorrowed" | "borrowApy";
@@ -57,7 +71,9 @@ export type MarketRow = {
   name: string;
   icon: string;
   totalSupplied: number;
+  totalSuppliedUsd: number | null;
   totalBorrowed: number;
+  totalBorrowedUsd: number | null;
   supplyApy: number;
   borrowApy: number;
 };
@@ -68,6 +84,7 @@ export type DashboardSupplyRow = {
   name: string;
   icon: string;
   balance: number;
+  balanceUsd: number | null;
   apy: number;
   isCollateral: boolean;
 };
@@ -78,15 +95,19 @@ export type DashboardBorrowRow = {
   name: string;
   icon: string;
   debt: number;
+  debtUsd: number | null;
   apy: number;
 };
 
 export type DashboardSummary = {
   netWorth: number;
+  netWorthUsd: number | null;
   averageApy: number;
   borrowUtilization: number;
   totalSupplied: number;
+  totalSuppliedUsd: number | null;
   totalBorrowed: number;
+  totalBorrowedUsd: number | null;
   lendingRewards: number;
 };
 
@@ -95,7 +116,9 @@ const EMPTY_AAVE_STATE: AaveState = {
   userSupplies: [],
   userBorrows: [],
   walletBalances: {},
+  walletBalancesUsd: {},
   allowances: {},
+  userAccountMetrics: null,
   loading: true,
   loadError: null,
   hasLoadedOnce: false,
@@ -108,11 +131,11 @@ const sortRows = (rows: MarketRow[], key: MarketSortKey, direction: SortDirectio
       case "asset":
         return factor * left.symbol.localeCompare(right.symbol);
       case "totalSupplied":
-        return factor * (left.totalSupplied - right.totalSupplied);
+        return factor * ((left.totalSuppliedUsd ?? left.totalSupplied) - (right.totalSuppliedUsd ?? right.totalSupplied));
       case "supplyApy":
         return factor * (left.supplyApy - right.supplyApy);
       case "totalBorrowed":
-        return factor * (left.totalBorrowed - right.totalBorrowed);
+        return factor * ((left.totalBorrowedUsd ?? left.totalBorrowed) - (right.totalBorrowedUsd ?? right.totalBorrowed));
       case "borrowApy":
         return factor * (left.borrowApy - right.borrowApy);
       default:
@@ -129,6 +152,9 @@ const toAaveError = (value: unknown): string => {
   }
   return "UNKNOWN_ERROR";
 };
+
+const isUserRejectedRequestError = (value: string): boolean =>
+  value.includes(USER_REJECTED_REQUEST_MESSAGE);
 
 export function useLendingController() {
   const engine = useMockEngine();
@@ -196,7 +222,9 @@ export function useLendingController() {
           userSupplies: [],
           userBorrows: [],
           walletBalances: {},
+          walletBalancesUsd: {},
           allowances: {},
+          userAccountMetrics: null,
           loading: false,
           loadError: null,
           hasLoadedOnce: true,
@@ -204,7 +232,8 @@ export function useLendingController() {
         return;
       }
 
-      const [reserveDataResults, reserveConfigResults, reserveCapsResults] = await Promise.all([
+      const [reserveDataResults, reserveConfigResults, reserveCapsResults, oraclePriceResults, oracleBaseCurrencyUnit] =
+        await Promise.all([
         wallet.publicClient.multicall({
           allowFailure: false,
           contracts: assets.map((asset) => ({
@@ -232,58 +261,97 @@ export function useLendingController() {
             args: [asset],
           })),
         }),
+        wallet.publicClient.multicall({
+          allowFailure: false,
+          contracts: assets.map((asset) => ({
+            address: networkConfig.deployments.aaveOracle,
+            abi: ORACLE_ABI,
+            functionName: "getAssetPrice",
+            args: [asset],
+          })),
+        }),
+        wallet.publicClient.readContract({
+          address: networkConfig.deployments.aaveOracle,
+          abi: ORACLE_ABI,
+          functionName: "BASE_CURRENCY_UNIT",
+        }),
       ]);
 
-      const userReserveResults =
+      const [userReserveResults, walletBalancesResults, allowanceResults, userAccountDataResult] =
         user === null
-          ? []
-          : await wallet.publicClient.multicall({
-              allowFailure: false,
-              contracts: assets.map((asset) => ({
-                address: networkConfig.deployments.protocolDataProvider,
-                abi: AAVE_DATA_PROVIDER_ABI,
-                functionName: "getUserReserveData",
-                args: [asset, user],
-              })),
-            });
-
-      const walletBalancesResults =
-        user === null
-          ? []
-          : await wallet.publicClient.multicall({
-              allowFailure: false,
-              contracts: assets.map((asset) => ({
-                address: asset,
-                abi: ERC20_ABI,
-                functionName: "balanceOf",
+          ? [[], [], [], null]
+          : await Promise.all([
+              wallet.publicClient.multicall({
+                allowFailure: false,
+                contracts: assets.map((asset) => ({
+                  address: networkConfig.deployments.protocolDataProvider,
+                  abi: AAVE_DATA_PROVIDER_ABI,
+                  functionName: "getUserReserveData",
+                  args: [asset, user],
+                })),
+              }),
+              wallet.publicClient.multicall({
+                allowFailure: false,
+                contracts: assets.map((asset) => ({
+                  address: asset,
+                  abi: ERC20_ABI,
+                  functionName: "balanceOf",
+                  args: [user],
+                })),
+              }),
+              wallet.publicClient.multicall({
+                allowFailure: false,
+                contracts: assets.map((asset) => ({
+                  address: asset,
+                  abi: ERC20_ABI,
+                  functionName: "allowance",
+                  args: [user, networkConfig.deployments.poolProxy],
+                })),
+              }),
+              wallet.publicClient.readContract({
+                address: networkConfig.deployments.poolProxy,
+                abi: POOL_ABI,
+                functionName: "getUserAccountData",
                 args: [user],
-              })),
-            });
-
-      const allowanceResults =
-        user === null
-          ? []
-          : await wallet.publicClient.multicall({
-              allowFailure: false,
-              contracts: assets.map((asset) => ({
-                address: asset,
-                abi: ERC20_ABI,
-                functionName: "allowance",
-                args: [user, networkConfig.deployments.poolProxy],
-              })),
-            });
+              }),
+            ]);
 
       const nextAssets: AaveAssetRuntime[] = [];
       const nextSupplies: UserSupply[] = [];
       const nextBorrows: UserBorrow[] = [];
       const nextWalletBalances: Record<string, number> = {};
+      const nextWalletBalancesUsd: Record<string, number | null> = {};
       const nextAllowances: Record<string, number> = {};
       const reserveDataList = reserveDataResults as unknown as readonly unknown[];
       const reserveConfigList = reserveConfigResults as unknown as readonly unknown[];
       const reserveCapsList = reserveCapsResults as unknown as readonly unknown[];
+      const oraclePriceList = oraclePriceResults as unknown as readonly unknown[];
       const userReserveList = userReserveResults as unknown as readonly unknown[];
       const walletBalancesList = walletBalancesResults as unknown as readonly unknown[];
       const allowanceList = allowanceResults as unknown as readonly unknown[];
+      const oracleBaseUnit = oracleBaseCurrencyUnit as bigint;
+      const hasOracleBaseUnit = oracleBaseUnit > 0n;
+      const baseCurrencyUnit = hasOracleBaseUnit ? Number(oracleBaseUnit) : 0;
+
+      const userAccountMetrics: UserAccountMetrics | null =
+        userAccountDataResult === null
+          ? null
+          : (() => {
+              const [totalCollateralBase, totalDebtBase, availableBorrowsBase, currentLiquidationThreshold, ltv, healthFactorRaw] =
+                userAccountDataResult as [bigint, bigint, bigint, bigint, bigint, bigint];
+              const healthFactorValue = Number(healthFactorRaw) / HEALTH_FACTOR_SCALE;
+              const isInfiniteHealthFactor = healthFactorRaw >= (2n ** 256n - 1n) / 2n;
+              return {
+                healthFactor:
+                  isInfiniteHealthFactor || !Number.isFinite(healthFactorValue) ? Number.POSITIVE_INFINITY : healthFactorValue,
+                totalCollateralBase: Number(totalCollateralBase),
+                totalDebtBase: Number(totalDebtBase),
+                availableBorrowsBase: Number(availableBorrowsBase),
+                currentLiquidationThreshold: Number(currentLiquidationThreshold),
+                ltv: Number(ltv),
+                baseCurrencyUnit,
+              };
+            })();
 
       for (let index = 0; index < assets.length; index += 1) {
         const address = assets[index];
@@ -325,9 +393,21 @@ export function useLendingController() {
         ] = reserveConfig;
         const [, , totalAToken, , totalVariableDebt, liquidityRate, variableBorrowRate] = reserveData;
         const [borrowCap] = reserveCaps;
+        const oraclePriceRaw = oraclePriceList[index] as bigint;
         const normalizedId = normalizeAssetId(address);
         const configuredAsset = getAssetConfigByAddress(address);
         const assetDecimals = Number(decimals);
+
+        const oraclePrice = hasOracleBaseUnit ? Number(oraclePriceRaw) / baseCurrencyUnit : undefined;
+        const hasOraclePrice = oraclePrice !== undefined && Number.isFinite(oraclePrice) && oraclePrice > 0;
+        const totalSupplied = formatUnitsToNumber(totalAToken, assetDecimals);
+        const totalBorrowed = formatUnitsToNumber(totalVariableDebt, assetDecimals);
+        const borrowCapValue = formatUnitsToNumber(borrowCap, assetDecimals);
+        const totalSuppliedUsd = hasOraclePrice ? totalSupplied * oraclePrice : null;
+        const totalBorrowedUsd = hasOraclePrice ? totalBorrowed * oraclePrice : null;
+        const availableLiquidityUsd =
+          hasOraclePrice ? Math.max(0, totalSupplied - totalBorrowed) * oraclePrice : null;
+        const borrowCapUsd = hasOraclePrice ? borrowCapValue * oraclePrice : null;
 
         const asset: AaveAssetRuntime = {
           id: configuredAsset?.id ?? normalizedId,
@@ -336,15 +416,20 @@ export function useLendingController() {
           name: configuredAsset?.name ?? tokenInfo.symbol,
           icon: configuredAsset?.icon ?? tokenInfo.symbol.toLowerCase(),
           decimals: configuredAsset?.decimals ?? assetDecimals,
-          totalSupplied: formatUnitsToNumber(totalAToken, assetDecimals),
-          totalBorrowed: formatUnitsToNumber(totalVariableDebt, assetDecimals),
+          totalSupplied,
+          totalSuppliedUsd,
+          totalBorrowed,
+          totalBorrowedUsd,
+          availableLiquidityUsd,
           supplyApy: rayToPercent(liquidityRate),
           borrowApy: rayToPercent(variableBorrowRate),
           maxLtv: bpsToPercent(ltv),
           liquidationThreshold: bpsToPercent(liquidationThreshold),
           liquidationPenalty: bpsToPercent(liquidationBonus > 10_000n ? liquidationBonus - 10_000n : 0n),
-          borrowCap: formatUnitsToNumber(borrowCap, assetDecimals),
+          borrowCap: borrowCapValue,
+          borrowCapUsd,
           reserveFactor: bpsToPercent(reserveFactor),
+          oraclePrice: hasOraclePrice ? oraclePrice : undefined,
         };
 
         nextAssets.push(asset);
@@ -357,6 +442,7 @@ export function useLendingController() {
             nextSupplies.push({
               assetId: asset.id,
               balance: currentSupply,
+              balanceUsd: hasOraclePrice ? currentSupply * oraclePrice : null,
               apy: asset.supplyApy,
               isCollateral: usageAsCollateralEnabled,
             });
@@ -365,10 +451,13 @@ export function useLendingController() {
             nextBorrows.push({
               assetId: asset.id,
               debt: currentDebt,
+              debtUsd: hasOraclePrice ? currentDebt * oraclePrice : null,
               apy: asset.borrowApy,
             });
           }
-          nextWalletBalances[asset.id] = formatUnitsToNumber(walletBalancesList[index] as bigint, assetDecimals);
+          const walletBalance = formatUnitsToNumber(walletBalancesList[index] as bigint, assetDecimals);
+          nextWalletBalances[asset.id] = walletBalance;
+          nextWalletBalancesUsd[asset.id] = hasOraclePrice ? walletBalance * oraclePrice : null;
           nextAllowances[asset.id] = formatUnitsToNumber(allowanceList[index] as bigint, assetDecimals);
         }
       }
@@ -378,17 +467,26 @@ export function useLendingController() {
         userSupplies: nextSupplies,
         userBorrows: nextBorrows,
         walletBalances: nextWalletBalances,
+        walletBalancesUsd: nextWalletBalancesUsd,
         allowances: nextAllowances,
+        userAccountMetrics,
         loading: false,
         loadError: null,
         hasLoadedOnce: true,
       });
     } catch (error) {
-      setAaveState((prev) => ({ ...prev, loading: false, loadError: toAaveError(error), hasLoadedOnce: true }));
+      const errorCode = toAaveError(error);
+      setAaveState((prev) => ({
+        ...prev,
+        loading: false,
+        loadError: isUserRejectedRequestError(errorCode) ? null : errorCode,
+        hasLoadedOnce: true,
+      }));
     }
   }, [
     networkConfig.deployments.poolProxy,
     networkConfig.deployments.protocolDataProvider,
+    networkConfig.deployments.aaveOracle,
     user,
     wallet.isWrongNetwork,
     wallet.mode,
@@ -411,7 +509,16 @@ export function useLendingController() {
   const mockUserBorrows = user ? engine.selectors.getUserBorrows(user as `0x${string}`) : [];
   const mockLendingRewards = user ? engine.selectors.getUserLendingRewards(user as `0x${string}`) : 0;
 
-  const assets = wallet.mode === "mock" ? mockAssets : aaveState.assets;
+  const assets =
+    wallet.mode === "mock"
+      ? mockAssets.map((asset) => ({
+          ...asset,
+          totalSuppliedUsd: asset.totalSupplied,
+          totalBorrowedUsd: asset.totalBorrowed,
+          availableLiquidityUsd: Math.max(0, asset.totalSupplied - asset.totalBorrowed),
+          borrowCapUsd: (asset.borrowCap ?? 0),
+        }))
+      : aaveState.assets;
   const userSupplies = wallet.mode === "mock" ? mockUserSupplies : aaveState.userSupplies;
   const userBorrows = wallet.mode === "mock" ? mockUserBorrows : aaveState.userBorrows;
   const lendingRewards = wallet.mode === "mock" ? mockLendingRewards : 0;
@@ -446,7 +553,9 @@ export function useLendingController() {
           name: asset.name,
           icon: asset.icon,
           totalSupplied: asset.totalSupplied,
+            totalSuppliedUsd: wallet.mode === "mock" ? asset.totalSupplied : (asset.totalSuppliedUsd ?? null),
           totalBorrowed: asset.totalBorrowed,
+            totalBorrowedUsd: wallet.mode === "mock" ? asset.totalBorrowed : (asset.totalBorrowedUsd ?? null),
           supplyApy: asset.supplyApy,
           borrowApy: asset.borrowApy,
         })),
@@ -482,6 +591,10 @@ export function useLendingController() {
             name: asset.name,
             icon: asset.icon,
             balance: supplyItem.balance,
+            balanceUsd:
+              wallet.mode === "mock"
+                ? supplyItem.balance
+                : (supplyItem.balanceUsd ?? (asset.oraclePrice ? supplyItem.balance * asset.oraclePrice : null)),
             apy: supplyItem.apy,
             isCollateral: supplyItem.isCollateral,
           };
@@ -505,6 +618,10 @@ export function useLendingController() {
             name: asset.name,
             icon: asset.icon,
             debt: borrowItem.debt,
+            debtUsd:
+              wallet.mode === "mock"
+                ? borrowItem.debt
+                : (borrowItem.debtUsd ?? (asset.oraclePrice ? borrowItem.debt * asset.oraclePrice : null)),
             apy: borrowItem.apy,
           };
         })
@@ -515,23 +632,49 @@ export function useLendingController() {
   const dashboardSummary = useMemo<DashboardSummary>(() => {
     const totalSupplied = userSupplies.reduce((sum, item) => sum + item.balance, 0);
     const totalBorrowed = userBorrows.reduce((sum, item) => sum + item.debt, 0);
-    const netWorth = totalSupplied - totalBorrowed;
+    const totalSuppliedUsdRaw = dashboardSupplies.reduce((sum, item) => sum + (item.balanceUsd ?? 0), 0);
+    const totalBorrowedUsdRaw = dashboardBorrows.reduce((sum, item) => sum + (item.debtUsd ?? 0), 0);
+    const hasUsdCoverage =
+      wallet.mode === "mock"
+        ? true
+        : dashboardSupplies.every((item) => item.balanceUsd !== null) && dashboardBorrows.every((item) => item.debtUsd !== null);
+    const totalSuppliedUsd = hasUsdCoverage ? totalSuppliedUsdRaw : null;
+    const totalBorrowedUsd = hasUsdCoverage ? totalBorrowedUsdRaw : null;
+    const netWorthToken = totalSupplied - totalBorrowed;
+    const netWorthUsd = hasUsdCoverage ? totalSuppliedUsdRaw - totalBorrowedUsdRaw : null;
+    const netWorth = wallet.mode === "real" ? (netWorthUsd ?? netWorthToken) : netWorthToken;
 
-    const weightedSupplyApy = userSupplies.reduce((sum, item) => sum + item.balance * item.apy, 0);
-    const weightedBorrowApy = userBorrows.reduce((sum, item) => sum + item.debt * item.apy, 0);
-    const totalExposure = totalSupplied + totalBorrowed;
-    const averageApy = totalExposure > 0 ? (weightedSupplyApy - weightedBorrowApy) / totalExposure : 0;
-    const borrowUtilization = totalSupplied > 0 ? (totalBorrowed / totalSupplied) * 100 : 0;
+    const weightedSupplyApy =
+      wallet.mode === "real" && hasUsdCoverage
+        ? dashboardSupplies.reduce((sum, item) => sum + (item.balanceUsd ?? 0) * item.apy, 0)
+        : userSupplies.reduce((sum, item) => sum + item.balance * item.apy, 0);
+    const weightedBorrowApy =
+      wallet.mode === "real" && hasUsdCoverage
+        ? dashboardBorrows.reduce((sum, item) => sum + (item.debtUsd ?? 0) * item.apy, 0)
+        : userBorrows.reduce((sum, item) => sum + item.debt * item.apy, 0);
+    const netWorthBase =
+      wallet.mode === "real" && hasUsdCoverage
+        ? (netWorthUsd ?? 0)
+        : netWorthToken;
+    const safeNetWorthBase = netWorthBase !== 0 ? netWorthBase : 1;
+    const averageApy = (weightedSupplyApy - weightedBorrowApy) / safeNetWorthBase;
+    const borrowUtilization =
+      wallet.mode === "real" && hasUsdCoverage
+        ? (totalSuppliedUsdRaw > 0 ? (totalBorrowedUsdRaw / totalSuppliedUsdRaw) * 100 : 0)
+        : (totalSupplied > 0 ? (totalBorrowed / totalSupplied) * 100 : 0);
 
     return {
       netWorth,
+      netWorthUsd,
       averageApy,
       borrowUtilization,
       totalSupplied,
+      totalSuppliedUsd,
       totalBorrowed,
+      totalBorrowedUsd,
       lendingRewards,
     };
-  }, [lendingRewards, userBorrows, userSupplies, renderTick]);
+  }, [dashboardBorrows, dashboardSupplies, lendingRewards, userBorrows, userSupplies, wallet.mode, renderTick]);
 
   const setSort = useCallback(
     (nextKey: MarketSortKey) => {
@@ -637,6 +780,11 @@ export function useLendingController() {
         void loadAaveState();
       } catch (error) {
         const errorCode = toAaveError(error);
+        if (isUserRejectedRequestError(errorCode)) {
+          setLastError(null);
+          setToast(null);
+          return;
+        }
         setLastError(errorCode);
         setToast({
           tone: "error",
@@ -863,6 +1011,19 @@ export function useLendingController() {
     [aaveState.walletBalances, engine, user, wallet.mode]
   );
 
+  const getWalletBalanceUsdForAsset = useCallback(
+    (assetId: AssetId): number | null => {
+      if (!user) {
+        return null;
+      }
+      if (wallet.mode === "mock") {
+        return engine.selectors.getUserBalance(user as `0x${string}`, assetId);
+      }
+      return aaveState.walletBalancesUsd[assetId] ?? null;
+    },
+    [aaveState.walletBalancesUsd, engine, user, wallet.mode]
+  );
+
   useEffect(() => {
     if (wallet.mode === "real" && aaveState.loadError) {
       setLastError(aaveState.loadError);
@@ -884,6 +1045,7 @@ export function useLendingController() {
     dashboardSupplies,
     dashboardBorrows,
     dashboardSummary,
+    userAccountMetrics: aaveState.userAccountMetrics,
     lendingRewards,
     isLoading: wallet.mode === "real" ? aaveState.loading : false,
     setSort,
@@ -892,6 +1054,7 @@ export function useLendingController() {
     getBorrowForAsset,
     getAllowanceForAsset,
     getWalletBalanceForAsset,
+    getWalletBalanceUsdForAsset,
     approve,
     supply,
     borrow,

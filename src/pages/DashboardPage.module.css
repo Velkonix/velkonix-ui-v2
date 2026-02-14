@@ -5,17 +5,6 @@
   gap: var(--layout-page-gap);
 }
 
-.loadingOverlay {
-  position: absolute;
-  inset: 0;
-  z-index: 20;
-  display: grid;
-  place-content: center;
-  justify-items: center;
-  gap: var(--space-3);
-  background: var(--bg-primary);
-}
-
 .summaryGrid {
   display: grid;
   gap: var(--layout-summary-gap);

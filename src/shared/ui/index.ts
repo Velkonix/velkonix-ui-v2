@@ -7,6 +7,7 @@ export { Typography } from "./foundation/Typography";
 export { Badge } from "./feedback/Badge";
 export { EmptyState } from "./feedback/EmptyState";
 export { ErrorState } from "./feedback/ErrorState";
+export { Loader } from "./feedback/Loader";
 export { Skeleton } from "./feedback/Skeleton";
 export { Spinner } from "./feedback/Spinner";
 export { Toast } from "./feedback/Toast";

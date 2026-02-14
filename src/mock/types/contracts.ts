@@ -6,20 +6,26 @@ export interface Asset {
   symbol: string;
   name: string;
   icon: string;
+  oraclePrice?: number;
   totalSupplied: number;
+  totalSuppliedUsd?: number | null;
   totalBorrowed: number;
+  totalBorrowedUsd?: number | null;
+  availableLiquidityUsd?: number | null;
   supplyApy: number;
   borrowApy: number;
   maxLtv?: number;
   liquidationThreshold?: number;
   liquidationPenalty?: number;
   borrowCap?: number;
+  borrowCapUsd?: number | null;
   reserveFactor?: number;
 }
 
 export interface UserSupply {
   assetId: string;
   balance: number;
+  balanceUsd?: number | null;
   apy: number;
   isCollateral: boolean;
 }
@@ -27,6 +33,7 @@ export interface UserSupply {
 export interface UserBorrow {
   assetId: string;
   debt: number;
+  debtUsd?: number | null;
   apy: number;
 }
 

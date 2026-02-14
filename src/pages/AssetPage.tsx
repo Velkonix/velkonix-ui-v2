@@ -9,6 +9,7 @@ import {
   Card,
   Divider,
   ErrorState,
+  Loader,
   Modal,
   MetricText,
   PanelHeader,
@@ -34,9 +35,12 @@ type PositionRow = {
 type InfoTabId = "supply" | "borrow";
 
 const formatTokenAmount = (value: number, symbol: string): string => `${formatNumber(value)} ${symbol}`;
+const formatUsdAmount = (value: number): string => `$${formatNumber(value)}`;
+const formatOptionalUsdAmount = (value: number | null | undefined): string =>
+  value === null || value === undefined ? "N/A" : formatUsdAmount(value);
 const formatHealthFactor = (value: number): string => formatNumber(value, { decimals: 2, compact: false });
 const formatPercent = (value: number): string => `${formatNumber(value, { decimals: 2, compact: false })}%`;
-const formatInputAmount = (value: number): string => formatNumber(value, { decimals: 4, compact: false, useGrouping: false });
+const formatInputAmount = (value: number): string => formatNumber(value, { compact: false, useGrouping: false });
 const RATE_SERIES_LENGTH = 120;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -62,8 +66,8 @@ const buildSyntheticRateSeries = (baseRate: number, seedKey: string): Array<{ da
 export function AssetPage() {
   const navigate = useNavigate();
   const { assetId = "" } = useParams<{ assetId: string }>();
-  const [supplyAmount, setSupplyAmount] = useState("100");
-  const [borrowAmount, setBorrowAmount] = useState("50");
+  const [supplyAmount, setSupplyAmount] = useState("");
+  const [borrowAmount, setBorrowAmount] = useState("");
   const [activeInfoTab, setActiveInfoTab] = useState<InfoTabId>("supply");
   const [isSupplyModalOpen, setIsSupplyModalOpen] = useState(false);
   const [isBorrowModalOpen, setIsBorrowModalOpen] = useState(false);
@@ -74,11 +78,13 @@ export function AssetPage() {
     lastError,
     toast,
     isLoading,
+    dashboardSummary,
+    userAccountMetrics,
     getAssetById,
     getSupplyForAsset,
-    getBorrowForAsset,
     getAllowanceForAsset,
     getWalletBalanceForAsset,
+    getWalletBalanceUsdForAsset,
     approve,
     supply,
     borrow,
@@ -86,8 +92,6 @@ export function AssetPage() {
   } = useLendingController();
 
   const asset = getAssetById(assetId);
-  const supplyPosition = getSupplyForAsset(assetId);
-  const borrowPosition = getBorrowForAsset(assetId);
   const allowance = getAllowanceForAsset(assetId);
 
   const parsedSupplyAmount = Number(supplyAmount);
@@ -97,16 +101,66 @@ export function AssetPage() {
 
   const requiresApproval = normalizedSupplyAmount > 0 && allowance < normalizedSupplyAmount;
   const walletBalance = asset ? getWalletBalanceForAsset(asset.id) : 0;
+  const walletBalanceUsd = asset ? getWalletBalanceUsdForAsset(asset.id) : null;
+  const assetSupplyPosition = asset ? getSupplyForAsset(asset.id) : null;
+  const isAssetCollateralEnabled = assetSupplyPosition ? assetSupplyPosition.isCollateral : true;
+  const oraclePrice = asset?.oraclePrice;
+  const hasOraclePrice = oraclePrice !== undefined && Number.isFinite(oraclePrice) && oraclePrice > 0;
   const availableToSupply = walletBalance;
-  const availableToBorrow = Math.max(0, (asset?.totalSupplied ?? 0) - (asset?.totalBorrowed ?? 0));
+  const reserveAvailableLiquidity = Math.max(0, (asset?.totalSupplied ?? 0) - (asset?.totalBorrowed ?? 0));
+  const borrowCapRemaining =
+    asset?.borrowCap && asset.borrowCap > 0 ? Math.max(0, asset.borrowCap - (asset?.totalBorrowed ?? 0)) : Number.POSITIVE_INFINITY;
+  const protocolBorrowLimit = Math.min(reserveAvailableLiquidity, borrowCapRemaining);
+  const userBorrowLimitByAccountData =
+    wallet.mode === "real" && userAccountMetrics !== null && userAccountMetrics.baseCurrencyUnit > 0 && hasOraclePrice
+      ? Math.max(0, userAccountMetrics.availableBorrowsBase / userAccountMetrics.baseCurrencyUnit / Number(oraclePrice))
+      : Number.POSITIVE_INFINITY;
+  const availableToBorrow = Math.max(0, Math.min(protocolBorrowLimit, userBorrowLimitByAccountData));
   const reserveSize = Math.max(0, (asset?.totalSupplied ?? 0) - (asset?.totalBorrowed ?? 0));
+  const reserveSizeUsd = asset?.availableLiquidityUsd ?? (hasOraclePrice ? reserveSize * oraclePrice : null);
+  const supplyAmountUsd = hasOraclePrice ? normalizedSupplyAmount * oraclePrice : null;
+  const borrowAmountUsd = hasOraclePrice ? normalizedBorrowAmount * oraclePrice : null;
   const exceedsSupplyLimit = normalizedSupplyAmount > availableToSupply;
   const exceedsBorrowLimit = normalizedBorrowAmount > availableToBorrow;
-  const currentSupplied = supplyPosition?.balance ?? 0;
-  const currentDebt = borrowPosition?.debt ?? 0;
-  const supplyHealthFactor = currentDebt > 0 ? (currentSupplied + normalizedSupplyAmount) / currentDebt : Number.POSITIVE_INFINITY;
-  const borrowHealthFactor =
-    currentDebt + normalizedBorrowAmount > 0 ? currentSupplied / (currentDebt + normalizedBorrowAmount) : Number.POSITIVE_INFINITY;
+
+  const fallbackTotalSuppliedBefore = dashboardSummary.totalSupplied;
+  const fallbackTotalBorrowedBefore = dashboardSummary.totalBorrowed;
+  const fallbackCurrentHealthFactor =
+    fallbackTotalBorrowedBefore > 0 ? fallbackTotalSuppliedBefore / fallbackTotalBorrowedBefore : Number.POSITIVE_INFINITY;
+  const fallbackSupplyHealthFactorAfter =
+    fallbackTotalBorrowedBefore > 0
+      ? (fallbackTotalSuppliedBefore + normalizedSupplyAmount) / fallbackTotalBorrowedBefore
+      : Number.POSITIVE_INFINITY;
+  const fallbackBorrowHealthFactorAfter =
+    fallbackTotalBorrowedBefore + normalizedBorrowAmount > 0
+      ? fallbackTotalSuppliedBefore / (fallbackTotalBorrowedBefore + normalizedBorrowAmount)
+      : Number.POSITIVE_INFINITY;
+
+  const canUseRealHealthFactor =
+    wallet.mode === "real" && userAccountMetrics !== null && userAccountMetrics.baseCurrencyUnit > 0;
+  const toBaseAmount = (usdAmount: number | null): number =>
+    canUseRealHealthFactor && usdAmount !== null ? usdAmount * userAccountMetrics.baseCurrencyUnit : 0;
+  const projectHealthFactor = (collateralDeltaBase: number, debtDeltaBase: number): number => {
+    if (!canUseRealHealthFactor) {
+      return Number.POSITIVE_INFINITY;
+    }
+    const totalDebtAfter = Math.max(0, userAccountMetrics.totalDebtBase + debtDeltaBase);
+    if (totalDebtAfter <= 0) {
+      return Number.POSITIVE_INFINITY;
+    }
+    const totalCollateralAfter = Math.max(0, userAccountMetrics.totalCollateralBase + collateralDeltaBase);
+    return (totalCollateralAfter * (userAccountMetrics.currentLiquidationThreshold / 10_000)) / totalDebtAfter;
+  };
+
+  const currentHealthFactor = canUseRealHealthFactor
+    ? (userAccountMetrics.healthFactor ?? Number.POSITIVE_INFINITY)
+    : fallbackCurrentHealthFactor;
+  const supplyHealthFactorAfter = canUseRealHealthFactor
+    ? projectHealthFactor(isAssetCollateralEnabled ? toBaseAmount(supplyAmountUsd) : 0, 0)
+    : fallbackSupplyHealthFactorAfter;
+  const borrowHealthFactorAfter = canUseRealHealthFactor
+    ? projectHealthFactor(0, toBaseAmount(borrowAmountUsd))
+    : fallbackBorrowHealthFactorAfter;
   const utilizationRate = asset && asset.totalSupplied > 0 ? (asset.totalBorrowed / asset.totalSupplied) * 100 : 0;
 
   const supplyRows = useMemo<PositionRow[]>(
@@ -114,11 +168,15 @@ export function AssetPage() {
       asset
         ? [
             { metric: "Supply APY", value: formatPercent(asset.supplyApy) },
-            { metric: "Total supplied", value: formatTokenAmount(asset.totalSupplied, asset.symbol) },
+            {
+              metric: "Total supplied",
+              value: `${formatTokenAmount(asset.totalSupplied, asset.symbol)} (${formatOptionalUsdAmount(asset.totalSuppliedUsd)})`,
+            },
             { metric: "Utilization Rate", value: formatPercent(utilizationRate) },
             { metric: "Max LTV", value: formatPercent(asset.maxLtv ?? 0) },
             { metric: "Liquidation threshold", value: formatPercent(asset.liquidationThreshold ?? 0) },
             { metric: "Liquidation penalty", value: formatPercent(asset.liquidationPenalty ?? 0) },
+            { metric: "Oracle price", value: asset.oraclePrice !== undefined ? formatUsdAmount(asset.oraclePrice) : "N/A" },
           ]
         : [],
     [asset, utilizationRate]
@@ -129,8 +187,14 @@ export function AssetPage() {
       asset
         ? [
             { metric: "Borrow APY", value: formatPercent(asset.borrowApy) },
-            { metric: "Total borrowed", value: formatTokenAmount(asset.totalBorrowed, asset.symbol) },
-            { metric: "Borrow cap", value: formatTokenAmount(asset.borrowCap ?? 0, asset.symbol) },
+            {
+              metric: "Total borrowed",
+              value: `${formatTokenAmount(asset.totalBorrowed, asset.symbol)} (${formatOptionalUsdAmount(asset.totalBorrowedUsd)})`,
+            },
+            {
+              metric: "Borrow cap",
+              value: `${formatTokenAmount(asset.borrowCap ?? 0, asset.symbol)} (${formatOptionalUsdAmount(asset.borrowCapUsd)})`,
+            },
             { metric: "Reserve factor", value: formatPercent(asset.reserveFactor ?? 0) },
           ]
         : [],
@@ -152,7 +216,7 @@ export function AssetPage() {
   if (isLoading) {
     return (
       <PageContainer>
-        <Typography muted>Loading asset data...</Typography>
+        <Loader label="Loading asset data..." />
       </PageContainer>
     );
   }
@@ -194,7 +258,7 @@ export function AssetPage() {
         />
         <MetricText
           title="Reserve size"
-          value={formatTokenAmount(reserveSize, asset.symbol)}
+          value={formatOptionalUsdAmount(reserveSizeUsd)}
           className={styles.reserveSizeMetric}
           role="status"
           aria-label="Reserve size"
@@ -257,7 +321,7 @@ export function AssetPage() {
         <aside className={styles.actionsColumn}>
           <Section>
             <Card className={styles.actionsCard}>
-              <WalletBalanceCard value={formatTokenAmount(walletBalance, asset.symbol)} />
+              <WalletBalanceCard value={`${formatTokenAmount(walletBalance, asset.symbol)} (${formatOptionalUsdAmount(walletBalanceUsd)})`} />
 
               <Divider />
 
@@ -273,7 +337,10 @@ export function AssetPage() {
                 <ActionButton
                   label="Supply"
                   disabled={!wallet.isConnected || busyOp !== null || availableToSupply <= 0}
-                  onClick={() => setIsSupplyModalOpen(true)}
+                  onClick={() => {
+                    setSupplyAmount("");
+                    setIsSupplyModalOpen(true);
+                  }}
                 />
               </div>
 
@@ -289,7 +356,10 @@ export function AssetPage() {
                 <ActionButton
                   label="Borrow"
                   disabled={!wallet.isConnected || busyOp !== null || availableToBorrow <= 0}
-                  onClick={() => setIsBorrowModalOpen(true)}
+                  onClick={() => {
+                    setBorrowAmount("");
+                    setIsBorrowModalOpen(true);
+                  }}
                 />
               </div>
 
@@ -311,7 +381,8 @@ export function AssetPage() {
             assetLabel={asset.symbol}
             balanceLabel="Available"
             balanceValue={formatInputAmount(availableToSupply)}
-            maxValue={formatInputAmount(availableToSupply)}
+            maxValue={availableToSupply}
+            usdValue={formatOptionalUsdAmount(supplyAmountUsd)}
           />
           <div className={styles.txOverview}>
             <Typography as="p" variant="label" className={styles.txOverviewTitle}>
@@ -327,7 +398,9 @@ export function AssetPage() {
               <Typography as="span" muted>
                 Health factor
               </Typography>
-              <Typography as="span">{formatHealthFactor(supplyHealthFactor)}</Typography>
+              <Typography as="span">
+                {formatHealthFactor(currentHealthFactor)} {"->"} {formatHealthFactor(supplyHealthFactorAfter)}
+              </Typography>
             </div>
           </div>
           {exceedsSupplyLimit ? (
@@ -362,7 +435,8 @@ export function AssetPage() {
             assetLabel={asset.symbol}
             balanceLabel="Available to borrow"
             balanceValue={formatInputAmount(availableToBorrow)}
-            maxValue={formatInputAmount(availableToBorrow)}
+            maxValue={availableToBorrow}
+            usdValue={formatOptionalUsdAmount(borrowAmountUsd)}
           />
           <div className={styles.txOverview}>
             <Typography as="p" variant="label" className={styles.txOverviewTitle}>
@@ -378,7 +452,9 @@ export function AssetPage() {
               <Typography as="span" muted>
                 Health factor
               </Typography>
-              <Typography as="span">{formatHealthFactor(borrowHealthFactor)}</Typography>
+              <Typography as="span">
+                {formatHealthFactor(currentHealthFactor)} {"->"} {formatHealthFactor(borrowHealthFactorAfter)}
+              </Typography>
             </div>
           </div>
           {exceedsBorrowLimit ? (
