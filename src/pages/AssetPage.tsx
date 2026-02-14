@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { useLendingController } from "../features/lending";
@@ -21,7 +21,9 @@ import {
   ToastPopup,
   Typography,
   ValueCell,
+  WideSwitch,
   WalletBalanceCard,
+  Checkbox,
 } from "../shared/ui";
 import { getAssetIconBySymbol } from "../shared/lib/assetIcons";
 import { formatNumber } from "../shared/lib/numberFormat";
@@ -43,9 +45,34 @@ const formatPercent = (value: number): string => `${formatNumber(value, { decima
 const formatInputAmount = (value: number): string => formatNumber(value, { compact: false, useGrouping: false });
 const RATE_SERIES_LENGTH = 120;
 const DAY_MS = 24 * 60 * 60 * 1000;
+const HEALTH_FACTOR_SAFE_THRESHOLD = 3;
+const HEALTH_FACTOR_RISK_CONFIRMATION_THRESHOLD = 1.5;
+const HEALTH_FACTOR_LIQUIDATION_THRESHOLD = 1;
 
 const seedFromString = (value: string): number =>
   Array.from(value).reduce((accumulator, char, index) => accumulator + char.charCodeAt(0) * (index + 1), 0);
+
+const clamp = (value: number, min: number, max: number): number => Math.min(max, Math.max(min, value));
+
+const getHealthFactorTextStyle = (value: number): CSSProperties => {
+  if (!Number.isFinite(value)) {
+    return { color: "var(--success)" };
+  }
+  if (value <= HEALTH_FACTOR_LIQUIDATION_THRESHOLD) {
+    return { color: "var(--error)" };
+  }
+  if (value >= HEALTH_FACTOR_SAFE_THRESHOLD) {
+    return { color: "var(--success)" };
+  }
+  const normalized = clamp(
+    (value - HEALTH_FACTOR_LIQUIDATION_THRESHOLD) /
+      (HEALTH_FACTOR_SAFE_THRESHOLD - HEALTH_FACTOR_LIQUIDATION_THRESHOLD),
+    0,
+    1
+  );
+  const hue = Math.round(normalized * 120);
+  return { color: `hsl(${hue} 78% 58%)` };
+};
 
 const buildSyntheticRateSeries = (baseRate: number, seedKey: string): Array<{ date: number; value: number }> => {
   const seed = seedFromString(seedKey);
@@ -71,6 +98,9 @@ export function AssetPage() {
   const [activeInfoTab, setActiveInfoTab] = useState<InfoTabId>("supply");
   const [isSupplyModalOpen, setIsSupplyModalOpen] = useState(false);
   const [isBorrowModalOpen, setIsBorrowModalOpen] = useState(false);
+  const [isSupplyTxPending, setIsSupplyTxPending] = useState(false);
+  const [isBorrowRiskAccepted, setIsBorrowRiskAccepted] = useState(false);
+  const [wethDisplayUnit, setWethDisplayUnit] = useState<"weth" | "eth">("weth");
 
   const {
     wallet,
@@ -85,8 +115,11 @@ export function AssetPage() {
     getAllowanceForAsset,
     getWalletBalanceForAsset,
     getWalletBalanceUsdForAsset,
+    getNativeBalance,
+    getNativeBalanceUsd,
     approve,
     supply,
+    supplyWithNativeEth,
     borrow,
     clearToast,
   } = useLendingController();
@@ -99,9 +132,10 @@ export function AssetPage() {
   const parsedBorrowAmount = Number(borrowAmount);
   const normalizedBorrowAmount = Number.isFinite(parsedBorrowAmount) && parsedBorrowAmount > 0 ? parsedBorrowAmount : 0;
 
-  const requiresApproval = normalizedSupplyAmount > 0 && allowance < normalizedSupplyAmount;
   const walletBalance = asset ? getWalletBalanceForAsset(asset.id) : 0;
   const walletBalanceUsd = asset ? getWalletBalanceUsdForAsset(asset.id) : null;
+  const nativeBalance = getNativeBalance();
+  const nativeBalanceUsd = getNativeBalanceUsd();
   const assetSupplyPosition = asset ? getSupplyForAsset(asset.id) : null;
   const isAssetCollateralEnabled = assetSupplyPosition ? assetSupplyPosition.isCollateral : true;
   const oraclePrice = asset?.oraclePrice;
@@ -120,7 +154,6 @@ export function AssetPage() {
   const reserveSizeUsd = asset?.availableLiquidityUsd ?? (hasOraclePrice ? reserveSize * oraclePrice : null);
   const supplyAmountUsd = hasOraclePrice ? normalizedSupplyAmount * oraclePrice : null;
   const borrowAmountUsd = hasOraclePrice ? normalizedBorrowAmount * oraclePrice : null;
-  const exceedsSupplyLimit = normalizedSupplyAmount > availableToSupply;
   const exceedsBorrowLimit = normalizedBorrowAmount > availableToBorrow;
 
   const fallbackTotalSuppliedBefore = dashboardSummary.totalSupplied;
@@ -161,6 +194,10 @@ export function AssetPage() {
   const borrowHealthFactorAfter = canUseRealHealthFactor
     ? projectHealthFactor(0, toBaseAmount(borrowAmountUsd))
     : fallbackBorrowHealthFactorAfter;
+  const requiresBorrowRiskConfirmation =
+    normalizedBorrowAmount > 0 &&
+    Number.isFinite(borrowHealthFactorAfter) &&
+    borrowHealthFactorAfter < HEALTH_FACTOR_RISK_CONFIRMATION_THRESHOLD;
   const utilizationRate = asset && asset.totalSupplied > 0 ? (asset.totalBorrowed / asset.totalSupplied) * 100 : 0;
 
   const supplyRows = useMemo<PositionRow[]>(
@@ -213,10 +250,24 @@ export function AssetPage() {
   const activeTabLabel = activeInfoTab === "supply" ? "Supply" : "Borrow";
   const activeRateTitle = activeInfoTab === "supply" ? "Supply Rate" : "Borrow Rate";
 
+  useEffect(() => {
+    if (!isSupplyTxPending || busyOp === "supply") {
+      return;
+    }
+    if (busyOp !== null) {
+      return;
+    }
+    if (toast?.tone === "success" && toast.title === "SUPPLY success") {
+      setIsSupplyModalOpen(false);
+      setSupplyAmount("");
+    }
+    setIsSupplyTxPending(false);
+  }, [busyOp, isSupplyTxPending, toast]);
+
   if (isLoading) {
     return (
       <PageContainer>
-        <Loader label="Loading asset data..." />
+        <Loader fullPage label="Loading asset data..." />
       </PageContainer>
     );
   }
@@ -242,6 +293,15 @@ export function AssetPage() {
   }
 
   const assetIconUrl = getAssetIconBySymbol(asset.symbol);
+  const isWethAsset = asset.symbol.toUpperCase() === "WETH";
+  const displayAssetSymbol = isWethAsset && wethDisplayUnit === "eth" ? "ETH" : asset.symbol;
+  const usesNativeEthDisplay = isWethAsset && wethDisplayUnit === "eth";
+  const displayWalletBalance = usesNativeEthDisplay ? nativeBalance : walletBalance;
+  const displayWalletBalanceUsd = usesNativeEthDisplay ? nativeBalanceUsd : walletBalanceUsd;
+  const displayAvailableToSupply = usesNativeEthDisplay ? nativeBalance : availableToSupply;
+  const displayAvailableToBorrow = availableToBorrow;
+  const requiresApproval = !usesNativeEthDisplay && normalizedSupplyAmount > 0 && allowance < normalizedSupplyAmount;
+  const exceedsSupplyLimit = normalizedSupplyAmount > displayAvailableToSupply;
 
   return (
     <PageContainer className={styles.page}>
@@ -321,7 +381,21 @@ export function AssetPage() {
         <aside className={styles.actionsColumn}>
           <Section>
             <Card className={styles.actionsCard}>
-              <WalletBalanceCard value={`${formatTokenAmount(walletBalance, asset.symbol)} (${formatOptionalUsdAmount(walletBalanceUsd)})`} />
+              <PanelHeader title="User Info" />
+              {isWethAsset ? (
+                <WideSwitch
+                  ariaLabel="Asset denomination"
+                  value={wethDisplayUnit}
+                  options={[
+                    { value: "weth", label: "WETH" },
+                    { value: "eth", label: "ETH" },
+                  ] as const}
+                  onChange={setWethDisplayUnit}
+                />
+              ) : null}
+              <WalletBalanceCard
+                value={`${formatTokenAmount(displayWalletBalance, displayAssetSymbol)} (${formatOptionalUsdAmount(displayWalletBalanceUsd)})`}
+              />
 
               <Divider />
 
@@ -331,14 +405,15 @@ export function AssetPage() {
                     Available to supply
                   </Typography>
                   <Typography as="p" variant="body" className={styles.actionValue}>
-                    {formatTokenAmount(availableToSupply, asset.symbol)}
+                    {formatTokenAmount(displayAvailableToSupply, displayAssetSymbol)}
                   </Typography>
                 </div>
                 <ActionButton
                   label="Supply"
-                  disabled={!wallet.isConnected || busyOp !== null || availableToSupply <= 0}
+                  disabled={!wallet.isConnected || busyOp !== null || displayAvailableToSupply <= 0}
                   onClick={() => {
                     setSupplyAmount("");
+                    setIsSupplyTxPending(false);
                     setIsSupplyModalOpen(true);
                   }}
                 />
@@ -350,7 +425,7 @@ export function AssetPage() {
                     Available to borrow
                   </Typography>
                   <Typography as="p" variant="body" className={styles.actionValue}>
-                    {formatTokenAmount(availableToBorrow, asset.symbol)}
+                    {formatTokenAmount(displayAvailableToBorrow, displayAssetSymbol)}
                   </Typography>
                 </div>
                 <ActionButton
@@ -358,6 +433,7 @@ export function AssetPage() {
                   disabled={!wallet.isConnected || busyOp !== null || availableToBorrow <= 0}
                   onClick={() => {
                     setBorrowAmount("");
+                    setIsBorrowRiskAccepted(false);
                     setIsBorrowModalOpen(true);
                   }}
                 />
@@ -371,17 +447,17 @@ export function AssetPage() {
         </aside>
       </div>
 
-      <Modal isOpen={isSupplyModalOpen} size="xs" title={`Supply ${asset.symbol}`} onClose={() => setIsSupplyModalOpen(false)}>
+      <Modal isOpen={isSupplyModalOpen} size="xs" title={`Supply ${displayAssetSymbol}`} onClose={() => setIsSupplyModalOpen(false)}>
         <div className={styles.modalContent}>
           <AmountInput
             label="Supply amount"
             value={supplyAmount}
             onChange={(event) => setSupplyAmount(event.target.value)}
             placeholder="0.00"
-            assetLabel={asset.symbol}
+            assetLabel={displayAssetSymbol}
             balanceLabel="Available"
-            balanceValue={formatInputAmount(availableToSupply)}
-            maxValue={availableToSupply}
+            balanceValue={formatInputAmount(displayAvailableToSupply)}
+            maxValue={displayAvailableToSupply}
             usdValue={formatOptionalUsdAmount(supplyAmountUsd)}
           />
           <div className={styles.txOverview}>
@@ -398,8 +474,10 @@ export function AssetPage() {
               <Typography as="span" muted>
                 Health factor
               </Typography>
-              <Typography as="span">
-                {formatHealthFactor(currentHealthFactor)} {"->"} {formatHealthFactor(supplyHealthFactorAfter)}
+              <Typography as="span" className={styles.healthFactorFlow}>
+                <span style={getHealthFactorTextStyle(currentHealthFactor)}>{formatHealthFactor(currentHealthFactor)}</span>
+                <span className={styles.healthFactorArrow}>&rarr;</span>
+                <span style={getHealthFactorTextStyle(supplyHealthFactorAfter)}>{formatHealthFactor(supplyHealthFactorAfter)}</span>
               </Typography>
             </div>
           </div>
@@ -420,7 +498,19 @@ export function AssetPage() {
             }
             isLoading={busyOp === "approve" || busyOp === "supply"}
             disabled={!wallet.isConnected || busyOp !== null || normalizedSupplyAmount <= 0 || exceedsSupplyLimit}
-            onClick={() => void (requiresApproval ? approve(asset.id, supplyAmount) : supply(asset.id, supplyAmount))}
+            onClick={() => {
+              if (usesNativeEthDisplay) {
+                setIsSupplyTxPending(true);
+                void supplyWithNativeEth(asset.id, supplyAmount);
+                return;
+              }
+              if (requiresApproval) {
+                void approve(asset.id, supplyAmount);
+                return;
+              }
+              setIsSupplyTxPending(true);
+              void supply(asset.id, supplyAmount);
+            }}
           />
         </div>
       </Modal>
@@ -452,11 +542,29 @@ export function AssetPage() {
               <Typography as="span" muted>
                 Health factor
               </Typography>
-              <Typography as="span">
-                {formatHealthFactor(currentHealthFactor)} {"->"} {formatHealthFactor(borrowHealthFactorAfter)}
+              <Typography as="span" className={styles.healthFactorFlow}>
+                <span style={getHealthFactorTextStyle(currentHealthFactor)}>{formatHealthFactor(currentHealthFactor)}</span>
+                <span className={styles.healthFactorArrow}>&rarr;</span>
+                <span style={getHealthFactorTextStyle(borrowHealthFactorAfter)}>{formatHealthFactor(borrowHealthFactorAfter)}</span>
               </Typography>
             </div>
           </div>
+          {requiresBorrowRiskConfirmation ? (
+            <div className={styles.riskWarning}>
+              <Typography as="p" variant="caption" className={styles.riskWarningTitle}>
+                High liquidation risk
+              </Typography>
+              <Typography as="p" variant="caption" muted>
+                Borrowing this amount reduces your health factor below {HEALTH_FACTOR_RISK_CONFIRMATION_THRESHOLD.toFixed(1)}.
+                This can lead to liquidation if market conditions move against your position.
+              </Typography>
+              <Checkbox
+                checked={isBorrowRiskAccepted}
+                onChange={(event) => setIsBorrowRiskAccepted(event.currentTarget.checked)}
+                label="I understand and accept the liquidation risk."
+              />
+            </div>
+          ) : null}
           {exceedsBorrowLimit ? (
             <Typography muted role="status">
               Borrow amount exceeds available liquidity.
@@ -465,7 +573,13 @@ export function AssetPage() {
           <ActionButton
             label={busyOp === "borrow" ? "Borrowing..." : "Borrow"}
             isLoading={busyOp === "borrow"}
-            disabled={!wallet.isConnected || busyOp !== null || normalizedBorrowAmount <= 0 || exceedsBorrowLimit}
+            disabled={
+              !wallet.isConnected ||
+              busyOp !== null ||
+              normalizedBorrowAmount <= 0 ||
+              exceedsBorrowLimit ||
+              (requiresBorrowRiskConfirmation && !isBorrowRiskAccepted)
+            }
             onClick={() => void borrow(asset.id, borrowAmount)}
           />
         </div>

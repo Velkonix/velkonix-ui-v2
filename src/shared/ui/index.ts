@@ -34,6 +34,7 @@ export { InputGroup } from "./inputs/InputGroup";
 export { NumberInput } from "./inputs/NumberInput";
 export { Select } from "./inputs/Select";
 export { Switch } from "./inputs/Switch";
+export { WideSwitch } from "./inputs/WideSwitch";
 
 export { Modal } from "./modals/Modal";
 

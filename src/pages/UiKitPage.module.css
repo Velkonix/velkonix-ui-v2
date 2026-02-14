@@ -75,6 +75,11 @@
   max-width: 460px;
 }
 
+.wideSwitchDemo {
+  margin-top: var(--space-4);
+  max-width: 360px;
+}
+
 .gridThree {
   display: grid;
   gap: var(--space-4);

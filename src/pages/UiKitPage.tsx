@@ -46,6 +46,7 @@ import {
   TxStatus,
   Typography,
   ValueCell,
+  WideSwitch,
   WalletBalanceCard,
   WalletConnectButton,
   WalletMenu,
@@ -96,6 +97,7 @@ export function UiKitPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [amountValue, setAmountValue] = useState("");
   const [activeTheme, setActiveTheme] = useState<ThemeName>("blue");
+  const [activeAssetPair, setActiveAssetPair] = useState("weth");
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", activeTheme);
@@ -242,6 +244,17 @@ export function UiKitPage() {
           <div className={styles.row}>
             <Switch label="Collateral toggle" variant="collateral" />
             <Checkbox label="Agree to terms" />
+          </div>
+          <div className={styles.wideSwitchDemo}>
+            <WideSwitch
+              ariaLabel="Asset denomination switch"
+              value={activeAssetPair}
+              options={[
+                { value: "weth", label: "WETH" },
+                { value: "eth", label: "ETH" },
+              ]}
+              onChange={setActiveAssetPair}
+            />
           </div>
           <Tabs
             items={[

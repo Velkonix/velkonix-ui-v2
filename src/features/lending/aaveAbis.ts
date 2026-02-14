@@ -28,6 +28,16 @@ export const ERC20_ABI = [
   },
 ] as const;
 
+export const WETH_ABI = [
+  {
+    type: "function",
+    name: "deposit",
+    stateMutability: "payable",
+    inputs: [],
+    outputs: [],
+  },
+] as const;
+
 export const POOL_ABI = [
   {
     type: "function",

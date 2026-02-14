@@ -249,7 +249,7 @@ export function MarketsPage() {
           </Card>
         ) : null}
         {isLoading ? (
-          <Loader label="Loading markets data..." />
+          <Loader fullPage label="Loading markets data..." />
         ) : null}
         {!isLoading ? (
           <>

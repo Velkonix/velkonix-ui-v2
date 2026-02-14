@@ -42,6 +42,7 @@ const parseAmount = (value: string): number => {
 
 const formatAmount = (value: number): string => formatNumber(value);
 const formatPercent = (value: number): string => `${formatNumber(value, { decimals: 2, compact: false })}%`;
+const MAX_MOCK_APPROVE_AMOUNT = Number.MAX_SAFE_INTEGER;
 
 type ToastTone = "success" | "error" | "info";
 
@@ -241,7 +242,9 @@ export function MockModePage() {
               isLoading={busyOp === "approve"}
               disabled={busyOp !== null || !wallet.isConnected}
               onClick={() =>
-                runOperation("approve", () => engine.lending.approve(user as Address, selectedAsset, numericAmount))
+                runOperation("approve", () =>
+                  engine.lending.approve(user as Address, selectedAsset, MAX_MOCK_APPROVE_AMOUNT)
+                )
               }
             />
             <ActionButton

@@ -25,9 +25,7 @@ export function Loader({
       aria-live="polite"
       {...props}
     >
-      <span className={styles.spinnerShell} aria-hidden="true">
-        <Spinner size={size} />
-      </span>
+      <Spinner size={size} className={styles.spinner} aria-hidden="true" />
       {label ? (
         <Typography as="span" variant="label" muted className={styles.label}>
           {label}

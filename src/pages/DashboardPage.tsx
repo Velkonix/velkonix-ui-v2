@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useLendingController } from "../features/lending";
@@ -8,6 +8,7 @@ import {
   AssetCell,
   Card,
   ClaimButton,
+  Checkbox,
   EmptyState,
   Icon,
   Loader,
@@ -32,6 +33,8 @@ type WithdrawModalState = {
   symbol: string;
   supplyBalance: number;
   maxAmount: number;
+  maxAmountByLiquidity: number;
+  maxAmountByHealthFactor: number;
   isCollateral: boolean;
 } | null;
 
@@ -76,6 +79,29 @@ const computeHealthFactor = (totalSupplied: number, totalBorrowed: number): numb
   totalBorrowed > 0 ? totalSupplied / totalBorrowed : Number.POSITIVE_INFINITY;
 const getAvailableLiquidity = (totalSupplied: number, totalBorrowed: number): number =>
   Math.max(0, totalSupplied - totalBorrowed);
+const HEALTH_FACTOR_SAFE_THRESHOLD = 3;
+const HEALTH_FACTOR_RISK_CONFIRMATION_THRESHOLD = 1.5;
+const HEALTH_FACTOR_LIQUIDATION_THRESHOLD = 1;
+const clamp = (value: number, min: number, max: number): number => Math.min(max, Math.max(min, value));
+const getHealthFactorTextStyle = (value: number): CSSProperties => {
+  if (!Number.isFinite(value)) {
+    return { color: "var(--success)" };
+  }
+  if (value <= HEALTH_FACTOR_LIQUIDATION_THRESHOLD) {
+    return { color: "var(--error)" };
+  }
+  if (value >= HEALTH_FACTOR_SAFE_THRESHOLD) {
+    return { color: "var(--success)" };
+  }
+  const normalized = clamp(
+    (value - HEALTH_FACTOR_LIQUIDATION_THRESHOLD) /
+      (HEALTH_FACTOR_SAFE_THRESHOLD - HEALTH_FACTOR_LIQUIDATION_THRESHOLD),
+    0,
+    1
+  );
+  const hue = Math.round(normalized * 120);
+  return { color: `hsl(${hue} 78% 58%)` };
+};
 
 export function DashboardPage() {
   const navigate = useNavigate();
@@ -106,6 +132,9 @@ export function DashboardPage() {
   const [isCollateralTxPending, setIsCollateralTxPending] = useState(false);
   const [isWithdrawTxPending, setIsWithdrawTxPending] = useState(false);
   const [isRepayTxPending, setIsRepayTxPending] = useState(false);
+  const [isCollateralRiskAccepted, setIsCollateralRiskAccepted] = useState(false);
+  const [isWithdrawRiskAccepted, setIsWithdrawRiskAccepted] = useState(false);
+  const [isRepayRiskAccepted, setIsRepayRiskAccepted] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [repayAmount, setRepayAmount] = useState("");
 
@@ -113,7 +142,11 @@ export function DashboardPage() {
   const normalizedWithdrawAmount = Number.isFinite(parsedWithdrawAmount) && parsedWithdrawAmount > 0 ? parsedWithdrawAmount : 0;
   const withdrawExceedsLimit = withdrawModal !== null && normalizedWithdrawAmount > withdrawModal.maxAmount;
   const withdrawBlockedByUtilization =
-    withdrawModal !== null && withdrawModal.maxAmount < withdrawModal.supplyBalance;
+    withdrawModal !== null && withdrawModal.maxAmountByLiquidity < withdrawModal.supplyBalance;
+  const withdrawBlockedByHealthFactorLimit =
+    withdrawModal !== null &&
+    withdrawModal.isCollateral &&
+    withdrawModal.maxAmountByHealthFactor < Math.min(withdrawModal.supplyBalance, withdrawModal.maxAmountByLiquidity);
 
   const repayWalletBalance = useMemo(
     () => (repayModal ? getWalletBalanceForAsset(repayModal.assetId) : 0),
@@ -139,8 +172,9 @@ export function DashboardPage() {
   const repayAmountApplied = repayModal ? Math.min(normalizedRepayAmount, repayModal.maxDebt) : 0;
   const repayRemainingDebtBefore = repayModal?.maxDebt ?? 0;
   const repayRemainingDebtAfter = Math.max(0, repayRemainingDebtBefore - repayAmountApplied);
+  const totalCollateralBalance = dashboardSupplies.reduce((sum, item) => sum + (item.isCollateral ? item.balance : 0), 0);
   const fallbackHealthFactor = computeHealthFactor(
-    dashboardSupplies.reduce((sum, item) => sum + (item.isCollateral ? item.balance : 0), 0),
+    totalCollateralBalance,
     dashboardSummary.totalBorrowed
   );
   const canUseRealHealthFactor =
@@ -173,6 +207,34 @@ export function DashboardPage() {
     const totalCollateralAfter = Math.max(0, userAccountMetrics.totalCollateralBase + collateralDeltaBase);
     return (totalCollateralAfter * (userAccountMetrics.currentLiquidationThreshold / 10_000)) / totalDebtAfter;
   };
+  const getMaxWithdrawByHealthFactor = (assetId: string, isCollateral: boolean, upperBound: number): number => {
+    if (!isCollateral || upperBound <= 0) {
+      return upperBound;
+    }
+    const isAmountAllowed = (amount: number): boolean => {
+      if (canUseRealHealthFactor) {
+        return projectHealthFactor(-toBaseAmount(assetId, amount), 0) >= HEALTH_FACTOR_LIQUIDATION_THRESHOLD;
+      }
+      return (
+        computeHealthFactor(Math.max(0, totalCollateralBalance - amount), dashboardSummary.totalBorrowed) >=
+        HEALTH_FACTOR_LIQUIDATION_THRESHOLD
+      );
+    };
+    if (isAmountAllowed(upperBound)) {
+      return upperBound;
+    }
+    let low = 0;
+    let high = upperBound;
+    for (let index = 0; index < 40; index += 1) {
+      const mid = (low + high) / 2;
+      if (isAmountAllowed(mid)) {
+        low = mid;
+      } else {
+        high = mid;
+      }
+    }
+    return Math.max(0, low);
+  };
 
   const withdrawHealthFactorBefore = canUseRealHealthFactor
     ? (userAccountMetrics.healthFactor ?? Number.POSITIVE_INFINITY)
@@ -180,6 +242,12 @@ export function DashboardPage() {
   const withdrawHealthFactorAfter = canUseRealHealthFactor
     ? projectHealthFactor(withdrawModal?.isCollateral ? -toBaseAmount(withdrawModal.assetId, withdrawAmountApplied) : 0, 0)
     : computeHealthFactor(Math.max(0, dashboardSummary.totalSupplied - withdrawAmountApplied), dashboardSummary.totalBorrowed);
+  const withdrawBlockedByHealthFactor =
+    withdrawModal !== null &&
+    normalizedWithdrawAmount > 0 &&
+    withdrawModal.isCollateral &&
+    Number.isFinite(withdrawHealthFactorAfter) &&
+    withdrawHealthFactorAfter < HEALTH_FACTOR_LIQUIDATION_THRESHOLD;
   const repayHealthFactorBefore = canUseRealHealthFactor
     ? (userAccountMetrics.healthFactor ?? Number.POSITIVE_INFINITY)
     : fallbackHealthFactor;
@@ -188,10 +256,7 @@ export function DashboardPage() {
     : computeHealthFactor(dashboardSummary.totalSupplied, Math.max(0, dashboardSummary.totalBorrowed - repayAmountApplied));
   const collateralHealthFactorBefore = canUseRealHealthFactor
     ? (userAccountMetrics.healthFactor ?? Number.POSITIVE_INFINITY)
-    : computeHealthFactor(
-        dashboardSupplies.reduce((sum, item) => sum + (item.isCollateral ? item.balance : 0), 0),
-        dashboardSummary.totalBorrowed
-      );
+    : computeHealthFactor(totalCollateralBalance, dashboardSummary.totalBorrowed);
   const collateralDeltaBase = collateralModal
     ? toBaseAmount(collateralModal.assetId, collateralModal.nextEnabled ? collateralModal.supplyBalance : -collateralModal.supplyBalance)
     : 0;
@@ -200,12 +265,26 @@ export function DashboardPage() {
     : computeHealthFactor(
         Math.max(
           0,
-          dashboardSupplies.reduce((sum, item) => sum + (item.isCollateral ? item.balance : 0), 0) +
-            (collateralModal ? (collateralModal.nextEnabled ? collateralModal.supplyBalance : -collateralModal.supplyBalance) : 0)
+          totalCollateralBalance + (collateralModal ? (collateralModal.nextEnabled ? collateralModal.supplyBalance : -collateralModal.supplyBalance) : 0)
         ),
         dashboardSummary.totalBorrowed
       );
   const collateralDisableBlocked = collateralModal !== null && !collateralModal.nextEnabled && collateralHealthFactorAfter < 1;
+  const requiresCollateralRiskConfirmation =
+    collateralModal !== null &&
+    !collateralModal.nextEnabled &&
+    Number.isFinite(collateralHealthFactorAfter) &&
+    collateralHealthFactorAfter < HEALTH_FACTOR_RISK_CONFIRMATION_THRESHOLD;
+  const requiresWithdrawRiskConfirmation =
+    withdrawModal !== null &&
+    normalizedWithdrawAmount > 0 &&
+    Number.isFinite(withdrawHealthFactorAfter) &&
+    withdrawHealthFactorAfter < HEALTH_FACTOR_RISK_CONFIRMATION_THRESHOLD;
+  const requiresRepayRiskConfirmation =
+    repayModal !== null &&
+    normalizedRepayAmount > 0 &&
+    Number.isFinite(repayHealthFactorAfter) &&
+    repayHealthFactorAfter < HEALTH_FACTOR_RISK_CONFIRMATION_THRESHOLD;
 
   useEffect(() => {
     if (!isCollateralTxPending || busyOp === "setCollateral") {
@@ -467,6 +546,7 @@ export function DashboardPage() {
                               isCurrentlyEnabled: row.isCollateral,
                               nextEnabled: event.target.checked,
                             });
+                            setIsCollateralRiskAccepted(false);
                           }}
                           aria-label={`Use ${row.symbol} as collateral`}
                         />
@@ -486,14 +566,19 @@ export function DashboardPage() {
                           event.stopPropagation();
                           const asset = getAssetById(row.assetId);
                           const liquidityLimit = asset ? getAvailableLiquidity(asset.totalSupplied, asset.totalBorrowed) : row.balance;
+                          const operationalLimit = Math.min(row.balance, liquidityLimit);
+                          const healthFactorLimit = getMaxWithdrawByHealthFactor(row.assetId, row.isCollateral, operationalLimit);
                           setWithdrawModal({
                             assetId: row.assetId,
                             symbol: row.symbol,
                             supplyBalance: row.balance,
-                            maxAmount: Math.min(row.balance, liquidityLimit),
+                            maxAmount: Math.min(operationalLimit, healthFactorLimit),
+                            maxAmountByLiquidity: liquidityLimit,
+                            maxAmountByHealthFactor: healthFactorLimit,
                             isCollateral: row.isCollateral,
                           });
                           setWithdrawAmount("");
+                          setIsWithdrawRiskAccepted(false);
                         }}
                       />
                     ),
@@ -557,6 +642,7 @@ export function DashboardPage() {
                             maxDebt: row.debt,
                           });
                           setRepayAmount("");
+                          setIsRepayRiskAccepted(false);
                         }}
                       />
                     ),
@@ -578,6 +664,7 @@ export function DashboardPage() {
         onClose={() => {
           setCollateralModal(null);
           setIsCollateralTxPending(false);
+          setIsCollateralRiskAccepted(false);
         }}
       >
         {collateralModal ? (
@@ -598,11 +685,33 @@ export function DashboardPage() {
                 <Typography as="span" muted>
                   Health factor
                 </Typography>
-                <Typography as="span" className={styles.txOverviewTransition}>
-                  {formatHealthFactor(collateralHealthFactorBefore)} &rarr; {formatHealthFactor(collateralHealthFactorAfter)}
+                <Typography as="span" className={`${styles.txOverviewTransition} ${styles.healthFactorFlow}`}>
+                  <span style={getHealthFactorTextStyle(collateralHealthFactorBefore)}>
+                    {formatHealthFactor(collateralHealthFactorBefore)}
+                  </span>
+                  <span className={styles.healthFactorArrow}>&rarr;</span>
+                  <span style={getHealthFactorTextStyle(collateralHealthFactorAfter)}>
+                    {formatHealthFactor(collateralHealthFactorAfter)}
+                  </span>
                 </Typography>
               </div>
             </div>
+            {requiresCollateralRiskConfirmation ? (
+              <div className={styles.riskWarning}>
+                <Typography as="p" variant="caption" className={styles.riskWarningTitle}>
+                  High liquidation risk
+                </Typography>
+                <Typography as="p" variant="caption" muted>
+                  Disabling this collateral reduces health factor below {HEALTH_FACTOR_RISK_CONFIRMATION_THRESHOLD.toFixed(1)}.
+                  This can lead to liquidation if market conditions move against your position.
+                </Typography>
+                <Checkbox
+                  checked={isCollateralRiskAccepted}
+                  onChange={(event) => setIsCollateralRiskAccepted(event.currentTarget.checked)}
+                  label="I understand and accept the liquidation risk."
+                />
+              </div>
+            ) : null}
             {collateralDisableBlocked ? (
               <Typography muted role="status">
                 Cannot disable collateral: resulting health factor would be below 1.00.
@@ -619,7 +728,12 @@ export function DashboardPage() {
                     : "Disable collateral"
               }
               isLoading={busyOp === "setCollateral"}
-              disabled={!wallet.isConnected || busyOp !== null || collateralDisableBlocked}
+              disabled={
+                !wallet.isConnected ||
+                busyOp !== null ||
+                collateralDisableBlocked ||
+                (requiresCollateralRiskConfirmation && !isCollateralRiskAccepted)
+              }
               onClick={() => {
                 setIsCollateralTxPending(true);
                 void setCollateral(collateralModal.assetId, collateralModal.nextEnabled);
@@ -636,6 +750,7 @@ export function DashboardPage() {
         onClose={() => {
           setWithdrawModal(null);
           setIsWithdrawTxPending(false);
+          setIsWithdrawRiskAccepted(false);
         }}
       >
         {withdrawModal ? (
@@ -666,22 +781,58 @@ export function DashboardPage() {
                 <Typography as="span" muted>
                   Health factor
                 </Typography>
-                <Typography as="span" className={styles.txOverviewTransition}>
-                  {formatHealthFactor(withdrawHealthFactorBefore)} &rarr; {formatHealthFactor(withdrawHealthFactorAfter)}
+                <Typography as="span" className={`${styles.txOverviewTransition} ${styles.healthFactorFlow}`}>
+                  <span style={getHealthFactorTextStyle(withdrawHealthFactorBefore)}>
+                    {formatHealthFactor(withdrawHealthFactorBefore)}
+                  </span>
+                  <span className={styles.healthFactorArrow}>&rarr;</span>
+                  <span style={getHealthFactorTextStyle(withdrawHealthFactorAfter)}>
+                    {formatHealthFactor(withdrawHealthFactorAfter)}
+                  </span>
                 </Typography>
               </div>
             </div>
+            {requiresWithdrawRiskConfirmation ? (
+              <div className={styles.riskWarning}>
+                <Typography as="p" variant="caption" className={styles.riskWarningTitle}>
+                  High liquidation risk
+                </Typography>
+                <Typography as="p" variant="caption" muted>
+                  Withdrawing this amount reduces health factor below {HEALTH_FACTOR_RISK_CONFIRMATION_THRESHOLD.toFixed(1)}.
+                  This can lead to liquidation if market conditions move against your position.
+                </Typography>
+                <Checkbox
+                  checked={isWithdrawRiskAccepted}
+                  onChange={(event) => setIsWithdrawRiskAccepted(event.currentTarget.checked)}
+                  label="I understand and accept the liquidation risk."
+                />
+              </div>
+            ) : null}
             {withdrawExceedsLimit ? (
               <Typography muted role="status">
-                {withdrawBlockedByUtilization
-                  ? `Withdraw amount exceeds currently available liquidity in the pool due to utilization. Right now you can withdraw up to ${formatAmount(withdrawModal.maxAmount)} ${withdrawModal.symbol}.`
-                  : "Withdraw amount exceeds supplied balance."}
+                {withdrawBlockedByHealthFactorLimit
+                  ? `Withdraw amount would reduce health factor below 1.00. Right now you can withdraw up to ${formatAmount(withdrawModal.maxAmount)} ${withdrawModal.symbol}.`
+                  : withdrawBlockedByUtilization
+                    ? `Withdraw amount exceeds currently available liquidity in the pool due to utilization. Right now you can withdraw up to ${formatAmount(withdrawModal.maxAmount)} ${withdrawModal.symbol}.`
+                    : "Withdraw amount exceeds supplied balance."}
+              </Typography>
+            ) : null}
+            {withdrawBlockedByHealthFactor && !withdrawExceedsLimit ? (
+              <Typography muted role="status">
+                Withdraw amount would reduce health factor below 1.00.
               </Typography>
             ) : null}
             <ActionButton
               label={busyOp === "withdraw" ? "Withdrawing..." : "Withdraw"}
               isLoading={busyOp === "withdraw"}
-              disabled={!wallet.isConnected || busyOp !== null || normalizedWithdrawAmount <= 0 || withdrawExceedsLimit}
+              disabled={
+                !wallet.isConnected ||
+                busyOp !== null ||
+                normalizedWithdrawAmount <= 0 ||
+                withdrawExceedsLimit ||
+                withdrawBlockedByHealthFactor ||
+                (requiresWithdrawRiskConfirmation && !isWithdrawRiskAccepted)
+              }
               onClick={() => {
                 setIsWithdrawTxPending(true);
                 void withdraw(withdrawModal.assetId, withdrawAmount);
@@ -698,6 +849,7 @@ export function DashboardPage() {
         onClose={() => {
           setRepayModal(null);
           setIsRepayTxPending(false);
+          setIsRepayRiskAccepted(false);
         }}
       >
         {repayModal ? (
@@ -728,11 +880,33 @@ export function DashboardPage() {
                 <Typography as="span" muted>
                   Health factor
                 </Typography>
-                <Typography as="span" className={styles.txOverviewTransition}>
-                  {formatHealthFactor(repayHealthFactorBefore)} &rarr; {formatHealthFactor(repayHealthFactorAfter)}
+                <Typography as="span" className={`${styles.txOverviewTransition} ${styles.healthFactorFlow}`}>
+                  <span style={getHealthFactorTextStyle(repayHealthFactorBefore)}>
+                    {formatHealthFactor(repayHealthFactorBefore)}
+                  </span>
+                  <span className={styles.healthFactorArrow}>&rarr;</span>
+                  <span style={getHealthFactorTextStyle(repayHealthFactorAfter)}>
+                    {formatHealthFactor(repayHealthFactorAfter)}
+                  </span>
                 </Typography>
               </div>
             </div>
+            {requiresRepayRiskConfirmation ? (
+              <div className={styles.riskWarning}>
+                <Typography as="p" variant="caption" className={styles.riskWarningTitle}>
+                  High liquidation risk
+                </Typography>
+                <Typography as="p" variant="caption" muted>
+                  Repaying this amount keeps health factor below {HEALTH_FACTOR_RISK_CONFIRMATION_THRESHOLD.toFixed(1)}.
+                  Your position may still be vulnerable to liquidation.
+                </Typography>
+                <Checkbox
+                  checked={isRepayRiskAccepted}
+                  onChange={(event) => setIsRepayRiskAccepted(event.currentTarget.checked)}
+                  label="I understand and accept the liquidation risk."
+                />
+              </div>
+            ) : null}
             {repayExceedsLimit ? (
               <Typography muted role="status">
                 Repay amount exceeds wallet balance or outstanding debt.
@@ -741,7 +915,13 @@ export function DashboardPage() {
             <ActionButton
               label={busyOp === "approve" ? "Approving..." : busyOp === "repay" ? "Repaying..." : requiresRepayApproval ? "Approve" : "Repay"}
               isLoading={busyOp === "approve" || busyOp === "repay"}
-              disabled={!wallet.isConnected || busyOp !== null || normalizedRepayAmount <= 0 || repayExceedsLimit}
+              disabled={
+                !wallet.isConnected ||
+                busyOp !== null ||
+                normalizedRepayAmount <= 0 ||
+                repayExceedsLimit ||
+                (requiresRepayRiskConfirmation && !isRepayRiskAccepted)
+              }
               onClick={() => {
                 if (requiresRepayApproval) {
                   void approve(repayModal.assetId, repayAmount);
