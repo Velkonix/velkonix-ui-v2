@@ -1,17 +1,16 @@
-import { useEffect, useMemo, useState, type MouseEvent, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useLendingController, type MarketRow, type MarketSortKey } from "../features/lending";
 import {
   ActionButton,
-  ApyCell,
+  ApyWithDetails,
   AssetCell,
   Card,
   EmptyState,
   Icon,
   Loader,
   MetricTile,
-  Modal,
   PageContainer,
   PageHeader,
   Section,
@@ -20,12 +19,6 @@ import {
 } from "../shared/ui";
 import { formatNumber } from "../shared/lib/numberFormat";
 import styles from "./MarketsPage.module.css";
-
-type ApyModalState = {
-  assetSymbol: string;
-  metric: "supply" | "borrow";
-  apy: number;
-} | null;
 
 type MobileMetricRow = {
   key: string;
@@ -36,13 +29,13 @@ type MobileMetricRow = {
 const formatAmount = (value: number): string => formatNumber(value);
 const formatUsd = (value: number): string => `$${formatNumber(value)}`;
 const formatUsdOrNa = (value: number | null): string => (value === null ? "N/A" : formatUsd(value));
-const formatPercent = (value: number): string => `${formatNumber(value, { decimals: 2, compact: false })}%`;
 const MOBILE_MEDIA_QUERY = "(max-width: 768px)";
+const SUPPLY_MOCK_REWARD_APY = 0.42;
+const BORROW_MOCK_REWARD_APY = 0.27;
 
 export function MarketsPage() {
   const navigate = useNavigate();
   const { wallet, marketRows, setSort, sortDirection, sortKey, isLoading } = useLendingController();
-  const [apyModal, setApyModal] = useState<ApyModalState>(null);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -103,17 +96,23 @@ export function MarketsPage() {
     </button>
   );
 
-  const openApyModal = (
-    event: MouseEvent<HTMLButtonElement>,
-    row: MarketRow,
-    metric: "supply" | "borrow"
-  ) => {
-    event.stopPropagation();
-    setApyModal({
-      assetSymbol: row.symbol,
-      metric,
-      apy: metric === "supply" ? row.supplyApy : row.borrowApy,
-    });
+  const getApyDetails = (row: MarketRow, metric: "supply" | "borrow") => {
+    const totalApy = metric === "supply" ? row.supplyApy : row.borrowApy;
+    const rewardApyTotal = metric === "supply" ? SUPPLY_MOCK_REWARD_APY : -BORROW_MOCK_REWARD_APY;
+    const baseApy = totalApy - rewardApyTotal;
+    return {
+      title: `${row.symbol} ${metric === "supply" ? "Supply" : "Borrow"} APY`,
+      totalApy,
+      baseApy,
+      rewardApyTotal,
+      rewards: [
+        {
+          tokenSymbol: "VELK",
+          source: metric === "supply" ? "Velkonix Liquidity Mining" : "Velkonix Borrow Incentives",
+          apy: rewardApyTotal,
+        },
+      ],
+    };
   };
 
   const renderDualAmount = (tokenValue: number, usdValue: number | null, symbol: string) => (
@@ -135,11 +134,7 @@ export function MarketsPage() {
       {
         key: "supplyApy",
         label: "Supply APY",
-        value: (
-          <button type="button" className={styles.apyButton} onClick={(event) => openApyModal(event, row, "supply")}>
-            <ApyCell>{formatPercent(row.supplyApy)}</ApyCell>
-          </button>
-        ),
+        value: <ApyWithDetails {...getApyDetails(row, "supply")} stopPropagation />,
       },
       {
         key: "totalBorrowed",
@@ -149,11 +144,7 @@ export function MarketsPage() {
       {
         key: "borrowApy",
         label: "Borrow APY",
-        value: (
-          <button type="button" className={styles.apyButton} onClick={(event) => openApyModal(event, row, "borrow")}>
-            <ApyCell>{formatPercent(row.borrowApy)}</ApyCell>
-          </button>
-        ),
+        value: <ApyWithDetails {...getApyDetails(row, "borrow")} stopPropagation />,
       },
     ];
 
@@ -299,15 +290,7 @@ export function MarketsPage() {
                   key: "supplyApy",
                   title: titleButton("Supply APY", "supplyApy"),
                   align: "right",
-                  render: (row) => (
-                    <button
-                      type="button"
-                      className={styles.apyButton}
-                      onClick={(event) => openApyModal(event, row, "supply")}
-                    >
-                      <ApyCell>{formatPercent(row.supplyApy)}</ApyCell>
-                    </button>
-                  ),
+                  render: (row) => <ApyWithDetails {...getApyDetails(row, "supply")} stopPropagation />,
                 },
                 {
                   key: "totalBorrowed",
@@ -319,15 +302,7 @@ export function MarketsPage() {
                   key: "borrowApy",
                   title: titleButton("Borrow APY", "borrowApy"),
                   align: "right",
-                  render: (row) => (
-                    <button
-                      type="button"
-                      className={styles.apyButton}
-                      onClick={(event) => openApyModal(event, row, "borrow")}
-                    >
-                      <ApyCell>{formatPercent(row.borrowApy)}</ApyCell>
-                    </button>
-                  ),
+                  render: (row) => <ApyWithDetails {...getApyDetails(row, "borrow")} stopPropagation />,
                 },
               ]}
               rows={marketRows}
@@ -340,18 +315,6 @@ export function MarketsPage() {
         ) : null}
       </Section>
 
-      <Modal
-        isOpen={apyModal !== null}
-        title={apyModal ? `${apyModal.assetSymbol} ${apyModal.metric === "supply" ? "Supply" : "Borrow"} APY` : ""}
-        onClose={() => setApyModal(null)}
-      >
-        {apyModal ? (
-          <div className={styles.modalContent}>
-            <ValueCell tone="muted">Current APY</ValueCell>
-            <ApyCell>{formatPercent(apyModal.apy)}</ApyCell>
-          </div>
-        ) : null}
-      </Modal>
     </PageContainer>
   );
 }

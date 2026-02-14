@@ -1,6 +1,25 @@
 export type Address = `0x${string}`;
 export type AssetId = string;
 
+export interface ApyRewardEntry {
+  tokenSymbol: string;
+  source: string;
+  apy: number;
+  claimable?: number;
+}
+
+export interface ApyBreakdown {
+  baseApy: number;
+  rewardApy: number;
+  totalApy: number;
+  rewards: ApyRewardEntry[];
+}
+
+export interface LendingRewardBalance {
+  tokenSymbol: string;
+  amount: number;
+}
+
 export interface Asset {
   id: string;
   symbol: string;
@@ -27,6 +46,7 @@ export interface UserSupply {
   balance: number;
   balanceUsd?: number | null;
   apy: number;
+  apyBreakdown?: ApyBreakdown;
   isCollateral: boolean;
 }
 
@@ -35,6 +55,7 @@ export interface UserBorrow {
   debt: number;
   debtUsd?: number | null;
   apy: number;
+  apyBreakdown?: ApyBreakdown;
 }
 
 export interface ExitQueueItem {

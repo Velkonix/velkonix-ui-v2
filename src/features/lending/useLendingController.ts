@@ -4,9 +4,10 @@ import type { Address } from "viem";
 import { getActiveNetworkConfig, getAssetConfigByAddress, validateActiveNetworkConfig } from "../../config/networks";
 import { useMockEngine } from "../../app/providers/MockEngineProvider";
 import { useWallet } from "../../app/providers/WalletProvider";
-import type { Asset, AssetId, MockTxResult, Tx, UserBorrow, UserSupply } from "../../mock";
+import type { Asset, AssetId, LendingRewardBalance, MockTxResult, Tx, UserBorrow, UserSupply } from "../../mock";
 import { AAVE_DATA_PROVIDER_ABI, ERC20_ABI, ORACLE_ABI, POOL_ABI, WETH_ABI } from "./aaveAbis";
 import { bpsToPercent, formatUnitsToNumber, parseAmountToUnits, rayToPercent } from "./aaveMath";
+import { defaultLendingIncentivesProvider, type PositionApyBreakdown } from "./incentivesProvider";
 
 const MOCK_POLL_INTERVAL_MS = 250;
 const ONCHAIN_POLL_INTERVAL_MS = 15_000;
@@ -90,6 +91,7 @@ export type DashboardSupplyRow = {
   balance: number;
   balanceUsd: number | null;
   apy: number;
+  apyBreakdown: PositionApyBreakdown;
   isCollateral: boolean;
 };
 
@@ -101,18 +103,29 @@ export type DashboardBorrowRow = {
   debt: number;
   debtUsd: number | null;
   apy: number;
+  apyBreakdown: PositionApyBreakdown;
+};
+
+export type DashboardNetApyBreakdown = {
+  baseApy: number;
+  rewardApyTotal: number;
+  totalApy: number;
 };
 
 export type DashboardSummary = {
   netWorth: number;
   netWorthUsd: number | null;
   averageApy: number;
+  averageApyBase: number;
+  averageApyRewards: number;
+  averageApyBreakdown: DashboardNetApyBreakdown;
   borrowUtilization: number;
   totalSupplied: number;
   totalSuppliedUsd: number | null;
   totalBorrowed: number;
   totalBorrowedUsd: number | null;
   lendingRewards: number;
+  lendingRewardsBreakdown: LendingRewardBalance[];
 };
 
 const EMPTY_AAVE_STATE: AaveState = {
@@ -528,6 +541,7 @@ export function useLendingController() {
   const mockUserSupplies = user ? engine.selectors.getUserSupplies(user as `0x${string}`) : [];
   const mockUserBorrows = user ? engine.selectors.getUserBorrows(user as `0x${string}`) : [];
   const mockLendingRewards = user ? engine.selectors.getUserLendingRewards(user as `0x${string}`) : 0;
+  const mockLendingRewardsBreakdown = user ? engine.selectors.getUserLendingRewardsBreakdown(user as `0x${string}`) : [];
 
   const assets =
     wallet.mode === "mock"
@@ -542,6 +556,7 @@ export function useLendingController() {
   const userSupplies = wallet.mode === "mock" ? mockUserSupplies : aaveState.userSupplies;
   const userBorrows = wallet.mode === "mock" ? mockUserBorrows : aaveState.userBorrows;
   const lendingRewards = wallet.mode === "mock" ? mockLendingRewards : 0;
+  const lendingRewardsBreakdown = wallet.mode === "mock" ? mockLendingRewardsBreakdown : [];
 
   const assetsById = useMemo<Map<AssetId, Asset>>(
     () => new Map(assets.map((asset) => [asset.id, asset])),
@@ -604,6 +619,7 @@ export function useLendingController() {
           if (!asset) {
             return null;
           }
+          const apyBreakdown = defaultLendingIncentivesProvider.getSupplyApyBreakdown(supplyItem);
 
           return {
             assetId: supplyItem.assetId,
@@ -615,7 +631,8 @@ export function useLendingController() {
               wallet.mode === "mock"
                 ? supplyItem.balance
                 : (supplyItem.balanceUsd ?? (asset.oraclePrice ? supplyItem.balance * asset.oraclePrice : null)),
-            apy: supplyItem.apy,
+            apy: apyBreakdown.totalApy,
+            apyBreakdown,
             isCollateral: supplyItem.isCollateral,
           };
         })
@@ -631,6 +648,7 @@ export function useLendingController() {
           if (!asset) {
             return null;
           }
+          const apyBreakdown = defaultLendingIncentivesProvider.getBorrowApyBreakdown(borrowItem);
 
           return {
             assetId: borrowItem.assetId,
@@ -642,7 +660,8 @@ export function useLendingController() {
               wallet.mode === "mock"
                 ? borrowItem.debt
                 : (borrowItem.debtUsd ?? (asset.oraclePrice ? borrowItem.debt * asset.oraclePrice : null)),
-            apy: borrowItem.apy,
+            apy: apyBreakdown.totalApy,
+            apyBreakdown,
           };
         })
         .filter((row): row is DashboardBorrowRow => row !== null),
@@ -664,26 +683,52 @@ export function useLendingController() {
     const netWorthUsd = hasUsdCoverage ? totalSuppliedUsdRaw - totalBorrowedUsdRaw : null;
     const netWorth = wallet.mode === "real" ? (netWorthUsd ?? netWorthToken) : netWorthToken;
 
-    const weightedSupplyApy =
+    const weightedSupplyBaseApy =
       wallet.mode === "real"
-        ? dashboardSupplies.reduce((sum, item) => sum + (item.balanceUsd ?? 0) * item.apy, 0)
-        : userSupplies.reduce((sum, item) => sum + item.balance * item.apy, 0);
-    const weightedBorrowApy =
+        ? dashboardSupplies.reduce((sum, item) => sum + (item.balanceUsd ?? 0) * item.apyBreakdown.baseApy, 0)
+        : userSupplies.reduce(
+            (sum, item) => sum + item.balance * defaultLendingIncentivesProvider.getSupplyApyBreakdown(item).baseApy,
+            0
+          );
+    const weightedSupplyRewardApy =
       wallet.mode === "real"
-        ? dashboardBorrows.reduce((sum, item) => sum + (item.debtUsd ?? 0) * item.apy, 0)
-        : userBorrows.reduce((sum, item) => sum + item.debt * item.apy, 0);
+        ? dashboardSupplies.reduce((sum, item) => sum + (item.balanceUsd ?? 0) * item.apyBreakdown.rewardApyTotal, 0)
+        : userSupplies.reduce(
+            (sum, item) => sum + item.balance * defaultLendingIncentivesProvider.getSupplyApyBreakdown(item).rewardApyTotal,
+            0
+          );
+    const weightedBorrowBaseApy =
+      wallet.mode === "real"
+        ? dashboardBorrows.reduce((sum, item) => sum + (item.debtUsd ?? 0) * item.apyBreakdown.baseApy, 0)
+        : userBorrows.reduce(
+            (sum, item) => sum + item.debt * defaultLendingIncentivesProvider.getBorrowApyBreakdown(item).baseApy,
+            0
+          );
+    const weightedBorrowRewardApy =
+      wallet.mode === "real"
+        ? dashboardBorrows.reduce((sum, item) => sum + (item.debtUsd ?? 0) * item.apyBreakdown.rewardApyTotal, 0)
+        : userBorrows.reduce(
+            (sum, item) => sum + item.debt * defaultLendingIncentivesProvider.getBorrowApyBreakdown(item).rewardApyTotal,
+            0
+          );
     const totalSuppliedBase = wallet.mode === "real" ? totalSuppliedUsdRaw : totalSupplied;
     const totalBorrowedBase = wallet.mode === "real" ? totalBorrowedUsdRaw : totalBorrowed;
-    const earnedApy = totalSuppliedBase > 0 ? weightedSupplyApy / totalSuppliedBase : 0;
-    const debtApy = totalBorrowedBase > 0 ? weightedBorrowApy / totalBorrowedBase : 0;
+    const earnedBaseApy = totalSuppliedBase > 0 ? weightedSupplyBaseApy / totalSuppliedBase : 0;
+    const earnedRewardApy = totalSuppliedBase > 0 ? weightedSupplyRewardApy / totalSuppliedBase : 0;
+    const debtBaseApy = totalBorrowedBase > 0 ? weightedBorrowBaseApy / totalBorrowedBase : 0;
+    const debtRewardApy = totalBorrowedBase > 0 ? weightedBorrowRewardApy / totalBorrowedBase : 0;
     const netWorthBase =
       wallet.mode === "real"
         ? (netWorthUsd ?? 0)
         : netWorthToken;
     const safeNetWorthBase = netWorthBase !== 0 ? netWorthBase : 1;
-    const averageApy =
-      earnedApy * (totalSuppliedBase / safeNetWorthBase) -
-      debtApy * (totalBorrowedBase / safeNetWorthBase);
+    const averageApyBase =
+      earnedBaseApy * (totalSuppliedBase / safeNetWorthBase) -
+      debtBaseApy * (totalBorrowedBase / safeNetWorthBase);
+    const averageApyRewards =
+      earnedRewardApy * (totalSuppliedBase / safeNetWorthBase) -
+      debtRewardApy * (totalBorrowedBase / safeNetWorthBase);
+    const averageApy = averageApyBase + averageApyRewards;
     const borrowUtilization =
       wallet.mode === "real" && hasUsdCoverage
         ? (totalSuppliedUsdRaw > 0 ? (totalBorrowedUsdRaw / totalSuppliedUsdRaw) * 100 : 0)
@@ -693,14 +738,22 @@ export function useLendingController() {
       netWorth,
       netWorthUsd,
       averageApy,
+      averageApyBase,
+      averageApyRewards,
+      averageApyBreakdown: {
+        baseApy: averageApyBase,
+        rewardApyTotal: averageApyRewards,
+        totalApy: averageApy,
+      },
       borrowUtilization,
       totalSupplied,
       totalSuppliedUsd,
       totalBorrowed,
       totalBorrowedUsd,
       lendingRewards,
+      lendingRewardsBreakdown,
     };
-  }, [dashboardBorrows, dashboardSupplies, lendingRewards, userBorrows, userSupplies, wallet.mode, renderTick]);
+  }, [dashboardBorrows, dashboardSupplies, lendingRewards, lendingRewardsBreakdown, userBorrows, userSupplies, wallet.mode, renderTick]);
 
   const setSort = useCallback(
     (nextKey: MarketSortKey) => {

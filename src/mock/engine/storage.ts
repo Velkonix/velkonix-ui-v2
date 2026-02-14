@@ -71,6 +71,10 @@ const createDefaultUser = (): MockUserState => ({
   supplies: [],
   borrows: [],
   lendingRewards: 0,
+  lendingRewardsByToken: {
+    VELK: 0,
+    ARB: 0,
+  },
   staking: {
     velkBalance: 50_000,
     xVelkBalance: 0,
@@ -176,7 +180,9 @@ const readUsers = (): Record<Address, MockUserState> | null => {
     const supplies = parseJson<MockUserState["supplies"]>(getByKey(`mock.user.${address}.supplies`));
     const borrows = parseJson<MockUserState["borrows"]>(getByKey(`mock.user.${address}.borrows`));
     const staking = parseJson<MockUserState["staking"]>(getByKey(`mock.user.${address}.staking`));
-    const rewards = parseJson<{ lendingRewards: number }>(getByKey(`mock.user.${address}.rewards`));
+    const rewards = parseJson<{ lendingRewards: number; lendingRewardsByToken?: Record<string, number> }>(
+      getByKey(`mock.user.${address}.rewards`)
+    );
     if (!balances || !allowances || !supplies || !borrows || !staking || !rewards) {
       return null;
     }
@@ -187,6 +193,7 @@ const readUsers = (): Record<Address, MockUserState> | null => {
       borrows,
       staking,
       lendingRewards: rewards.lendingRewards,
+      lendingRewardsByToken: rewards.lendingRewardsByToken ?? { VELK: rewards.lendingRewards, ARB: 0 },
     };
   }
   return users;
@@ -284,6 +291,7 @@ export const saveMockState = (state: MockDbState): void => {
       `mock.user.${address}.rewards`,
       JSON.stringify({
         lendingRewards: user.lendingRewards,
+        lendingRewardsByToken: user.lendingRewardsByToken,
       })
     );
   }

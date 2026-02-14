@@ -1,4 +1,13 @@
-import type { Address, Asset, AssetId, StakingState, Tx, UserBorrow, UserSupply } from "../types/contracts";
+import type {
+  Address,
+  Asset,
+  AssetId,
+  LendingRewardBalance,
+  StakingState,
+  Tx,
+  UserBorrow,
+  UserSupply,
+} from "../types/contracts";
 import type { MockDbState } from "../types/state";
 import type { MockExitQueueItem } from "../types/state";
 
@@ -58,6 +67,13 @@ export class MockSelectors {
 
   public getUserLendingRewards(user: Address): number {
     return this.readState().users[user]?.lendingRewards ?? 0;
+  }
+
+  public getUserLendingRewardsBreakdown(user: Address): LendingRewardBalance[] {
+    const rewardsByToken = this.readState().users[user]?.lendingRewardsByToken ?? {};
+    return Object.entries(rewardsByToken)
+      .map(([tokenSymbol, amount]) => ({ tokenSymbol, amount }))
+      .filter((item) => item.amount > 0);
   }
 
   public getStakingState(user: Address): StakingState {

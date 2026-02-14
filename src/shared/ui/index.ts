@@ -15,6 +15,7 @@ export { ToastPopup } from "./feedback/ToastPopup";
 export { Tooltip } from "./feedback/Tooltip";
 
 export { ApyCell } from "./data-display/ApyCell";
+export { ApyWithDetails } from "./data-display/ApyWithDetails";
 export { AssetCell } from "./data-display/AssetCell";
 export { Card } from "./data-display/Card";
 export { InfoTableCard } from "./data-display/InfoTableCard";

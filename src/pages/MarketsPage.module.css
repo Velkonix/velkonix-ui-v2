@@ -45,24 +45,6 @@
   transform: translateY(-0.03em);
 }
 
-.apyButton {
-  border: none;
-  background: transparent;
-  min-height: var(--touch-target-min);
-  padding: 0 var(--space-2);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-}
-
-.apyButton:hover span {
-  filter: brightness(1.05);
-}
-
-.apyButton:focus-visible {
-  outline: none;
-  box-shadow: var(--glow-soft);
-}
-
 .dualValue {
   display: inline-flex;
   flex-direction: column;
@@ -132,11 +114,6 @@
   display: none;
 }
 
-.mobileMetricsTable .apyButton {
-  min-height: 0;
-  padding: 0;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .mobileAssetPanel,
   .mobileAssetPanel:hover {
@@ -146,8 +123,7 @@
 }
 
 @media (max-width: 768px) {
-  .sortButton,
-  .apyButton {
+  .sortButton {
     min-height: 40px;
   }
 }

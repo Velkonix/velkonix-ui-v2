@@ -40,6 +40,7 @@ export interface MockUserState {
   supplies: UserSupply[];
   borrows: UserBorrow[];
   lendingRewards: number;
+  lendingRewardsByToken: Record<string, number>;
   staking: MockStakingStore;
 }
 

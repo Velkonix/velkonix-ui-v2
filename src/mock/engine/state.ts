@@ -9,6 +9,10 @@ const createUser = (): MockUserState => ({
   supplies: [],
   borrows: [],
   lendingRewards: 0,
+  lendingRewardsByToken: {
+    VELK: 0,
+    ARB: 0,
+  },
   staking: {
     velkBalance: 0,
     xVelkBalance: 0,

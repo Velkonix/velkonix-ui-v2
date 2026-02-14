@@ -14,11 +14,14 @@ export { LendingMockAdapter } from "./adapters/lendingAdapter";
 export { StakingMockAdapter } from "./adapters/stakingAdapter";
 export { MockSelectors } from "./selectors/portfolioSelectors";
 export type {
+  ApyBreakdown,
+  ApyRewardEntry,
   Address,
   Asset,
   AssetId,
   ExitQueueItem,
   LendingMockApi,
+  LendingRewardBalance,
   MockTxOptions,
   MockTxResult,
   StakingMockApi,

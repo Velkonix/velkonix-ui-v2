@@ -5,6 +5,7 @@ import { useLendingController } from "../features/lending";
 import {
   ActionButton,
   AmountInput,
+  ApyWithDetails,
   AssetCell,
   Card,
   ClaimButton,
@@ -471,7 +472,7 @@ export function DashboardPage() {
             }
           />
           <MetricTile
-            title="Unclaimed rewards"
+            title="Rewards"
             value={formatAmount(dashboardSummary.lendingRewards)}
             media={
               <Icon size={18} viewBox="0 0 512 512" aria-label="Unclaimed rewards icon">
@@ -501,7 +502,10 @@ export function DashboardPage() {
               details={
                 <>
                   <PanelHeaderStat label="Balance" value={formatAmount(suppliesBalance)} />
-                  <PanelHeaderStat label="APY" value={formatPercent(suppliesWeightedApy)} />
+                  <PanelHeaderStat
+                    label="APY"
+                    value={formatPercent(suppliesWeightedApy)}
+                  />
                 </>
               }
             />
@@ -525,7 +529,16 @@ export function DashboardPage() {
                     key: "apy",
                     title: "APY",
                     align: "right",
-                    render: (row) => <ValueCell>{formatPercent(row.apy)}</ValueCell>,
+                    render: (row) => (
+                      <ApyWithDetails
+                        title={`${row.symbol} supply APY`}
+                        totalApy={row.apyBreakdown.totalApy}
+                        baseApy={row.apyBreakdown.baseApy}
+                        rewardApyTotal={row.apyBreakdown.rewardApyTotal}
+                        rewards={row.apyBreakdown.rewards}
+                        stopPropagation
+                      />
+                    ),
                   },
                   {
                     key: "collateral",
@@ -599,7 +612,10 @@ export function DashboardPage() {
               details={
                 <>
                   <PanelHeaderStat label="Balance" value={formatAmount(borrowsBalance)} />
-                  <PanelHeaderStat label="APY" value={formatPercent(borrowsWeightedApy)} />
+                  <PanelHeaderStat
+                    label="APY"
+                    value={formatPercent(borrowsWeightedApy)}
+                  />
                 </>
               }
             />
@@ -623,7 +639,16 @@ export function DashboardPage() {
                     key: "apy",
                     title: "APY",
                     align: "right",
-                    render: (row) => <ValueCell>{formatPercent(row.apy)}</ValueCell>,
+                    render: (row) => (
+                      <ApyWithDetails
+                        title={`${row.symbol} borrow APY`}
+                        totalApy={row.apyBreakdown.totalApy}
+                        baseApy={row.apyBreakdown.baseApy}
+                        rewardApyTotal={row.apyBreakdown.rewardApyTotal}
+                        rewards={row.apyBreakdown.rewards}
+                        stopPropagation
+                      />
+                    ),
                   },
                   {
                     key: "repay",
