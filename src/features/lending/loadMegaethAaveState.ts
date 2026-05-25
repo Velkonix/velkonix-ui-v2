@@ -55,36 +55,50 @@ type AggregatedReserve = {
   reserveFactor: bigint;
   usageAsCollateralEnabled: boolean;
   borrowingEnabled: boolean;
+  stableBorrowRateEnabled: boolean;
   isActive: boolean;
   isFrozen: boolean;
   liquidityIndex: bigint;
   variableBorrowIndex: bigint;
   liquidityRate: bigint;
   variableBorrowRate: bigint;
+  stableBorrowRate: bigint;
   lastUpdateTimestamp: number;
   aTokenAddress: Address;
+  stableDebtTokenAddress: Address;
   variableDebtTokenAddress: Address;
   interestRateStrategyAddress: Address;
   availableLiquidity: bigint;
+  totalPrincipalStableDebt: bigint;
+  averageStableRate: bigint;
+  stableDebtLastUpdateTimestamp: bigint;
   totalScaledVariableDebt: bigint;
   priceInMarketReferenceCurrency: bigint;
   priceOracle: Address;
   variableRateSlope1: bigint;
   variableRateSlope2: bigint;
+  stableRateSlope1: bigint;
+  stableRateSlope2: bigint;
+  baseStableBorrowRate: bigint;
   baseVariableBorrowRate: bigint;
   optimalUsageRatio: bigint;
   isPaused: boolean;
   isSiloedBorrowing: boolean;
   accruedToTreasury: bigint;
+  unbacked: bigint;
   isolationModeTotalDebt: bigint;
   flashLoanEnabled: boolean;
   debtCeiling: bigint;
   debtCeilingDecimals: bigint;
+  eModeCategoryId: number;
   borrowCap: bigint;
   supplyCap: bigint;
+  eModeLtv: number;
+  eModeLiquidationThreshold: number;
+  eModeLiquidationBonus: number;
+  eModePriceSource: Address;
+  eModeLabel: string;
   borrowableInIsolation: boolean;
-  virtualUnderlyingBalance: bigint;
-  deficit: bigint;
 };
 
 type BaseCurrencyInfo = {
@@ -98,7 +112,10 @@ type UserReserve = {
   underlyingAsset: Address;
   scaledATokenBalance: bigint;
   usageAsCollateralEnabledOnUser: boolean;
+  stableBorrowRate: bigint;
   scaledVariableDebt: bigint;
+  principalStableDebt: bigint;
+  stableBorrowLastUpdateTimestamp: bigint;
 };
 
 type RewardInfo = {
@@ -125,6 +142,7 @@ type AggregatedReserveIncentive = {
   underlyingAsset: Address;
   aIncentiveData: IncentiveData;
   vIncentiveData: IncentiveData;
+  sIncentiveData: IncentiveData;
 };
 
 type UserRewardInfo = {
@@ -148,6 +166,7 @@ type UserReserveIncentive = {
   underlyingAsset: Address;
   aTokenIncentivesUserData: UserIncentiveData;
   vTokenIncentivesUserData: UserIncentiveData;
+  sTokenIncentivesUserData: UserIncentiveData;
 };
 
 type Params = {
