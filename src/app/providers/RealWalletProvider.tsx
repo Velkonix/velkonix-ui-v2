@@ -5,7 +5,6 @@ import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useCallback, useMemo } from "react";
 import type { ReactNode } from "react";
 import { WagmiProvider, http, useAccount, useChainId, useConnect, useDisconnect, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
-import { arbitrumSepolia } from "wagmi/chains";
 
 import { getActiveNetworkConfig } from "../../config/networks";
 import type { WalletAddress } from "../../shared/lib/wallet";
@@ -14,8 +13,14 @@ import { WalletContext, createWalletContextValue } from "./walletContext";
 const WALLETCONNECT_PROJECT_ID = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID ?? "demo";
 const walletQueryClient = new QueryClient();
 const activeNetwork = getActiveNetworkConfig();
-const ACTIVE_CHAIN = arbitrumSepolia;
-const ACTIVE_RPC_URL = import.meta.env.VITE_ARBITRUM_SEPOLIA_RPC_URL?.trim() || ACTIVE_CHAIN.rpcUrls.default.http[0];
+const ACTIVE_CHAIN = activeNetwork.viemChain;
+
+const RPC_OVERRIDE_BY_NETWORK: Record<string, string | undefined> = {
+  "megaeth-mainnet": import.meta.env.VITE_MEGAETH_RPC_URL?.trim() || undefined,
+  "arbitrum-sepolia": import.meta.env.VITE_ARBITRUM_SEPOLIA_RPC_URL?.trim() || undefined,
+};
+const ACTIVE_RPC_URL =
+  RPC_OVERRIDE_BY_NETWORK[activeNetwork.key] || activeNetwork.rpcUrl || ACTIVE_CHAIN.rpcUrls.default.http[0];
 
 if (ACTIVE_CHAIN.id !== activeNetwork.chainId) {
   throw new Error(`Unsupported wallet chainId ${activeNetwork.chainId}.`);

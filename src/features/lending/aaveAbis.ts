@@ -223,3 +223,205 @@ export const ORACLE_ABI = [
     outputs: [{ name: "", type: "uint256" }],
   },
 ] as const;
+
+const AGGREGATED_RESERVE_DATA_COMPONENTS = [
+  { name: "underlyingAsset", type: "address" },
+  { name: "name", type: "string" },
+  { name: "symbol", type: "string" },
+  { name: "decimals", type: "uint256" },
+  { name: "baseLTVasCollateral", type: "uint256" },
+  { name: "reserveLiquidationThreshold", type: "uint256" },
+  { name: "reserveLiquidationBonus", type: "uint256" },
+  { name: "reserveFactor", type: "uint256" },
+  { name: "usageAsCollateralEnabled", type: "bool" },
+  { name: "borrowingEnabled", type: "bool" },
+  { name: "isActive", type: "bool" },
+  { name: "isFrozen", type: "bool" },
+  { name: "liquidityIndex", type: "uint128" },
+  { name: "variableBorrowIndex", type: "uint128" },
+  { name: "liquidityRate", type: "uint128" },
+  { name: "variableBorrowRate", type: "uint128" },
+  { name: "lastUpdateTimestamp", type: "uint40" },
+  { name: "aTokenAddress", type: "address" },
+  { name: "variableDebtTokenAddress", type: "address" },
+  { name: "interestRateStrategyAddress", type: "address" },
+  { name: "availableLiquidity", type: "uint256" },
+  { name: "totalScaledVariableDebt", type: "uint256" },
+  { name: "priceInMarketReferenceCurrency", type: "uint256" },
+  { name: "priceOracle", type: "address" },
+  { name: "variableRateSlope1", type: "uint256" },
+  { name: "variableRateSlope2", type: "uint256" },
+  { name: "baseVariableBorrowRate", type: "uint256" },
+  { name: "optimalUsageRatio", type: "uint256" },
+  { name: "isPaused", type: "bool" },
+  { name: "isSiloedBorrowing", type: "bool" },
+  { name: "accruedToTreasury", type: "uint128" },
+  { name: "isolationModeTotalDebt", type: "uint128" },
+  { name: "flashLoanEnabled", type: "bool" },
+  { name: "debtCeiling", type: "uint256" },
+  { name: "debtCeilingDecimals", type: "uint256" },
+  { name: "borrowCap", type: "uint256" },
+  { name: "supplyCap", type: "uint256" },
+  { name: "borrowableInIsolation", type: "bool" },
+  { name: "virtualUnderlyingBalance", type: "uint128" },
+  { name: "deficit", type: "uint128" },
+] as const;
+
+const BASE_CURRENCY_INFO_COMPONENTS = [
+  { name: "marketReferenceCurrencyUnit", type: "uint256" },
+  { name: "marketReferenceCurrencyPriceInUsd", type: "int256" },
+  { name: "networkBaseTokenPriceInUsd", type: "int256" },
+  { name: "networkBaseTokenPriceDecimals", type: "uint8" },
+] as const;
+
+const USER_RESERVE_DATA_COMPONENTS = [
+  { name: "underlyingAsset", type: "address" },
+  { name: "scaledATokenBalance", type: "uint256" },
+  { name: "usageAsCollateralEnabledOnUser", type: "bool" },
+  { name: "scaledVariableDebt", type: "uint256" },
+] as const;
+
+export const UI_POOL_DATA_PROVIDER_ABI = [
+  {
+    type: "function",
+    name: "getReservesData",
+    stateMutability: "view",
+    inputs: [{ name: "provider", type: "address" }],
+    outputs: [
+      {
+        name: "",
+        type: "tuple[]",
+        components: AGGREGATED_RESERVE_DATA_COMPONENTS,
+      },
+      {
+        name: "",
+        type: "tuple",
+        components: BASE_CURRENCY_INFO_COMPONENTS,
+      },
+    ],
+  },
+  {
+    type: "function",
+    name: "getUserReservesData",
+    stateMutability: "view",
+    inputs: [
+      { name: "provider", type: "address" },
+      { name: "user", type: "address" },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "tuple[]",
+        components: USER_RESERVE_DATA_COMPONENTS,
+      },
+      { name: "", type: "uint8" },
+    ],
+  },
+] as const;
+
+const REWARD_INFO_COMPONENTS = [
+  { name: "rewardTokenSymbol", type: "string" },
+  { name: "rewardTokenAddress", type: "address" },
+  { name: "rewardOracleAddress", type: "address" },
+  { name: "emissionPerSecond", type: "uint256" },
+  { name: "incentivesLastUpdateTimestamp", type: "uint256" },
+  { name: "tokenIncentivesIndex", type: "uint256" },
+  { name: "emissionEndTimestamp", type: "uint256" },
+  { name: "rewardPriceFeed", type: "int256" },
+  { name: "rewardTokenDecimals", type: "uint8" },
+  { name: "precision", type: "uint8" },
+  { name: "priceFeedDecimals", type: "uint8" },
+] as const;
+
+const INCENTIVE_DATA_COMPONENTS = [
+  { name: "tokenAddress", type: "address" },
+  { name: "incentiveControllerAddress", type: "address" },
+  { name: "rewardsTokenInformation", type: "tuple[]", components: REWARD_INFO_COMPONENTS },
+] as const;
+
+const AGGREGATED_RESERVE_INCENTIVE_DATA_COMPONENTS = [
+  { name: "underlyingAsset", type: "address" },
+  { name: "aIncentiveData", type: "tuple", components: INCENTIVE_DATA_COMPONENTS },
+  { name: "vIncentiveData", type: "tuple", components: INCENTIVE_DATA_COMPONENTS },
+] as const;
+
+const USER_REWARD_INFO_COMPONENTS = [
+  { name: "rewardTokenSymbol", type: "string" },
+  { name: "rewardOracleAddress", type: "address" },
+  { name: "rewardTokenAddress", type: "address" },
+  { name: "userUnclaimedRewards", type: "uint256" },
+  { name: "tokenIncentivesUserIndex", type: "uint256" },
+  { name: "rewardPriceFeed", type: "int256" },
+  { name: "priceFeedDecimals", type: "uint8" },
+  { name: "rewardTokenDecimals", type: "uint8" },
+] as const;
+
+const USER_INCENTIVE_DATA_COMPONENTS = [
+  { name: "tokenAddress", type: "address" },
+  { name: "incentiveControllerAddress", type: "address" },
+  { name: "userRewardsInformation", type: "tuple[]", components: USER_REWARD_INFO_COMPONENTS },
+] as const;
+
+const USER_RESERVE_INCENTIVE_DATA_COMPONENTS = [
+  { name: "underlyingAsset", type: "address" },
+  { name: "aTokenIncentivesUserData", type: "tuple", components: USER_INCENTIVE_DATA_COMPONENTS },
+  { name: "vTokenIncentivesUserData", type: "tuple", components: USER_INCENTIVE_DATA_COMPONENTS },
+] as const;
+
+export const UI_INCENTIVE_DATA_PROVIDER_ABI = [
+  {
+    type: "function",
+    name: "getReservesIncentivesData",
+    stateMutability: "view",
+    inputs: [{ name: "provider", type: "address" }],
+    outputs: [
+      {
+        name: "",
+        type: "tuple[]",
+        components: AGGREGATED_RESERVE_INCENTIVE_DATA_COMPONENTS,
+      },
+    ],
+  },
+  {
+    type: "function",
+    name: "getUserReservesIncentivesData",
+    stateMutability: "view",
+    inputs: [
+      { name: "provider", type: "address" },
+      { name: "user", type: "address" },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "tuple[]",
+        components: USER_RESERVE_INCENTIVE_DATA_COMPONENTS,
+      },
+    ],
+  },
+] as const;
+
+export const WALLET_BALANCE_PROVIDER_ABI = [
+  {
+    type: "function",
+    name: "batchBalanceOf",
+    stateMutability: "view",
+    inputs: [
+      { name: "users", type: "address[]" },
+      { name: "tokens", type: "address[]" },
+    ],
+    outputs: [{ name: "", type: "uint256[]" }],
+  },
+  {
+    type: "function",
+    name: "getUserWalletBalances",
+    stateMutability: "view",
+    inputs: [
+      { name: "provider", type: "address" },
+      { name: "user", type: "address" },
+    ],
+    outputs: [
+      { name: "", type: "address[]" },
+      { name: "", type: "uint256[]" },
+    ],
+  },
+] as const;

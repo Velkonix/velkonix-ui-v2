@@ -8,6 +8,7 @@ import type { Asset, AssetId, LendingRewardBalance, MockTxResult, Tx, UserBorrow
 import { AAVE_DATA_PROVIDER_ABI, ERC20_ABI, ORACLE_ABI, POOL_ABI, WETH_ABI } from "./aaveAbis";
 import { bpsToPercent, formatUnitsToNumber, parseAmountToUnits, rayToPercent } from "./aaveMath";
 import { defaultLendingIncentivesProvider, type PositionApyBreakdown } from "./incentivesProvider";
+import { loadMegaethAaveState } from "./loadMegaethAaveState";
 
 const MOCK_POLL_INTERVAL_MS = 250;
 const ONCHAIN_POLL_INTERVAL_MS = 15_000;
@@ -229,6 +230,29 @@ export function useLendingController() {
       loadError: null,
     }));
     try {
+      if (networkConfig.key === "megaeth-mainnet") {
+        const snapshot = await loadMegaethAaveState({
+          publicClient: wallet.publicClient,
+          network: networkConfig,
+          user,
+        });
+        setAaveState({
+          assets: snapshot.assets,
+          userSupplies: snapshot.userSupplies,
+          userBorrows: snapshot.userBorrows,
+          walletBalances: snapshot.walletBalances,
+          walletBalancesUsd: snapshot.walletBalancesUsd,
+          nativeBalance: snapshot.nativeBalance,
+          nativeBalanceUsd: snapshot.nativeBalanceUsd,
+          allowances: snapshot.allowances,
+          userAccountMetrics: snapshot.userAccountMetrics,
+          loading: false,
+          loadError: null,
+          hasLoadedOnce: true,
+        });
+        return;
+      }
+
       const reserveTokens = await wallet.publicClient.readContract({
         address: networkConfig.deployments.protocolDataProvider,
         abi: AAVE_DATA_PROVIDER_ABI,
@@ -517,9 +541,7 @@ export function useLendingController() {
       }));
     }
   }, [
-    networkConfig.deployments.poolProxy,
-    networkConfig.deployments.protocolDataProvider,
-    networkConfig.deployments.aaveOracle,
+    networkConfig,
     user,
     wallet.isWrongNetwork,
     wallet.mode,
