@@ -254,12 +254,15 @@ export async function loadMegaethAaveState({
   })) as readonly [readonly AggregatedReserve[], BaseCurrencyInfo];
 
   const [reservesData, baseCurrency] = reservesResult;
-  const reserveIncentives = (await publicClient.readContract({
-    address: deployments.uiIncentiveDataProvider,
-    abi: UI_INCENTIVE_DATA_PROVIDER_ABI,
-    functionName: "getReservesIncentivesData",
-    args: [deployments.poolAddressesProvider],
-  })) as readonly AggregatedReserveIncentive[];
+  const reserveIncentives = await publicClient
+    .readContract({
+      address: deployments.uiIncentiveDataProvider,
+      abi: UI_INCENTIVE_DATA_PROVIDER_ABI,
+      functionName: "getReservesIncentivesData",
+      args: [deployments.poolAddressesProvider],
+    })
+    .then((value) => value as readonly AggregatedReserveIncentive[])
+    .catch(() => [] as readonly AggregatedReserveIncentive[]);
 
   const reserveAddresses = reservesData.map((reserve) => reserve.underlyingAsset);
   const baseUnit = baseCurrency.marketReferenceCurrencyUnit;
@@ -290,12 +293,14 @@ export async function loadMegaethAaveState({
         functionName: "getUserReservesData",
         args: [deployments.poolAddressesProvider, user],
       }),
-      publicClient.readContract({
-        address: deployments.uiIncentiveDataProvider,
-        abi: UI_INCENTIVE_DATA_PROVIDER_ABI,
-        functionName: "getUserReservesIncentivesData",
-        args: [deployments.poolAddressesProvider, user],
-      }),
+      publicClient
+        .readContract({
+          address: deployments.uiIncentiveDataProvider,
+          abi: UI_INCENTIVE_DATA_PROVIDER_ABI,
+          functionName: "getUserReservesIncentivesData",
+          args: [deployments.poolAddressesProvider, user],
+        })
+        .catch(() => [] as readonly UserReserveIncentive[]),
       publicClient.readContract({
         address: deployments.walletBalanceProvider,
         abi: WALLET_BALANCE_PROVIDER_ABI,
@@ -311,12 +316,14 @@ export async function loadMegaethAaveState({
           args: [user, deployments.poolProxy],
         })),
       }),
-      publicClient.readContract({
-        address: deployments.poolProxy,
-        abi: POOL_ABI,
-        functionName: "getUserAccountData",
-        args: [user],
-      }),
+      publicClient
+        .readContract({
+          address: deployments.poolProxy,
+          abi: POOL_ABI,
+          functionName: "getUserAccountData",
+          args: [user],
+        })
+        .catch(() => null),
       publicClient.getBalance({ address: user }),
     ]);
 
@@ -325,14 +332,8 @@ export async function loadMegaethAaveState({
     userIncentives = userIncentivesResult as readonly UserReserveIncentive[];
     walletBalancesRaw = walletBalancesResult as readonly bigint[];
     allowancesRaw = allowancesResult as unknown as readonly bigint[];
-    userAccountDataResult = userAccountRaw as readonly [
-      bigint,
-      bigint,
-      bigint,
-      bigint,
-      bigint,
-      bigint,
-    ];
+    userAccountDataResult =
+      (userAccountRaw as readonly [bigint, bigint, bigint, bigint, bigint, bigint] | null) ?? null;
     nativeBalanceRaw = nativeBalanceValue as bigint;
   }
 
