@@ -2,12 +2,17 @@
 
 Bootstrap project for the Velkonix DeFi UI.
 
+## Package manager
+This project uses **pnpm** exclusively. `npm` and `yarn` are disallowed (a `preinstall` hook enforces this). Versions are pinned without `^`.
+
+Install: `pnpm install`
+
 ## Scripts
-- `npm run dev`
-- `npm run build`
-- `npm run preview`
-- `npm run lint:colors`
-- `npm run test`
+- `pnpm dev`
+- `pnpm build`
+- `pnpm preview`
+- `pnpm lint:colors`
+- `pnpm test`
 
 ## Internal Theme Switching
 - Theme is controlled by `VITE_THEME` in env.
@@ -15,6 +20,6 @@ Bootstrap project for the Velkonix DeFi UI.
   - `blue` (default)
   - `amber`
 - Example:
-  - `VITE_THEME=blue npm run dev`
+  - `VITE_THEME=blue pnpm dev`
 
 The app applies `<html data-theme="...">` during bootstrap, and all UI colors must come from tokens in `src/styles/index.css`.
