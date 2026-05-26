@@ -76,7 +76,11 @@
   padding: var(--space-4);
   border-radius: var(--radius-md);
   border: 1px solid rgba(var(--border-subtle-rgb), 0.45);
-  background: linear-gradient(180deg, rgba(var(--bg-secondary-rgb), 0.4), rgba(var(--bg-tertiary-rgb), 0.5));
+  background: linear-gradient(
+    180deg,
+    rgba(var(--bg-secondary-rgb), 0.4),
+    rgba(var(--bg-tertiary-rgb), 0.5)
+  );
 }
 
 .queueCardHeader {

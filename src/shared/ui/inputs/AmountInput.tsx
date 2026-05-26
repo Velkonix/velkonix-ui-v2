@@ -56,7 +56,10 @@ export function AmountInput({
     valueSetter?.call(inputElement, nextValue);
 
     if (onChange) {
-      onChange({ target: inputElement, currentTarget: inputElement } as ChangeEvent<HTMLInputElement>);
+      onChange({
+        target: inputElement,
+        currentTarget: inputElement,
+      } as ChangeEvent<HTMLInputElement>);
       return;
     }
 

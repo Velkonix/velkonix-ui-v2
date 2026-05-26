@@ -17,15 +17,35 @@
   opacity: 0.68;
   background-image:
     radial-gradient(circle at 14% 22%, rgba(236, 250, 255, 0.3) 0 1px, transparent 2.5px),
-    radial-gradient(circle at 78% 18%, rgba(var(--accent-glow-rgb), 0.24) 0 1.2px, transparent 2.8px),
+    radial-gradient(
+      circle at 78% 18%,
+      rgba(var(--accent-glow-rgb), 0.24) 0 1.2px,
+      transparent 2.8px
+    ),
     radial-gradient(circle at 66% 66%, rgba(248, 253, 255, 0.28) 0 1px, transparent 2.6px),
-    radial-gradient(circle at 34% 76%, rgba(var(--accent-active-rgb), 0.22) 0 1.1px, transparent 2.8px),
+    radial-gradient(
+      circle at 34% 76%,
+      rgba(var(--accent-active-rgb), 0.22) 0 1.1px,
+      transparent 2.8px
+    ),
     radial-gradient(circle at 88% 58%, rgba(244, 252, 255, 0.22) 0 0.9px, transparent 2.2px),
-    radial-gradient(circle at 22% 48%, rgba(var(--accent-glow-rgb), 0.25) 0 1.2px, transparent 2.7px),
+    radial-gradient(
+      circle at 22% 48%,
+      rgba(var(--accent-glow-rgb), 0.25) 0 1.2px,
+      transparent 2.7px
+    ),
     radial-gradient(circle at 10% 62%, rgba(240, 251, 255, 0.26) 0 0.9px, transparent 2.4px),
-    radial-gradient(circle at 58% 14%, rgba(var(--accent-active-rgb), 0.2) 0 1.1px, transparent 2.6px),
+    radial-gradient(
+      circle at 58% 14%,
+      rgba(var(--accent-active-rgb), 0.2) 0 1.1px,
+      transparent 2.6px
+    ),
     radial-gradient(circle at 74% 82%, rgba(238, 250, 255, 0.24) 0 1px, transparent 2.5px),
-    radial-gradient(circle at 44% 38%, rgba(var(--accent-glow-rgb), 0.22) 0 1.1px, transparent 2.6px);
+    radial-gradient(
+      circle at 44% 38%,
+      rgba(var(--accent-glow-rgb), 0.22) 0 1.1px,
+      transparent 2.6px
+    );
   background-size:
     220px 220px,
     260px 240px,
@@ -52,13 +72,25 @@
     radial-gradient(circle at 20% 16%, rgba(255, 255, 255, 0.28) 0 0.8px, transparent 2.2px),
     radial-gradient(circle at 84% 34%, rgba(var(--accent-glow-rgb), 0.22) 0 1px, transparent 2.4px),
     radial-gradient(circle at 40% 52%, rgba(236, 249, 255, 0.2) 0 0.9px, transparent 2.3px),
-    radial-gradient(circle at 14% 78%, rgba(var(--accent-active-rgb), 0.2) 0 0.9px, transparent 2.5px),
+    radial-gradient(
+      circle at 14% 78%,
+      rgba(var(--accent-active-rgb), 0.2) 0 0.9px,
+      transparent 2.5px
+    ),
     radial-gradient(circle at 70% 84%, rgba(250, 254, 255, 0.2) 0 0.8px, transparent 2.1px),
     radial-gradient(circle at 52% 24%, rgba(var(--accent-glow-rgb), 0.2) 0 1px, transparent 2.3px),
     radial-gradient(circle at 30% 30%, rgba(246, 253, 255, 0.2) 0 0.8px, transparent 2.1px),
-    radial-gradient(circle at 62% 70%, rgba(var(--accent-active-rgb), 0.18) 0 0.9px, transparent 2.4px),
+    radial-gradient(
+      circle at 62% 70%,
+      rgba(var(--accent-active-rgb), 0.18) 0 0.9px,
+      transparent 2.4px
+    ),
     radial-gradient(circle at 8% 42%, rgba(238, 250, 255, 0.2) 0 0.8px, transparent 2.1px),
-    radial-gradient(circle at 92% 62%, rgba(var(--accent-glow-rgb), 0.18) 0 0.9px, transparent 2.2px);
+    radial-gradient(
+      circle at 92% 62%,
+      rgba(var(--accent-glow-rgb), 0.18) 0 0.9px,
+      transparent 2.2px
+    );
   background-size:
     320px 300px,
     360px 330px,

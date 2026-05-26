@@ -56,7 +56,8 @@ type CollateralModalState = {
 const formatAmount = (value: number): string => formatNumber(value);
 const formatUsd = (value: number): string => `$${formatNumber(value)}`;
 const formatUsdOrNa = (value: number | null): string => (value === null ? "N/A" : formatUsd(value));
-const formatPercent = (value: number): string => `${formatNumber(value, { decimals: 2, compact: false })}%`;
+const formatPercent = (value: number): string =>
+  `${formatNumber(value, { decimals: 2, compact: false })}%`;
 const getHealthPercent = (healthFactor: number): number => {
   if (!Number.isFinite(healthFactor)) {
     return 100;
@@ -71,11 +72,14 @@ const getHealthPercent = (healthFactor: number): number => {
 const formatHealthFactor = (value: number): string =>
   Number.isFinite(value) ? formatNumber(value, { decimals: 2, compact: false }) : "∞";
 const formatHealthFactorWithPercent = (value: number): string => {
-  const numeric = Number.isFinite(value) ? formatNumber(value, { decimals: 2, compact: false }) : "∞";
+  const numeric = Number.isFinite(value)
+    ? formatNumber(value, { decimals: 2, compact: false })
+    : "∞";
   const healthPercent = formatNumber(getHealthPercent(value), { decimals: 2, compact: false });
   return `${numeric} (${healthPercent}%)`;
 };
-const formatInputAmount = (value: number): string => formatNumber(value, { compact: false, useGrouping: false });
+const formatInputAmount = (value: number): string =>
+  formatNumber(value, { compact: false, useGrouping: false });
 const computeHealthFactor = (totalSupplied: number, totalBorrowed: number): number =>
   totalBorrowed > 0 ? totalSupplied / totalBorrowed : Number.POSITIVE_INFINITY;
 const getAvailableLiquidity = (totalSupplied: number, totalBorrowed: number): number =>
@@ -83,7 +87,8 @@ const getAvailableLiquidity = (totalSupplied: number, totalBorrowed: number): nu
 const HEALTH_FACTOR_SAFE_THRESHOLD = 3;
 const HEALTH_FACTOR_RISK_CONFIRMATION_THRESHOLD = 1.5;
 const HEALTH_FACTOR_LIQUIDATION_THRESHOLD = 1;
-const clamp = (value: number, min: number, max: number): number => Math.min(max, Math.max(min, value));
+const clamp = (value: number, min: number, max: number): number =>
+  Math.min(max, Math.max(min, value));
 const getHealthFactorTextStyle = (value: number): CSSProperties => {
   if (!Number.isFinite(value)) {
     return { color: "var(--success)" };
@@ -140,14 +145,17 @@ export function DashboardPage() {
   const [repayAmount, setRepayAmount] = useState("");
 
   const parsedWithdrawAmount = Number(withdrawAmount);
-  const normalizedWithdrawAmount = Number.isFinite(parsedWithdrawAmount) && parsedWithdrawAmount > 0 ? parsedWithdrawAmount : 0;
-  const withdrawExceedsLimit = withdrawModal !== null && normalizedWithdrawAmount > withdrawModal.maxAmount;
+  const normalizedWithdrawAmount =
+    Number.isFinite(parsedWithdrawAmount) && parsedWithdrawAmount > 0 ? parsedWithdrawAmount : 0;
+  const withdrawExceedsLimit =
+    withdrawModal !== null && normalizedWithdrawAmount > withdrawModal.maxAmount;
   const withdrawBlockedByUtilization =
     withdrawModal !== null && withdrawModal.maxAmountByLiquidity < withdrawModal.supplyBalance;
   const withdrawBlockedByHealthFactorLimit =
     withdrawModal !== null &&
     withdrawModal.isCollateral &&
-    withdrawModal.maxAmountByHealthFactor < Math.min(withdrawModal.supplyBalance, withdrawModal.maxAmountByLiquidity);
+    withdrawModal.maxAmountByHealthFactor <
+      Math.min(withdrawModal.supplyBalance, withdrawModal.maxAmountByLiquidity);
 
   const repayWalletBalance = useMemo(
     () => (repayModal ? getWalletBalanceForAsset(repayModal.assetId) : 0),
@@ -163,23 +171,35 @@ export function DashboardPage() {
   );
 
   const parsedRepayAmount = Number(repayAmount);
-  const normalizedRepayAmount = Number.isFinite(parsedRepayAmount) && parsedRepayAmount > 0 ? parsedRepayAmount : 0;
+  const normalizedRepayAmount =
+    Number.isFinite(parsedRepayAmount) && parsedRepayAmount > 0 ? parsedRepayAmount : 0;
   const repayExceedsLimit = repayModal !== null && normalizedRepayAmount > repayAvailable;
-  const requiresRepayApproval = repayModal !== null && normalizedRepayAmount > 0 && repayAllowance < normalizedRepayAmount;
+  const requiresRepayApproval =
+    repayModal !== null && normalizedRepayAmount > 0 && repayAllowance < normalizedRepayAmount;
 
-  const withdrawAmountApplied = withdrawModal ? Math.min(normalizedWithdrawAmount, withdrawModal.maxAmount) : 0;
+  const withdrawAmountApplied = withdrawModal
+    ? Math.min(normalizedWithdrawAmount, withdrawModal.maxAmount)
+    : 0;
   const withdrawRemainingSupplyBefore = withdrawModal?.supplyBalance ?? 0;
-  const withdrawRemainingSupplyAfter = Math.max(0, withdrawRemainingSupplyBefore - withdrawAmountApplied);
+  const withdrawRemainingSupplyAfter = Math.max(
+    0,
+    withdrawRemainingSupplyBefore - withdrawAmountApplied
+  );
   const repayAmountApplied = repayModal ? Math.min(normalizedRepayAmount, repayModal.maxDebt) : 0;
   const repayRemainingDebtBefore = repayModal?.maxDebt ?? 0;
   const repayRemainingDebtAfter = Math.max(0, repayRemainingDebtBefore - repayAmountApplied);
-  const totalCollateralBalance = dashboardSupplies.reduce((sum, item) => sum + (item.isCollateral ? item.balance : 0), 0);
+  const totalCollateralBalance = dashboardSupplies.reduce(
+    (sum, item) => sum + (item.isCollateral ? item.balance : 0),
+    0
+  );
   const fallbackHealthFactor = computeHealthFactor(
     totalCollateralBalance,
     dashboardSummary.totalBorrowed
   );
   const canUseRealHealthFactor =
-    wallet.mode === "real" && userAccountMetrics !== null && userAccountMetrics.baseCurrencyUnit > 0;
+    wallet.mode === "real" &&
+    userAccountMetrics !== null &&
+    userAccountMetrics.baseCurrencyUnit > 0;
   const getAssetUsdPrice = (assetId: string): number | null => {
     const asset = getAssetById(assetId);
     if (!asset?.oraclePrice || !Number.isFinite(asset.oraclePrice) || asset.oraclePrice <= 0) {
@@ -205,20 +225,35 @@ export function DashboardPage() {
     if (totalDebtAfter <= 0) {
       return Number.POSITIVE_INFINITY;
     }
-    const totalCollateralAfter = Math.max(0, userAccountMetrics.totalCollateralBase + collateralDeltaBase);
-    return (totalCollateralAfter * (userAccountMetrics.currentLiquidationThreshold / 10_000)) / totalDebtAfter;
+    const totalCollateralAfter = Math.max(
+      0,
+      userAccountMetrics.totalCollateralBase + collateralDeltaBase
+    );
+    return (
+      (totalCollateralAfter * (userAccountMetrics.currentLiquidationThreshold / 10_000)) /
+      totalDebtAfter
+    );
   };
-  const getMaxWithdrawByHealthFactor = (assetId: string, isCollateral: boolean, upperBound: number): number => {
+  const getMaxWithdrawByHealthFactor = (
+    assetId: string,
+    isCollateral: boolean,
+    upperBound: number
+  ): number => {
     if (!isCollateral || upperBound <= 0) {
       return upperBound;
     }
     const isAmountAllowed = (amount: number): boolean => {
       if (canUseRealHealthFactor) {
-        return projectHealthFactor(-toBaseAmount(assetId, amount), 0) >= HEALTH_FACTOR_LIQUIDATION_THRESHOLD;
+        return (
+          projectHealthFactor(-toBaseAmount(assetId, amount), 0) >=
+          HEALTH_FACTOR_LIQUIDATION_THRESHOLD
+        );
       }
       return (
-        computeHealthFactor(Math.max(0, totalCollateralBalance - amount), dashboardSummary.totalBorrowed) >=
-        HEALTH_FACTOR_LIQUIDATION_THRESHOLD
+        computeHealthFactor(
+          Math.max(0, totalCollateralBalance - amount),
+          dashboardSummary.totalBorrowed
+        ) >= HEALTH_FACTOR_LIQUIDATION_THRESHOLD
       );
     };
     if (isAmountAllowed(upperBound)) {
@@ -241,8 +276,16 @@ export function DashboardPage() {
     ? (userAccountMetrics.healthFactor ?? Number.POSITIVE_INFINITY)
     : fallbackHealthFactor;
   const withdrawHealthFactorAfter = canUseRealHealthFactor
-    ? projectHealthFactor(withdrawModal?.isCollateral ? -toBaseAmount(withdrawModal.assetId, withdrawAmountApplied) : 0, 0)
-    : computeHealthFactor(Math.max(0, dashboardSummary.totalSupplied - withdrawAmountApplied), dashboardSummary.totalBorrowed);
+    ? projectHealthFactor(
+        withdrawModal?.isCollateral
+          ? -toBaseAmount(withdrawModal.assetId, withdrawAmountApplied)
+          : 0,
+        0
+      )
+    : computeHealthFactor(
+        Math.max(0, dashboardSummary.totalSupplied - withdrawAmountApplied),
+        dashboardSummary.totalBorrowed
+      );
   const withdrawBlockedByHealthFactor =
     withdrawModal !== null &&
     normalizedWithdrawAmount > 0 &&
@@ -254,23 +297,35 @@ export function DashboardPage() {
     : fallbackHealthFactor;
   const repayHealthFactorAfter = canUseRealHealthFactor
     ? projectHealthFactor(0, -toBaseAmount(repayModal?.assetId ?? "", repayAmountApplied))
-    : computeHealthFactor(dashboardSummary.totalSupplied, Math.max(0, dashboardSummary.totalBorrowed - repayAmountApplied));
+    : computeHealthFactor(
+        dashboardSummary.totalSupplied,
+        Math.max(0, dashboardSummary.totalBorrowed - repayAmountApplied)
+      );
   const collateralHealthFactorBefore = canUseRealHealthFactor
     ? (userAccountMetrics.healthFactor ?? Number.POSITIVE_INFINITY)
     : computeHealthFactor(totalCollateralBalance, dashboardSummary.totalBorrowed);
   const collateralDeltaBase = collateralModal
-    ? toBaseAmount(collateralModal.assetId, collateralModal.nextEnabled ? collateralModal.supplyBalance : -collateralModal.supplyBalance)
+    ? toBaseAmount(
+        collateralModal.assetId,
+        collateralModal.nextEnabled ? collateralModal.supplyBalance : -collateralModal.supplyBalance
+      )
     : 0;
   const collateralHealthFactorAfter = canUseRealHealthFactor
     ? projectHealthFactor(collateralDeltaBase, 0)
     : computeHealthFactor(
         Math.max(
           0,
-          totalCollateralBalance + (collateralModal ? (collateralModal.nextEnabled ? collateralModal.supplyBalance : -collateralModal.supplyBalance) : 0)
+          totalCollateralBalance +
+            (collateralModal
+              ? collateralModal.nextEnabled
+                ? collateralModal.supplyBalance
+                : -collateralModal.supplyBalance
+              : 0)
         ),
         dashboardSummary.totalBorrowed
       );
-  const collateralDisableBlocked = collateralModal !== null && !collateralModal.nextEnabled && collateralHealthFactorAfter < 1;
+  const collateralDisableBlocked =
+    collateralModal !== null && !collateralModal.nextEnabled && collateralHealthFactorAfter < 1;
   const requiresCollateralRiskConfirmation =
     collateralModal !== null &&
     !collateralModal.nextEnabled &&
@@ -326,7 +381,10 @@ export function DashboardPage() {
     setIsRepayTxPending(false);
   }, [busyOp, isRepayTxPending, toast]);
 
-  const suppliesBalance = useMemo(() => dashboardSupplies.reduce((sum, row) => sum + row.balance, 0), [dashboardSupplies]);
+  const suppliesBalance = useMemo(
+    () => dashboardSupplies.reduce((sum, row) => sum + row.balance, 0),
+    [dashboardSupplies]
+  );
   const suppliesWeightedApy = useMemo(() => {
     if (suppliesBalance <= 0) {
       return 0;
@@ -335,7 +393,10 @@ export function DashboardPage() {
     return weightedSum / suppliesBalance;
   }, [dashboardSupplies, suppliesBalance]);
 
-  const borrowsBalance = useMemo(() => dashboardBorrows.reduce((sum, row) => sum + row.debt, 0), [dashboardBorrows]);
+  const borrowsBalance = useMemo(
+    () => dashboardBorrows.reduce((sum, row) => sum + row.debt, 0),
+    [dashboardBorrows]
+  );
   const borrowsWeightedApy = useMemo(() => {
     if (borrowsBalance <= 0) {
       return 0;
@@ -346,9 +407,7 @@ export function DashboardPage() {
 
   return (
     <PageContainer className={styles.page} aria-busy={isLoading}>
-      {isLoading ? (
-        <Loader fullPage label="Loading dashboard data..." />
-      ) : null}
+      {isLoading ? <Loader fullPage label="Loading dashboard data..." /> : null}
       <PageHeader
         title="Dashboard"
         subtitle="your positions and protocol exposure"
@@ -408,10 +467,46 @@ export function DashboardPage() {
                   strokeLinecap="square"
                   strokeMiterlimit="10"
                 />
-                <line x1="18.68" y1="3.41" x2="14.86" y2="5.32" stroke="currentColor" strokeWidth="1.91" strokeLinecap="square" strokeMiterlimit="10" />
-                <line x1="19.64" y1="6.27" x2="13.91" y2="6.27" stroke="currentColor" strokeWidth="1.91" strokeLinecap="square" strokeMiterlimit="10" />
-                <line x1="12" y1="11.05" x2="12" y2="12" stroke="currentColor" strokeWidth="1.91" strokeLinecap="square" strokeMiterlimit="10" />
-                <line x1="12" y1="17.73" x2="12" y2="18.68" stroke="currentColor" strokeWidth="1.91" strokeLinecap="square" strokeMiterlimit="10" />
+                <line
+                  x1="18.68"
+                  y1="3.41"
+                  x2="14.86"
+                  y2="5.32"
+                  stroke="currentColor"
+                  strokeWidth="1.91"
+                  strokeLinecap="square"
+                  strokeMiterlimit="10"
+                />
+                <line
+                  x1="19.64"
+                  y1="6.27"
+                  x2="13.91"
+                  y2="6.27"
+                  stroke="currentColor"
+                  strokeWidth="1.91"
+                  strokeLinecap="square"
+                  strokeMiterlimit="10"
+                />
+                <line
+                  x1="12"
+                  y1="11.05"
+                  x2="12"
+                  y2="12"
+                  stroke="currentColor"
+                  strokeWidth="1.91"
+                  strokeLinecap="square"
+                  strokeMiterlimit="10"
+                />
+                <line
+                  x1="12"
+                  y1="17.73"
+                  x2="12"
+                  y2="18.68"
+                  stroke="currentColor"
+                  strokeWidth="1.91"
+                  strokeLinecap="square"
+                  strokeMiterlimit="10"
+                />
               </Icon>
             }
           />
@@ -486,7 +581,9 @@ export function DashboardPage() {
             actions={
               <ClaimButton
                 isLoading={busyOp === "claimLendingRewards"}
-                disabled={!wallet.isConnected || busyOp !== null || dashboardSummary.lendingRewards <= 0}
+                disabled={
+                  !wallet.isConnected || busyOp !== null || dashboardSummary.lendingRewards <= 0
+                }
                 onClick={() => void claimLendingRewards()}
               />
             }
@@ -502,15 +599,15 @@ export function DashboardPage() {
               details={
                 <>
                   <PanelHeaderStat label="Balance" value={formatAmount(suppliesBalance)} />
-                  <PanelHeaderStat
-                    label="APY"
-                    value={formatPercent(suppliesWeightedApy)}
-                  />
+                  <PanelHeaderStat label="APY" value={formatPercent(suppliesWeightedApy)} />
                 </>
               }
             />
             {dashboardSupplies.length === 0 ? (
-              <EmptyState title="No supplied positions" description="Supply assets from Markets or Asset page to see them here." />
+              <EmptyState
+                title="No supplied positions"
+                description="Supply assets from Markets or Asset page to see them here."
+              />
             ) : (
               <Table
                 columns={[
@@ -545,7 +642,10 @@ export function DashboardPage() {
                     title: "Collateral",
                     align: "center",
                     render: (row) => (
-                      <div className={styles.switchCell} onClick={(event) => event.stopPropagation()}>
+                      <div
+                        className={styles.switchCell}
+                        onClick={(event) => event.stopPropagation()}
+                      >
                         <Switch
                           variant="collateral"
                           checked={row.isCollateral}
@@ -578,9 +678,15 @@ export function DashboardPage() {
                         onClick={(event) => {
                           event.stopPropagation();
                           const asset = getAssetById(row.assetId);
-                          const liquidityLimit = asset ? getAvailableLiquidity(asset.totalSupplied, asset.totalBorrowed) : row.balance;
+                          const liquidityLimit = asset
+                            ? getAvailableLiquidity(asset.totalSupplied, asset.totalBorrowed)
+                            : row.balance;
                           const operationalLimit = Math.min(row.balance, liquidityLimit);
-                          const healthFactorLimit = getMaxWithdrawByHealthFactor(row.assetId, row.isCollateral, operationalLimit);
+                          const healthFactorLimit = getMaxWithdrawByHealthFactor(
+                            row.assetId,
+                            row.isCollateral,
+                            operationalLimit
+                          );
                           setWithdrawModal({
                             assetId: row.assetId,
                             symbol: row.symbol,
@@ -612,15 +718,15 @@ export function DashboardPage() {
               details={
                 <>
                   <PanelHeaderStat label="Balance" value={formatAmount(borrowsBalance)} />
-                  <PanelHeaderStat
-                    label="APY"
-                    value={formatPercent(borrowsWeightedApy)}
-                  />
+                  <PanelHeaderStat label="APY" value={formatPercent(borrowsWeightedApy)} />
                 </>
               }
             />
             {dashboardBorrows.length === 0 ? (
-              <EmptyState title="No borrow positions" description="Borrow assets on the Asset page to manage debt here." />
+              <EmptyState
+                title="No borrow positions"
+                description="Borrow assets on the Asset page to manage debt here."
+              />
             ) : (
               <Table
                 columns={[
@@ -685,7 +791,11 @@ export function DashboardPage() {
       <Modal
         isOpen={collateralModal !== null}
         size="xs"
-        title={collateralModal ? `${collateralModal.nextEnabled ? "Enable" : "Disable"} ${collateralModal.symbol} collateral` : ""}
+        title={
+          collateralModal
+            ? `${collateralModal.nextEnabled ? "Enable" : "Disable"} ${collateralModal.symbol} collateral`
+            : ""
+        }
         onClose={() => {
           setCollateralModal(null);
           setIsCollateralTxPending(false);
@@ -710,7 +820,10 @@ export function DashboardPage() {
                 <Typography as="span" muted>
                   Health factor
                 </Typography>
-                <Typography as="span" className={`${styles.txOverviewTransition} ${styles.healthFactorFlow}`}>
+                <Typography
+                  as="span"
+                  className={`${styles.txOverviewTransition} ${styles.healthFactorFlow}`}
+                >
                   <span style={getHealthFactorTextStyle(collateralHealthFactorBefore)}>
                     {formatHealthFactor(collateralHealthFactorBefore)}
                   </span>
@@ -727,8 +840,9 @@ export function DashboardPage() {
                   High liquidation risk
                 </Typography>
                 <Typography as="p" variant="caption" muted>
-                  Disabling this collateral reduces health factor below {HEALTH_FACTOR_RISK_CONFIRMATION_THRESHOLD.toFixed(1)}.
-                  This can lead to liquidation if market conditions move against your position.
+                  Disabling this collateral reduces health factor below{" "}
+                  {HEALTH_FACTOR_RISK_CONFIRMATION_THRESHOLD.toFixed(1)}. This can lead to
+                  liquidation if market conditions move against your position.
                 </Typography>
                 <Checkbox
                   checked={isCollateralRiskAccepted}
@@ -799,14 +913,18 @@ export function DashboardPage() {
                   Remaining supply
                 </Typography>
                 <Typography as="span" className={styles.txOverviewTransition}>
-                  {formatAmount(withdrawRemainingSupplyBefore)} &rarr; {formatAmount(withdrawRemainingSupplyAfter)} {withdrawModal.symbol}
+                  {formatAmount(withdrawRemainingSupplyBefore)} &rarr;{" "}
+                  {formatAmount(withdrawRemainingSupplyAfter)} {withdrawModal.symbol}
                 </Typography>
               </div>
               <div className={styles.txOverviewRow}>
                 <Typography as="span" muted>
                   Health factor
                 </Typography>
-                <Typography as="span" className={`${styles.txOverviewTransition} ${styles.healthFactorFlow}`}>
+                <Typography
+                  as="span"
+                  className={`${styles.txOverviewTransition} ${styles.healthFactorFlow}`}
+                >
                   <span style={getHealthFactorTextStyle(withdrawHealthFactorBefore)}>
                     {formatHealthFactor(withdrawHealthFactorBefore)}
                   </span>
@@ -823,8 +941,9 @@ export function DashboardPage() {
                   High liquidation risk
                 </Typography>
                 <Typography as="p" variant="caption" muted>
-                  Withdrawing this amount reduces health factor below {HEALTH_FACTOR_RISK_CONFIRMATION_THRESHOLD.toFixed(1)}.
-                  This can lead to liquidation if market conditions move against your position.
+                  Withdrawing this amount reduces health factor below{" "}
+                  {HEALTH_FACTOR_RISK_CONFIRMATION_THRESHOLD.toFixed(1)}. This can lead to
+                  liquidation if market conditions move against your position.
                 </Typography>
                 <Checkbox
                   checked={isWithdrawRiskAccepted}
@@ -898,14 +1017,18 @@ export function DashboardPage() {
                   Remaining debt
                 </Typography>
                 <Typography as="span" className={styles.txOverviewTransition}>
-                  {formatAmount(repayRemainingDebtBefore)} &rarr; {formatAmount(repayRemainingDebtAfter)} {repayModal.symbol}
+                  {formatAmount(repayRemainingDebtBefore)} &rarr;{" "}
+                  {formatAmount(repayRemainingDebtAfter)} {repayModal.symbol}
                 </Typography>
               </div>
               <div className={styles.txOverviewRow}>
                 <Typography as="span" muted>
                   Health factor
                 </Typography>
-                <Typography as="span" className={`${styles.txOverviewTransition} ${styles.healthFactorFlow}`}>
+                <Typography
+                  as="span"
+                  className={`${styles.txOverviewTransition} ${styles.healthFactorFlow}`}
+                >
                   <span style={getHealthFactorTextStyle(repayHealthFactorBefore)}>
                     {formatHealthFactor(repayHealthFactorBefore)}
                   </span>
@@ -922,8 +1045,9 @@ export function DashboardPage() {
                   High liquidation risk
                 </Typography>
                 <Typography as="p" variant="caption" muted>
-                  Repaying this amount keeps health factor below {HEALTH_FACTOR_RISK_CONFIRMATION_THRESHOLD.toFixed(1)}.
-                  Your position may still be vulnerable to liquidation.
+                  Repaying this amount keeps health factor below{" "}
+                  {HEALTH_FACTOR_RISK_CONFIRMATION_THRESHOLD.toFixed(1)}. Your position may still be
+                  vulnerable to liquidation.
                 </Typography>
                 <Checkbox
                   checked={isRepayRiskAccepted}
@@ -938,7 +1062,15 @@ export function DashboardPage() {
               </Typography>
             ) : null}
             <ActionButton
-              label={busyOp === "approve" ? "Approving..." : busyOp === "repay" ? "Repaying..." : requiresRepayApproval ? "Approve" : "Repay"}
+              label={
+                busyOp === "approve"
+                  ? "Approving..."
+                  : busyOp === "repay"
+                    ? "Repaying..."
+                    : requiresRepayApproval
+                      ? "Approve"
+                      : "Repay"
+              }
               isLoading={busyOp === "approve" || busyOp === "repay"}
               disabled={
                 !wallet.isConnected ||

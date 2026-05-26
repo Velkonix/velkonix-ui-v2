@@ -28,8 +28,22 @@ const renderIcon = (icon: WalletBalanceIcon) => {
 
   return (
     <>
-      <rect x="2.5" y="5" width="15" height="10" rx="2.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
-      <path d="M11.8 8.4h5v3.2h-5a1.6 1.6 0 1 1 0-3.2Z" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <rect
+        x="2.5"
+        y="5"
+        width="15"
+        height="10"
+        rx="2.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
+      <path
+        d="M11.8 8.4h5v3.2h-5a1.6 1.6 0 1 1 0-3.2Z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
       <circle cx="13.8" cy="10" r="0.9" fill="currentColor" />
     </>
   );

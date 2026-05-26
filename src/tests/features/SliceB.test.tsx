@@ -53,16 +53,22 @@ describe("Slice B", () => {
 
     const supplyDialog = screen.getByRole("dialog", { name: "Supply USDC" });
     await user.click(within(supplyDialog).getByRole("button", { name: "Approve" }));
-    await waitFor(() => expect(screen.getByText("APPROVE success")).toBeInTheDocument(), { timeout: 8_000 });
+    await waitFor(() => expect(screen.getByText("APPROVE success")).toBeInTheDocument(), {
+      timeout: 8_000,
+    });
 
     await user.click(within(supplyDialog).getByRole("button", { name: "Deposit" }));
-    await waitFor(() => expect(screen.getByText("SUPPLY success")).toBeInTheDocument(), { timeout: 8_000 });
+    await waitFor(() => expect(screen.getByText("SUPPLY success")).toBeInTheDocument(), {
+      timeout: 8_000,
+    });
     await user.click(within(supplyDialog).getByRole("button", { name: "Close" }));
 
     await user.click(screen.getByRole("button", { name: "Borrow" }));
     const borrowDialog = screen.getByRole("dialog", { name: "Borrow USDC" });
     await user.click(within(borrowDialog).getByRole("button", { name: "Borrow" }));
-    await waitFor(() => expect(screen.getByText("BORROW success")).toBeInTheDocument(), { timeout: 8_000 });
+    await waitFor(() => expect(screen.getByText("BORROW success")).toBeInTheDocument(), {
+      timeout: 8_000,
+    });
 
     assetRender.unmount();
 
@@ -75,18 +81,29 @@ describe("Slice B", () => {
     await user.click(screen.getAllByRole("button", { name: "Withdraw" })[0]);
     const withdrawDialog = screen.getByRole("dialog", { name: "Withdraw USDC" });
     await user.click(within(withdrawDialog).getByRole("button", { name: "Withdraw" }));
-    await waitFor(() => expect(screen.getByText("WITHDRAW success")).toBeInTheDocument(), { timeout: 8_000 });
+    await waitFor(() => expect(screen.getByText("WITHDRAW success")).toBeInTheDocument(), {
+      timeout: 8_000,
+    });
 
     await user.click(screen.getAllByRole("button", { name: "Repay" })[0]);
     const repayDialog = screen.getByRole("dialog", { name: "Repay USDC" });
     await user.click(within(repayDialog).getByRole("button", { name: "Approve" }));
-    await waitFor(() => expect(screen.getByText("APPROVE success")).toBeInTheDocument(), { timeout: 8_000 });
-    await user.click(within(screen.getByRole("dialog", { name: "Repay USDC" })).getByRole("button", { name: "Close" }));
-
-    await user.click(screen.getByRole("button", { name: "Claim" }));
-    await waitFor(() => expect(screen.getByText("CLAIMLENDINGREWARDS success")).toBeInTheDocument(), {
+    await waitFor(() => expect(screen.getByText("APPROVE success")).toBeInTheDocument(), {
       timeout: 8_000,
     });
+    await user.click(
+      within(screen.getByRole("dialog", { name: "Repay USDC" })).getByRole("button", {
+        name: "Close",
+      })
+    );
+
+    await user.click(screen.getByRole("button", { name: "Claim" }));
+    await waitFor(
+      () => expect(screen.getByText("CLAIMLENDINGREWARDS success")).toBeInTheDocument(),
+      {
+        timeout: 8_000,
+      }
+    );
 
     expect(screen.getAllByText(/tx_/i).length).toBeGreaterThan(0);
   }, 45_000);
@@ -104,7 +121,9 @@ describe("Slice B", () => {
     const borrowDialog = screen.getByRole("dialog", { name: "Borrow USDC" });
     await user.click(within(borrowDialog).getByRole("button", { name: "Borrow" }));
 
-    await waitFor(() => expect(screen.getByText("BORROW failed")).toBeInTheDocument(), { timeout: 8_000 });
+    await waitFor(() => expect(screen.getByText("BORROW failed")).toBeInTheDocument(), {
+      timeout: 8_000,
+    });
     expect(screen.getByText("Last error: DETERMINISTIC_FAILURE")).toBeInTheDocument();
 
     assetRender.unmount();

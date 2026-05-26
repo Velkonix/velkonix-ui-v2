@@ -23,7 +23,12 @@ export function WalletMenu({ address, className, ...props }: WalletMenuProps) {
         {shownAddress}
       </span>
       {wallet.isConnected && (
-        <Button className={styles.disconnect} size="sm" variant="ghost" onClick={() => void wallet.disconnect()}>
+        <Button
+          className={styles.disconnect}
+          size="sm"
+          variant="ghost"
+          onClick={() => void wallet.disconnect()}
+        >
           Disconnect
         </Button>
       )}

@@ -6,7 +6,12 @@ import styles from "./WalletConnectButton.module.css";
 
 type WalletConnectButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
 
-export function WalletConnectButton({ className, onClick, disabled, ...props }: WalletConnectButtonProps) {
+export function WalletConnectButton({
+  className,
+  onClick,
+  disabled,
+  ...props
+}: WalletConnectButtonProps) {
   const wallet = useWallet();
 
   if (wallet.isConnected) {
@@ -28,7 +33,12 @@ export function WalletConnectButton({ className, onClick, disabled, ...props }: 
     }
 
     return (
-      <Button className={`${styles.button} ${className ?? ""}`} variant="secondary" disabled {...props}>
+      <Button
+        className={`${styles.button} ${className ?? ""}`}
+        variant="secondary"
+        disabled
+        {...props}
+      >
         {wallet.shortAddress ?? wallet.address ?? "Wallet connected"}
       </Button>
     );
@@ -47,6 +57,7 @@ export function WalletConnectButton({ className, onClick, disabled, ...props }: 
         try {
           await wallet.connect();
         } catch (error) {
+          // eslint-disable-next-line no-console
           console.error("Wallet connection failed", error);
         }
       }}

@@ -176,13 +176,18 @@ const readUsers = (): Record<Address, MockUserState> | null => {
   const users: Record<Address, MockUserState> = {} as Record<Address, MockUserState>;
   for (const address of index) {
     const balances = parseJson<Record<string, number>>(getByKey(`mock.user.${address}.balances`));
-    const allowances = parseJson<Record<string, number>>(getByKey(`mock.user.${address}.allowances`));
-    const supplies = parseJson<MockUserState["supplies"]>(getByKey(`mock.user.${address}.supplies`));
+    const allowances = parseJson<Record<string, number>>(
+      getByKey(`mock.user.${address}.allowances`)
+    );
+    const supplies = parseJson<MockUserState["supplies"]>(
+      getByKey(`mock.user.${address}.supplies`)
+    );
     const borrows = parseJson<MockUserState["borrows"]>(getByKey(`mock.user.${address}.borrows`));
     const staking = parseJson<MockUserState["staking"]>(getByKey(`mock.user.${address}.staking`));
-    const rewards = parseJson<{ lendingRewards: number; lendingRewardsByToken?: Record<string, number> }>(
-      getByKey(`mock.user.${address}.rewards`)
-    );
+    const rewards = parseJson<{
+      lendingRewards: number;
+      lendingRewardsByToken?: Record<string, number>;
+    }>(getByKey(`mock.user.${address}.rewards`));
     if (!balances || !allowances || !supplies || !borrows || !staking || !rewards) {
       return null;
     }
@@ -193,7 +198,10 @@ const readUsers = (): Record<Address, MockUserState> | null => {
       borrows,
       staking,
       lendingRewards: rewards.lendingRewards,
-      lendingRewardsByToken: rewards.lendingRewardsByToken ?? { VELK: rewards.lendingRewards, ARB: 0 },
+      lendingRewardsByToken: rewards.lendingRewardsByToken ?? {
+        VELK: rewards.lendingRewards,
+        ARB: 0,
+      },
     };
   }
   return users;

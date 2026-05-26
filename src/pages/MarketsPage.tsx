@@ -60,7 +60,9 @@ export function MarketsPage() {
       if (values.some((value) => value === null)) {
         return null;
       }
-      return values.filter((value): value is number => value !== null).reduce((sum, value) => sum + value, 0);
+      return values
+        .filter((value): value is number => value !== null)
+        .reduce((sum, value) => sum + value, 0);
     };
     const totalMarketSizeUsd = sumNullable(marketRows.map((row) => row.totalSuppliedUsd));
     const totalBorrowsUsd = sumNullable(marketRows.map((row) => row.totalBorrowedUsd));
@@ -239,82 +241,88 @@ export function MarketsPage() {
             <ActionButton label="Switch network" onClick={() => void wallet.switchNetwork()} />
           </Card>
         ) : null}
-        {isLoading ? (
-          <Loader fullPage label="Loading markets data..." />
-        ) : null}
+        {isLoading ? <Loader fullPage label="Loading markets data..." /> : null}
         {!isLoading ? (
           <>
-        {marketRows.length === 0 ? (
-          <Card>
-            <EmptyState title="No markets available" description="Try again after data provider is ready." />
-          </Card>
-        ) : isMobile ? (
-          <div className={styles.mobileList}>
-            {marketRows.map((row) => (
-              <Card
-                key={row.id}
-                className={styles.mobileAssetPanel}
-                onClick={() => navigate(`/asset/${row.id}`)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    navigate(`/asset/${row.id}`);
-                  }
-                }}
-                role="button"
-                tabIndex={0}
-              >
-                <div className={styles.mobileAssetHeader}>
-                  <AssetCell symbol={row.symbol} name={row.name} />
-                </div>
-                {renderMobileMetricsTable(row)}
+            {marketRows.length === 0 ? (
+              <Card>
+                <EmptyState
+                  title="No markets available"
+                  description="Try again after data provider is ready."
+                />
               </Card>
-            ))}
-          </div>
-        ) : (
-          <Card>
-            <Table
-              columns={[
-                {
-                  key: "asset",
-                  title: titleButton("Asset", "asset"),
-                  render: (row) => <AssetCell symbol={row.symbol} name={row.name} />,
-                },
-                {
-                  key: "totalSupplied",
-                  title: titleButton("Total Supplied", "totalSupplied"),
-                  align: "right",
-                  render: (row) => renderDualAmount(row.totalSupplied, row.totalSuppliedUsd, row.symbol),
-                },
-                {
-                  key: "supplyApy",
-                  title: titleButton("Supply APY", "supplyApy"),
-                  align: "right",
-                  render: (row) => <ApyWithDetails {...getApyDetails(row, "supply")} stopPropagation />,
-                },
-                {
-                  key: "totalBorrowed",
-                  title: titleButton("Total Borrowed", "totalBorrowed"),
-                  align: "right",
-                  render: (row) => renderDualAmount(row.totalBorrowed, row.totalBorrowedUsd, row.symbol),
-                },
-                {
-                  key: "borrowApy",
-                  title: titleButton("Borrow APY", "borrowApy"),
-                  align: "right",
-                  render: (row) => <ApyWithDetails {...getApyDetails(row, "borrow")} stopPropagation />,
-                },
-              ]}
-              rows={marketRows}
-              getRowKey={(row) => row.id}
-              onRowClick={(row) => navigate(`/asset/${row.id}`)}
-            />
-          </Card>
-        )}
+            ) : isMobile ? (
+              <div className={styles.mobileList}>
+                {marketRows.map((row) => (
+                  <Card
+                    key={row.id}
+                    className={styles.mobileAssetPanel}
+                    onClick={() => navigate(`/asset/${row.id}`)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        navigate(`/asset/${row.id}`);
+                      }
+                    }}
+                    role="button"
+                    tabIndex={0}
+                  >
+                    <div className={styles.mobileAssetHeader}>
+                      <AssetCell symbol={row.symbol} name={row.name} />
+                    </div>
+                    {renderMobileMetricsTable(row)}
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <Card>
+                <Table
+                  columns={[
+                    {
+                      key: "asset",
+                      title: titleButton("Asset", "asset"),
+                      render: (row) => <AssetCell symbol={row.symbol} name={row.name} />,
+                    },
+                    {
+                      key: "totalSupplied",
+                      title: titleButton("Total Supplied", "totalSupplied"),
+                      align: "right",
+                      render: (row) =>
+                        renderDualAmount(row.totalSupplied, row.totalSuppliedUsd, row.symbol),
+                    },
+                    {
+                      key: "supplyApy",
+                      title: titleButton("Supply APY", "supplyApy"),
+                      align: "right",
+                      render: (row) => (
+                        <ApyWithDetails {...getApyDetails(row, "supply")} stopPropagation />
+                      ),
+                    },
+                    {
+                      key: "totalBorrowed",
+                      title: titleButton("Total Borrowed", "totalBorrowed"),
+                      align: "right",
+                      render: (row) =>
+                        renderDualAmount(row.totalBorrowed, row.totalBorrowedUsd, row.symbol),
+                    },
+                    {
+                      key: "borrowApy",
+                      title: titleButton("Borrow APY", "borrowApy"),
+                      align: "right",
+                      render: (row) => (
+                        <ApyWithDetails {...getApyDetails(row, "borrow")} stopPropagation />
+                      ),
+                    },
+                  ]}
+                  rows={marketRows}
+                  getRowKey={(row) => row.id}
+                  onRowClick={(row) => navigate(`/asset/${row.id}`)}
+                />
+              </Card>
+            )}
           </>
         ) : null}
       </Section>
-
     </PageContainer>
   );
 }

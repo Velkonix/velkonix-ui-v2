@@ -6,7 +6,11 @@
   border-radius: 12px;
   padding: var(--space-3) var(--space-4);
   background:
-    linear-gradient(180deg, rgba(var(--bg-secondary-rgb), 0.96), rgba(var(--bg-tertiary-rgb), 0.96)),
+    linear-gradient(
+      180deg,
+      rgba(var(--bg-secondary-rgb), 0.96),
+      rgba(var(--bg-tertiary-rgb), 0.96)
+    ),
     linear-gradient(
       180deg,
       rgba(217, 243, 255, 0.16),

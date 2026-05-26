@@ -11,16 +11,7 @@ export type InputProps = InputHTMLAttributes<HTMLInputElement> & {
   suffix?: ReactNode;
 };
 
-export function Input({
-  label,
-  hint,
-  error,
-  prefix,
-  suffix,
-  className,
-  id,
-  ...props
-}: InputProps) {
+export function Input({ label, hint, error, prefix, suffix, className, id, ...props }: InputProps) {
   const inputId = id ?? `input-${Math.random().toString(36).slice(2, 10)}`;
   const describedBy = error ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined;
 

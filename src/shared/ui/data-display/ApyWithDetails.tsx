@@ -25,7 +25,8 @@ type ApyWithDetailsProps = {
   valueClassName?: string;
 };
 
-const formatPercent = (value: number): string => `${formatNumber(value, { decimals: 2, compact: false })}%`;
+const formatPercent = (value: number): string =>
+  `${formatNumber(value, { decimals: 2, compact: false })}%`;
 const formatSignedPercent = (value: number): string =>
   `${value >= 0 ? "+" : ""}${formatNumber(value, { decimals: 2, compact: false })}%`;
 
@@ -51,7 +52,9 @@ export function ApyWithDetails({
   return (
     <>
       <button type="button" className={classNames(styles.trigger, className)} onClick={onClick}>
-        <ApyCell className={classNames(styles.apyValue, valueClassName)}>{formatPercent(totalApy)}</ApyCell>
+        <ApyCell className={classNames(styles.apyValue, valueClassName)}>
+          {formatPercent(totalApy)}
+        </ApyCell>
       </button>
 
       <Modal isOpen={isOpen} title={title} onClose={() => setIsOpen(false)}>
@@ -63,7 +66,11 @@ export function ApyWithDetails({
             </div>
             <div className={styles.summaryRow}>
               <ValueCell className={styles.summaryLabel}>Rewards APY</ValueCell>
-              <ValueCell className={rewardApyTotal >= 0 ? styles.rewardTotalPositive : styles.rewardTotalNegative}>
+              <ValueCell
+                className={
+                  rewardApyTotal >= 0 ? styles.rewardTotalPositive : styles.rewardTotalNegative
+                }
+              >
                 {formatSignedPercent(rewardApyTotal)}
               </ValueCell>
             </div>
@@ -77,7 +84,10 @@ export function ApyWithDetails({
             rewards.length > 0 ? (
               <div className={styles.rewardsList}>
                 {rewards.map((reward, index) => (
-                  <div className={styles.rewardItem} key={`${reward.tokenSymbol}-${reward.source}-${index}`}>
+                  <div
+                    className={styles.rewardItem}
+                    key={`${reward.tokenSymbol}-${reward.source}-${index}`}
+                  >
                     <div className={styles.rewardMeta}>
                       <Typography as="span" variant="label">
                         {reward.tokenSymbol}
@@ -86,7 +96,11 @@ export function ApyWithDetails({
                         {reward.source}
                       </Typography>
                     </div>
-                    <ValueCell className={reward.apy >= 0 ? styles.rewardTotalPositive : styles.rewardTotalNegative}>
+                    <ValueCell
+                      className={
+                        reward.apy >= 0 ? styles.rewardTotalPositive : styles.rewardTotalNegative
+                      }
+                    >
                       {formatSignedPercent(reward.apy)}
                     </ValueCell>
                   </div>

@@ -1,6 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { MouseEvent as ReactMouseEvent, ReactNode, TouchEvent as ReactTouchEvent } from "react";
-import { CartesianGrid, Line, LineChart, ReferenceDot, ReferenceLine, XAxis, YAxis } from "recharts";
+import type {
+  MouseEvent as ReactMouseEvent,
+  ReactNode,
+  TouchEvent as ReactTouchEvent,
+} from "react";
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ReferenceDot,
+  ReferenceLine,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 import { EmptyState } from "../feedback/EmptyState";
 import { ErrorState } from "../feedback/ErrorState";
@@ -16,7 +28,11 @@ import {
   getValueDomain,
   normalizeTimeSeries,
 } from "./TimeSeriesChart.utils";
-import type { ChartPeriod, NormalizedTimeSeriesPoint, TimeSeriesPoint } from "./TimeSeriesChart.utils";
+import type {
+  ChartPeriod,
+  NormalizedTimeSeriesPoint,
+  TimeSeriesPoint,
+} from "./TimeSeriesChart.utils";
 import styles from "./TimeSeriesChart.module.css";
 
 const PERIOD_LABELS: Record<ChartPeriod, string> = {
@@ -54,9 +70,10 @@ type ActiveState = {
   y: number;
 };
 
-function getFirstTouch(
-  touches: { item?: (index: number) => unknown; [index: number]: unknown }
-): { clientX: number; clientY: number } | null {
+function getFirstTouch(touches: {
+  item?: (index: number) => unknown;
+  [index: number]: unknown;
+}): { clientX: number; clientY: number } | null {
   const touch = typeof touches.item === "function" ? touches.item(0) : touches[0];
   if (
     typeof touch === "object" &&
@@ -66,7 +83,10 @@ function getFirstTouch(
     typeof (touch as { clientX: unknown }).clientX === "number" &&
     typeof (touch as { clientY: unknown }).clientY === "number"
   ) {
-    return { clientX: (touch as { clientX: number }).clientX, clientY: (touch as { clientY: number }).clientY };
+    return {
+      clientX: (touch as { clientX: number }).clientX,
+      clientY: (touch as { clientY: number }).clientY,
+    };
   }
   return null;
 }
@@ -118,7 +138,7 @@ export function TimeSeriesChart({
     return normalizeTimeSeries(data);
   }, [data]);
 
-  const safePeriod = periods.includes(activePeriod) ? activePeriod : periods[0] ?? "max";
+  const safePeriod = periods.includes(activePeriod) ? activePeriod : (periods[0] ?? "max");
   const filtered = useMemo(() => filterByPeriod(normalized, safePeriod), [normalized, safePeriod]);
 
   const valuesDomain = useMemo(() => getValueDomain(filtered), [filtered]);
@@ -172,10 +192,14 @@ export function TimeSeriesChart({
       return;
     }
     const x =
-      plotLeft + (filtered.length <= 1 ? innerWidth / 2 : (index / Math.max(1, filtered.length - 1)) * innerWidth);
+      plotLeft +
+      (filtered.length <= 1
+        ? innerWidth / 2
+        : (index / Math.max(1, filtered.length - 1)) * innerWidth);
     const point = filtered[index];
     const [domainMin, domainMax] = valuesDomain;
-    const yRatio = domainMax === domainMin ? 0.5 : (point.value - domainMin) / (domainMax - domainMin);
+    const yRatio =
+      domainMax === domainMin ? 0.5 : (point.value - domainMin) / (domainMax - domainMin);
     const y = CHART_MARGIN.top + (1 - yRatio) * innerHeight;
     setActiveState({ index, x, y });
   };
@@ -265,7 +289,10 @@ export function TimeSeriesChart({
               type="button"
               role="tab"
               aria-selected={safePeriod === period}
-              className={classNames(styles.periodButton, safePeriod === period && styles.periodButtonActive)}
+              className={classNames(
+                styles.periodButton,
+                safePeriod === period && styles.periodButtonActive
+              )}
               onClick={() => setPeriod(period)}
             >
               {PERIOD_LABELS[period]}
@@ -293,7 +320,11 @@ export function TimeSeriesChart({
           role="img"
           aria-label={ariaLabel}
         >
-          <CartesianGrid stroke="rgba(var(--border-subtle-rgb), 0.35)" strokeDasharray="3 6" vertical={false} />
+          <CartesianGrid
+            stroke="rgba(var(--border-subtle-rgb), 0.35)"
+            strokeDasharray="3 6"
+            vertical={false}
+          />
           <XAxis
             dataKey="timestamp"
             tickLine={false}
@@ -354,7 +385,10 @@ export function TimeSeriesChart({
 
         {activePoint && activeState ? (
           <div
-            className={classNames(styles.tooltip, showTooltipOnLeft ? styles.tooltipLeft : styles.tooltipRight)}
+            className={classNames(
+              styles.tooltip,
+              showTooltipOnLeft ? styles.tooltipLeft : styles.tooltipRight
+            )}
             style={{ left: activeState.x, top: activeState.y }}
             role="status"
             aria-live="polite"

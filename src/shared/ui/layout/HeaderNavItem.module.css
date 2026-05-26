@@ -16,7 +16,10 @@
   border-radius: var(--radius-sm);
   text-shadow: none;
   overflow: visible;
-  transition: color 160ms ease, text-shadow 160ms ease, filter 180ms ease;
+  transition:
+    color 160ms ease,
+    text-shadow 160ms ease,
+    filter 180ms ease;
 }
 
 .content {
@@ -128,7 +131,10 @@
       rgba(var(--accent-primary-rgb), 0) 100%
     );
   filter: blur(10px);
-  transition: opacity 180ms ease, filter 180ms ease, transform 180ms ease;
+  transition:
+    opacity 180ms ease,
+    filter 180ms ease,
+    transform 180ms ease;
 }
 
 .spotlightBeam::after {

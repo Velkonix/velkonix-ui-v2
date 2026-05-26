@@ -19,10 +19,7 @@ describe("Tabs", () => {
       />
     );
 
-    expect(screen.getByRole("tab", { name: "Convert" })).toHaveAttribute(
-      "aria-selected",
-      "true"
-    );
+    expect(screen.getByRole("tab", { name: "Convert" })).toHaveAttribute("aria-selected", "true");
 
     await user.click(screen.getByRole("tab", { name: "Stake" }));
     expect(handleChange).toHaveBeenCalledWith("stake");

@@ -26,11 +26,7 @@ export function Select({
   ...props
 }: SelectProps) {
   const selectId = id ?? `select-${Math.random().toString(36).slice(2, 10)}`;
-  const describedBy = error
-    ? `${selectId}-error`
-    : hint
-    ? `${selectId}-hint`
-    : undefined;
+  const describedBy = error ? `${selectId}-error` : hint ? `${selectId}-hint` : undefined;
 
   return (
     <div className={classNames(styles.wrapper, className)}>

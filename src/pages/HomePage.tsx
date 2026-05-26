@@ -10,7 +10,9 @@ function pickRandomIndices(length: number, count: number, previousKey = ""): num
   const target = Math.min(length, Math.max(0, count));
   if (target === 0) return [];
 
+  // eslint-disable-next-line no-useless-assignment
   let next: number[] = [];
+  // eslint-disable-next-line no-useless-assignment
   let key = "";
   let attempts = 0;
 
@@ -29,12 +31,14 @@ function pickRandomIndices(length: number, count: number, previousKey = ""): num
 
 export function HomePage() {
   const [flickerIndices, setFlickerIndices] = useState<number[]>(() =>
-    pickRandomIndices(HERO_WORD.length, FLICKER_COUNT),
+    pickRandomIndices(HERO_WORD.length, FLICKER_COUNT)
   );
 
   useEffect(() => {
     const timer = window.setInterval(() => {
-      setFlickerIndices((prev) => pickRandomIndices(HERO_WORD.length, FLICKER_COUNT, prev.join(",")));
+      setFlickerIndices((prev) =>
+        pickRandomIndices(HERO_WORD.length, FLICKER_COUNT, prev.join(","))
+      );
     }, FLICKER_CYCLE_MS);
 
     return () => window.clearInterval(timer);

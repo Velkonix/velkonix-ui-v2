@@ -2,12 +2,7 @@
   border: none;
   height: 1px;
   margin: var(--space-4) 0;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--border-accent),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, var(--border-accent), transparent);
 }
 
 .strong {

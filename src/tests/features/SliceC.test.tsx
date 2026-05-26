@@ -51,27 +51,35 @@ describe("Slice C", () => {
     await user.clear(screen.getByRole("textbox", { name: "Convert amount" }));
     await user.type(screen.getByRole("textbox", { name: "Convert amount" }), "500");
     await user.click(screen.getByRole("button", { name: "Convert" }));
-    await waitFor(() => expect(screen.getByText("CONVERT success")).toBeInTheDocument(), { timeout: 8_000 });
+    await waitFor(() => expect(screen.getByText("CONVERT success")).toBeInTheDocument(), {
+      timeout: 8_000,
+    });
 
     await user.click(screen.getByRole("tab", { name: "Stake" }));
     await user.clear(screen.getByRole("textbox", { name: "Stake amount" }));
     await user.type(screen.getByRole("textbox", { name: "Stake amount" }), "200");
     await user.click(screen.getByRole("button", { name: "Stake" }));
-    await waitFor(() => expect(screen.getByText("STAKETOREWARDS success")).toBeInTheDocument(), { timeout: 8_000 });
+    await waitFor(() => expect(screen.getByText("STAKETOREWARDS success")).toBeInTheDocument(), {
+      timeout: 8_000,
+    });
 
     await user.click(screen.getByRole("tab", { name: "Exit" }));
     await user.clear(screen.getByRole("textbox", { name: "Exit amount" }));
     await user.type(screen.getByRole("textbox", { name: "Exit amount" }), "100");
     await user.click(screen.getByRole("checkbox", { name: "Instant" }));
     await user.click(screen.getByRole("button", { name: /Loss .* and Exit/i }));
-    await waitFor(() => expect(screen.getByText("INSTANTEXIT success")).toBeInTheDocument(), { timeout: 8_000 });
+    await waitFor(() => expect(screen.getByText("INSTANTEXIT success")).toBeInTheDocument(), {
+      timeout: 8_000,
+    });
 
     await user.click(screen.getByRole("tab", { name: "Exit" }));
     await user.click(screen.getByRole("checkbox", { name: "Instant" }));
     await user.clear(screen.getByRole("textbox", { name: "Exit amount" }));
     await user.type(screen.getByRole("textbox", { name: "Exit amount" }), "50");
     await user.click(screen.getByRole("button", { name: "Request Exit" }));
-    await waitFor(() => expect(screen.getByText("REQUESTEXIT success")).toBeInTheDocument(), { timeout: 8_000 });
+    await waitFor(() => expect(screen.getByText("REQUESTEXIT success")).toBeInTheDocument(), {
+      timeout: 8_000,
+    });
 
     expect(screen.getAllByText(/tx_/i).length).toBeGreaterThan(0);
   }, 45_000);

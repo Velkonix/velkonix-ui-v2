@@ -77,7 +77,11 @@ export function WalletProvider({ children, mockMode }: WalletProviderProps) {
   }
 
   return (
-    <Suspense fallback={<WalletContext.Provider value={disconnectedRealWallet}>{children}</WalletContext.Provider>}>
+    <Suspense
+      fallback={
+        <WalletContext.Provider value={disconnectedRealWallet}>{children}</WalletContext.Provider>
+      }
+    >
       <LazyRealWalletProvider>{children}</LazyRealWalletProvider>
     </Suspense>
   );

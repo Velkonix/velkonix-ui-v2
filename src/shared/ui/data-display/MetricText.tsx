@@ -13,7 +13,10 @@ type MetricTextProps = HTMLAttributes<HTMLDivElement> & {
 
 export function MetricText({ title, value, icon, iconAlt, className, ...props }: MetricTextProps) {
   return (
-    <div className={classNames(styles.root, icon ? styles.rootWithIcon : undefined, className)} {...props}>
+    <div
+      className={classNames(styles.root, icon ? styles.rootWithIcon : undefined, className)}
+      {...props}
+    >
       {icon ? (
         <span className={styles.icon} aria-label={iconAlt} role={iconAlt ? "img" : undefined}>
           {icon}

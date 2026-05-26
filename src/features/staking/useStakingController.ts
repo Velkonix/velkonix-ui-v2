@@ -133,14 +133,18 @@ export function useStakingController() {
 
   const convert = useCallback(
     async (amountText: string) => {
-      await runOperation("convert", () => engine.staking.convert(user as Address, parseAmount(amountText)));
+      await runOperation("convert", () =>
+        engine.staking.convert(user as Address, parseAmount(amountText))
+      );
     },
     [engine.staking, runOperation, user]
   );
 
   const stakeToRewards = useCallback(
     async (amountText: string) => {
-      await runOperation("stakeToRewards", () => engine.staking.stakeToRewards(user as Address, parseAmount(amountText)));
+      await runOperation("stakeToRewards", () =>
+        engine.staking.stakeToRewards(user as Address, parseAmount(amountText))
+      );
     },
     [engine.staking, runOperation, user]
   );
@@ -155,12 +159,16 @@ export function useStakingController() {
   );
 
   const claimStakingRewards = useCallback(async () => {
-    await runOperation("claimStakingRewards", () => engine.staking.claimStakingRewards(user as Address));
+    await runOperation("claimStakingRewards", () =>
+      engine.staking.claimStakingRewards(user as Address)
+    );
   }, [engine.staking, runOperation, user]);
 
   const instantExit = useCallback(
     async (amountText: string) => {
-      await runOperation("instantExit", () => engine.staking.instantExit(user as Address, parseAmount(amountText)));
+      await runOperation("instantExit", () =>
+        engine.staking.instantExit(user as Address, parseAmount(amountText))
+      );
     },
     [engine.staking, runOperation, user]
   );
@@ -171,21 +179,27 @@ export function useStakingController() {
 
   const requestExit = useCallback(
     async (amountText: string) => {
-      await runOperation("requestExit", () => engine.staking.requestExit(user as Address, parseAmount(amountText)));
+      await runOperation("requestExit", () =>
+        engine.staking.requestExit(user as Address, parseAmount(amountText))
+      );
     },
     [engine.staking, runOperation, user]
   );
 
   const executeExitFromQueue = useCallback(
     async (queueItemId: string) => {
-      await runOperation("executeExitFromQueue", () => engine.staking.executeExitFromQueue(user as Address, queueItemId));
+      await runOperation("executeExitFromQueue", () =>
+        engine.staking.executeExitFromQueue(user as Address, queueItemId)
+      );
     },
     [engine.staking, runOperation, user]
   );
 
   const cancelExitRequest = useCallback(
     async (queueItemId: string) => {
-      await runOperation("cancelExitRequest", () => engine.staking.cancelExitRequest(user as Address, queueItemId));
+      await runOperation("cancelExitRequest", () =>
+        engine.staking.cancelExitRequest(user as Address, queueItemId)
+      );
     },
     [engine.staking, runOperation, user]
   );

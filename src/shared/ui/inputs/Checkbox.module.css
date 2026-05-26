@@ -21,7 +21,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: box-shadow 0.12s ease, background 0.12s ease;
+  transition:
+    box-shadow 0.12s ease,
+    background 0.12s ease;
 }
 
 .check {

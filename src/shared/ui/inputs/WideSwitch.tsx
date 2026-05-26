@@ -24,7 +24,12 @@ export function WideSwitch<T extends string = string>({
   disabled = false,
 }: WideSwitchProps<T>) {
   return (
-    <div className={classNames(styles.root, className)} role="radiogroup" aria-label={ariaLabel} aria-disabled={disabled || undefined}>
+    <div
+      className={classNames(styles.root, className)}
+      role="radiogroup"
+      aria-label={ariaLabel}
+      aria-disabled={disabled || undefined}
+    >
       {options.map((option) => {
         const isActive = option.value === value;
         return (

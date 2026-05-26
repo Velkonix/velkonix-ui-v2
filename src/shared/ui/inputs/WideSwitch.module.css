@@ -6,7 +6,11 @@
   padding: var(--space-1);
   border-radius: 14px;
   border: 1px solid rgba(var(--border-subtle-rgb), 0.78);
-  background: linear-gradient(180deg, rgba(var(--bg-secondary-rgb), 0.9), rgba(var(--bg-tertiary-rgb), 0.88));
+  background: linear-gradient(
+    180deg,
+    rgba(var(--bg-secondary-rgb), 0.9),
+    rgba(var(--bg-tertiary-rgb), 0.88)
+  );
 }
 
 .option {
@@ -34,7 +38,11 @@
 
 .optionActive {
   border-color: rgba(var(--accent-primary-rgb), 0.58);
-  background: linear-gradient(180deg, rgba(var(--accent-primary-rgb), 0.24), rgba(var(--accent-primary-rgb), 0.1));
+  background: linear-gradient(
+    180deg,
+    rgba(var(--accent-primary-rgb), 0.24),
+    rgba(var(--accent-primary-rgb), 0.1)
+  );
   color: var(--text-primary);
   box-shadow:
     0 0 0 1px rgba(var(--accent-primary-rgb), 0.18) inset,

@@ -102,7 +102,8 @@ export class StakingMockAdapter implements StakingMockApi {
       const next = cloneState(state);
       const staking = getOrCreateUser(next, user).staking;
       const nowMs = Date.now();
-      const isUnlocked = staking.depositTimestamp > 0 && nowMs >= staking.depositTimestamp + staking.lockDurationMs;
+      const isUnlocked =
+        staking.depositTimestamp > 0 && nowMs >= staking.depositTimestamp + staking.lockDurationMs;
       if (isUnlocked) {
         throwMockError("LOCKED", "Use vesting exit after unlock");
       }
@@ -126,7 +127,8 @@ export class StakingMockAdapter implements StakingMockApi {
       const next = cloneState(state);
       const staking = getOrCreateUser(next, user).staking;
       const nowMs = Date.now();
-      const isUnlocked = staking.depositTimestamp > 0 && nowMs >= staking.depositTimestamp + staking.lockDurationMs;
+      const isUnlocked =
+        staking.depositTimestamp > 0 && nowMs >= staking.depositTimestamp + staking.lockDurationMs;
       if (!isUnlocked) {
         throwMockError("LOCKED", "Position is still locked");
       }

@@ -171,7 +171,8 @@ const computeSideRewardBreakdown = (
     if (reward.emissionPerSecond === 0n) continue;
     if (Number(reward.emissionEndTimestamp) <= nowSec) continue;
     if (reward.rewardPriceFeed <= 0n) continue;
-    const yearlyTokens = formatUnitsToNumber(reward.emissionPerSecond, reward.rewardTokenDecimals) * SECONDS_PER_YEAR;
+    const yearlyTokens =
+      formatUnitsToNumber(reward.emissionPerSecond, reward.rewardTokenDecimals) * SECONDS_PER_YEAR;
     const priceUsd = safeNumber(reward.rewardPriceFeed) / 10 ** reward.priceFeedDecimals;
     if (!Number.isFinite(priceUsd) || priceUsd <= 0) continue;
     const apr = ((yearlyTokens * priceUsd) / totalSideUsd) * 100;
@@ -188,7 +189,11 @@ const findIncentiveByAsset = (
 ): AggregatedReserveIncentive | undefined =>
   list.find((item) => item.underlyingAsset.toLowerCase() === asset.toLowerCase());
 
-export async function loadMegaethAaveState({ publicClient, network, user }: Params): Promise<MegaethAaveSnapshot> {
+export async function loadMegaethAaveState({
+  publicClient,
+  network,
+  user,
+}: Params): Promise<MegaethAaveSnapshot> {
   const { deployments } = network;
   if (!deployments.uiPoolDataProvider) throw new Error("MISSING_UI_POOL_DATA_PROVIDER");
   if (!deployments.uiIncentiveDataProvider) throw new Error("MISSING_UI_INCENTIVE_DATA_PROVIDER");
@@ -220,45 +225,51 @@ export async function loadMegaethAaveState({ publicClient, network, user }: Para
   let userReserves: readonly UserReserve[] = [];
   let walletBalancesRaw: readonly bigint[] = [];
   let allowancesRaw: readonly bigint[] = [];
-  let userAccountDataResult: readonly [bigint, bigint, bigint, bigint, bigint, bigint] | null = null;
+  let userAccountDataResult: readonly [bigint, bigint, bigint, bigint, bigint, bigint] | null =
+    null;
   let nativeBalanceRaw = 0n;
 
   if (user !== null && reserveAddresses.length > 0) {
-    const [userReservesResult, walletBalancesResult, allowancesResult, userAccountRaw, nativeBalanceValue] =
-      await Promise.all([
-        publicClient.readContract({
-          address: deployments.uiPoolDataProvider,
-          abi: UI_POOL_DATA_PROVIDER_ABI,
-          functionName: "getUserReservesData",
-          args: [deployments.poolAddressesProvider, user],
-        }),
-        publicClient
-          .readContract({
-            address: deployments.walletBalanceProvider,
-            abi: WALLET_BALANCE_PROVIDER_ABI,
-            functionName: "batchBalanceOf",
-            args: [[user], reserveAddresses],
-          })
-          .catch(() => [] as readonly bigint[]),
-        publicClient.multicall({
-          allowFailure: false,
-          contracts: reserveAddresses.map((asset) => ({
-            address: asset,
-            abi: ERC20_ABI,
-            functionName: "allowance",
-            args: [user, deployments.poolProxy],
-          })),
-        }),
-        publicClient
-          .readContract({
-            address: deployments.poolProxy,
-            abi: POOL_ABI,
-            functionName: "getUserAccountData",
-            args: [user],
-          })
-          .catch(() => null),
-        publicClient.getBalance({ address: user }),
-      ]);
+    const [
+      userReservesResult,
+      walletBalancesResult,
+      allowancesResult,
+      userAccountRaw,
+      nativeBalanceValue,
+    ] = await Promise.all([
+      publicClient.readContract({
+        address: deployments.uiPoolDataProvider,
+        abi: UI_POOL_DATA_PROVIDER_ABI,
+        functionName: "getUserReservesData",
+        args: [deployments.poolAddressesProvider, user],
+      }),
+      publicClient
+        .readContract({
+          address: deployments.walletBalanceProvider,
+          abi: WALLET_BALANCE_PROVIDER_ABI,
+          functionName: "batchBalanceOf",
+          args: [[user], reserveAddresses],
+        })
+        .catch(() => [] as readonly bigint[]),
+      publicClient.multicall({
+        allowFailure: false,
+        contracts: reserveAddresses.map((asset) => ({
+          address: asset,
+          abi: ERC20_ABI,
+          functionName: "allowance",
+          args: [user, deployments.poolProxy],
+        })),
+      }),
+      publicClient
+        .readContract({
+          address: deployments.poolProxy,
+          abi: POOL_ABI,
+          functionName: "getUserAccountData",
+          args: [user],
+        })
+        .catch(() => null),
+      publicClient.getBalance({ address: user }),
+    ]);
 
     const [reservesList] = userReservesResult as readonly [readonly UserReserve[], number];
     userReserves = reservesList;
@@ -309,10 +320,18 @@ export async function loadMegaethAaveState({ publicClient, network, user }: Para
     const borrowBaseApy = rayToPercent(reserve.variableBorrowRate);
     const incentive = findIncentiveByAsset(reserveIncentives, address);
     const supplyRewards = incentive
-      ? computeSideRewardBreakdown(incentive.aIncentiveData.rewardsTokenInformation, totalSuppliedUsd ?? 0, nowSec)
+      ? computeSideRewardBreakdown(
+          incentive.aIncentiveData.rewardsTokenInformation,
+          totalSuppliedUsd ?? 0,
+          nowSec
+        )
       : { apyTotal: 0, entries: [] };
     const borrowRewards = incentive
-      ? computeSideRewardBreakdown(incentive.vIncentiveData.rewardsTokenInformation, totalBorrowedUsd ?? 0, nowSec)
+      ? computeSideRewardBreakdown(
+          incentive.vIncentiveData.rewardsTokenInformation,
+          totalBorrowedUsd ?? 0,
+          nowSec
+        )
       : { apyTotal: 0, entries: [] };
 
     const asset: MegaethAssetRuntime = {
@@ -344,8 +363,14 @@ export async function loadMegaethAaveState({ publicClient, network, user }: Para
     if (user !== null) {
       const userReserve = userReservesByAsset.get(normalizedAddress);
       if (userReserve) {
-        const actualSupplyRaw = scaledToActual(userReserve.scaledATokenBalance, reserve.liquidityIndex);
-        const actualDebtRaw = scaledToActual(userReserve.scaledVariableDebt, reserve.variableBorrowIndex);
+        const actualSupplyRaw = scaledToActual(
+          userReserve.scaledATokenBalance,
+          reserve.liquidityIndex
+        );
+        const actualDebtRaw = scaledToActual(
+          userReserve.scaledVariableDebt,
+          reserve.variableBorrowIndex
+        );
         const currentSupply = formatUnitsToNumber(actualSupplyRaw, decimals);
         const currentDebt = formatUnitsToNumber(actualDebtRaw, decimals);
 
@@ -411,7 +436,9 @@ export async function loadMegaethAaveState({ publicClient, network, user }: Para
           const hf = Number(healthFactorRaw) / HEALTH_FACTOR_SCALE;
           return {
             healthFactor:
-              healthFactorRaw >= MAX_UINT_HALF || !Number.isFinite(hf) ? Number.POSITIVE_INFINITY : hf,
+              healthFactorRaw >= MAX_UINT_HALF || !Number.isFinite(hf)
+                ? Number.POSITIVE_INFINITY
+                : hf,
             totalCollateralBase: Number(totalCollateralBase),
             totalDebtBase: Number(totalDebtBase),
             availableBorrowsBase: Number(availableBorrowsBase),

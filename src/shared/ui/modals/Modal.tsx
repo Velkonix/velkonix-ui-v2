@@ -14,14 +14,7 @@ type ModalProps = {
   size?: "xs" | "sm" | "md" | "lg";
 };
 
-export function Modal({
-  isOpen,
-  title,
-  onClose,
-  children,
-  footer,
-  size = "md",
-}: ModalProps) {
+export function Modal({ isOpen, title, onClose, children, footer, size = "md" }: ModalProps) {
   const titleId = useId();
 
   useEffect(() => {
@@ -48,13 +41,12 @@ export function Modal({
         onClick={(event) => event.stopPropagation()}
       >
         <header className={styles.header}>
-          {title && <h3 id={titleId} className={styles.title}>{title}</h3>}
-          <button
-            className={styles.close}
-            type="button"
-            aria-label="Close"
-            onClick={onClose}
-          >
+          {title && (
+            <h3 id={titleId} className={styles.title}>
+              {title}
+            </h3>
+          )}
+          <button className={styles.close} type="button" aria-label="Close" onClick={onClose}>
             ×
           </button>
         </header>

@@ -54,9 +54,7 @@ import {
 import { sendE2EDebugEvent } from "../shared/lib/e2eIngest";
 import styles from "./UiKitPage.module.css";
 
-const THEME_OPTIONS = [
-  { value: "blue", label: "Blue" },
-] as const;
+const THEME_OPTIONS = [{ value: "blue", label: "Blue" }] as const;
 
 type ThemeName = (typeof THEME_OPTIONS)[number]["value"];
 
@@ -383,9 +381,16 @@ export function UiKitPage() {
             rows={markets}
             getRowKey={(row) => row.asset}
           />
-          <InfoTableCard title="Your supplies" rows={infoRows} getRowKey={(row) => String(row.metric)} />
+          <InfoTableCard
+            title="Your supplies"
+            rows={infoRows}
+            getRowKey={(row) => String(row.metric)}
+          />
         </Card>
-        <Card title="Time series chart" subtitle="Neon style UI Kit line chart with simple interactions.">
+        <Card
+          title="Time series chart"
+          subtitle="Neon style UI Kit line chart with simple interactions."
+        >
           <div className={styles.chartDemo}>
             <TimeSeriesChart
               data={chartSeries}
@@ -434,13 +439,22 @@ export function UiKitPage() {
         <Card>
           <div className={styles.headerDemoStack}>
             <div className={styles.headerDemoHint}>
-              Resize viewport to 768px or less to validate burger menu layout, link alignment, and actions placement.
+              Resize viewport to 768px or less to validate burger menu layout, link alignment, and
+              actions placement.
             </div>
             <div className={styles.headerDemoFrame}>
-              <Header logo={<span>Velkonix</span>} nav={headerDemoNav} actions={<WalletConnectButton />} />
+              <Header
+                logo={<span>Velkonix</span>}
+                nav={headerDemoNav}
+                actions={<WalletConnectButton />}
+              />
             </div>
             <div className={`${styles.headerDemoFrame} ${styles.headerDemoMobileViewport}`}>
-              <Header logo={<span>Velkonix</span>} nav={headerDemoNav} actions={<WalletConnectButton />} />
+              <Header
+                logo={<span>Velkonix</span>}
+                nav={headerDemoNav}
+                actions={<WalletConnectButton />}
+              />
             </div>
           </div>
           <Spacer size={12} />

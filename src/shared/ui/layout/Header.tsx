@@ -73,7 +73,10 @@ export function Header({ logo, nav, actions, className, ...props }: HeaderProps)
   const mobileOverlay = hasNavigation ? (
     <div
       id={mobileMenuId}
-      className={classNames(styles.mobileDrawerOverlay, isMobileMenuOpen && styles.mobileDrawerOverlayOpen)}
+      className={classNames(
+        styles.mobileDrawerOverlay,
+        isMobileMenuOpen && styles.mobileDrawerOverlayOpen
+      )}
       aria-hidden={!isMobileMenuOpen}
       onMouseDown={() => setIsMobileMenuOpen(false)}
       onClick={() => setIsMobileMenuOpen(false)}
@@ -88,7 +91,11 @@ export function Header({ logo, nav, actions, className, ...props }: HeaderProps)
         onMouseDown={(event) => event.stopPropagation()}
         onClick={(event) => event.stopPropagation()}
       >
-        <nav className={styles.mobileDrawerNav} aria-label="Mobile primary" onClickCapture={closeOnInteractiveTarget}>
+        <nav
+          className={styles.mobileDrawerNav}
+          aria-label="Mobile primary"
+          onClickCapture={closeOnInteractiveTarget}
+        >
           {nav}
         </nav>
       </div>
@@ -121,7 +128,9 @@ export function Header({ logo, nav, actions, className, ...props }: HeaderProps)
         </div>
       ) : null}
 
-      {typeof document !== "undefined" && mobileOverlay ? createPortal(mobileOverlay, document.body) : null}
+      {typeof document !== "undefined" && mobileOverlay
+        ? createPortal(mobileOverlay, document.body)
+        : null}
     </header>
   );
 }

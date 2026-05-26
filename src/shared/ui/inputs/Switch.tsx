@@ -15,7 +15,11 @@ export function Switch({ label, className, id, variant = "default", ...props }: 
 
   return (
     <label
-      className={classNames(styles.wrapper, variant === "collateral" ? styles.collateral : undefined, className)}
+      className={classNames(
+        styles.wrapper,
+        variant === "collateral" ? styles.collateral : undefined,
+        className
+      )}
       htmlFor={switchId}
     >
       <input id={switchId} type="checkbox" className={styles.input} {...props} />

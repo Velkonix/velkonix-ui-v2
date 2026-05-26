@@ -91,11 +91,16 @@ describe("Slice A", () => {
     const borrowDialog = screen.getByRole("dialog", { name: "Borrow USDC" });
 
     await user.click(within(borrowDialog).getByRole("button", { name: "Borrow" }));
-    await waitFor(() => expect(screen.getByText("BORROW success")).toBeInTheDocument(), { timeout: 8_000 });
-
-    await waitFor(() => expect(screen.queryByText(/Last error: INSUFFICIENT_BALANCE/i)).not.toBeInTheDocument(), {
-      timeout: 5_000,
+    await waitFor(() => expect(screen.getByText("BORROW success")).toBeInTheDocument(), {
+      timeout: 8_000,
     });
+
+    await waitFor(
+      () => expect(screen.queryByText(/Last error: INSUFFICIENT_BALANCE/i)).not.toBeInTheDocument(),
+      {
+        timeout: 5_000,
+      }
+    );
 
     expect(screen.getAllByText(/Transaction tx_/i).length).toBeGreaterThan(0);
   }, 20_000);

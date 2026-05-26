@@ -31,12 +31,16 @@ describe("Wallet UI", () => {
 
     await user.click(screen.getByRole("button", { name: "Connect Wallet" }));
 
-    await waitFor(() => expect(screen.queryByRole("button", { name: "Connect Wallet" })).not.toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.queryByRole("button", { name: "Connect Wallet" })).not.toBeInTheDocument()
+    );
     expect(screen.getByTestId("wallet-menu")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Disconnect" })).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Disconnect" }));
 
-    await waitFor(() => expect(screen.getByRole("button", { name: "Connect Wallet" })).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Connect Wallet" })).toBeInTheDocument()
+    );
   });
 });

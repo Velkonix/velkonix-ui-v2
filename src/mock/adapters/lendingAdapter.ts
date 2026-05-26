@@ -153,7 +153,12 @@ export class LendingMockAdapter implements LendingMockApi {
     };
   }
 
-  private applySupply(state: MockDbState, userState: MockUserState, assetId: AssetId, amount: number): void {
+  private applySupply(
+    state: MockDbState,
+    userState: MockUserState,
+    assetId: AssetId,
+    amount: number
+  ): void {
     const balance = userState.balances[assetId] ?? 0;
     if (balance < amount) {
       throwMockError("INSUFFICIENT_BALANCE", "Insufficient wallet balance");
@@ -199,13 +204,20 @@ export class LendingMockAdapter implements LendingMockApi {
     asset.totalSupplied += amount;
     userState.lendingRewards += amount * REWARD_ACCRUAL_PER_SUPPLY;
     userState.lendingRewardsByToken.VELK =
-      (userState.lendingRewardsByToken.VELK ?? 0) + amount * REWARD_ACCRUAL_PER_SUPPLY * SUPPLY_REWARD_VELK_SHARE;
+      (userState.lendingRewardsByToken.VELK ?? 0) +
+      amount * REWARD_ACCRUAL_PER_SUPPLY * SUPPLY_REWARD_VELK_SHARE;
     userState.lendingRewardsByToken.ARB =
-      (userState.lendingRewardsByToken.ARB ?? 0) + amount * REWARD_ACCRUAL_PER_SUPPLY * SUPPLY_REWARD_ARB_SHARE;
+      (userState.lendingRewardsByToken.ARB ?? 0) +
+      amount * REWARD_ACCRUAL_PER_SUPPLY * SUPPLY_REWARD_ARB_SHARE;
     this.syncSupplyApy(userState, assetId);
   }
 
-  private applyWithdraw(state: MockDbState, userState: MockUserState, assetId: AssetId, amount: number): void {
+  private applyWithdraw(
+    state: MockDbState,
+    userState: MockUserState,
+    assetId: AssetId,
+    amount: number
+  ): void {
     const supply = getUserSupply(userState, assetId);
     if (supply === undefined || supply.balance < amount) {
       throwMockError("INSUFFICIENT_SUPPLY", "Insufficient supplied balance");
@@ -223,7 +235,12 @@ export class LendingMockAdapter implements LendingMockApi {
     asset.totalSupplied = Math.max(0, asset.totalSupplied - amount);
   }
 
-  private applyBorrow(state: MockDbState, userState: MockUserState, assetId: AssetId, amount: number): void {
+  private applyBorrow(
+    state: MockDbState,
+    userState: MockUserState,
+    assetId: AssetId,
+    amount: number
+  ): void {
     const asset = getAssetOrThrow(state, assetId);
     const borrow = getUserBorrow(userState, assetId);
 
@@ -254,7 +271,12 @@ export class LendingMockAdapter implements LendingMockApi {
     this.syncBorrowApy(userState, assetId);
   }
 
-  private applyRepay(state: MockDbState, userState: MockUserState, assetId: AssetId, amount: number): void {
+  private applyRepay(
+    state: MockDbState,
+    userState: MockUserState,
+    assetId: AssetId,
+    amount: number
+  ): void {
     const debt = getUserBorrow(userState, assetId);
     if (debt === undefined || debt.debt <= 0) {
       throwMockError("INSUFFICIENT_DEBT", "No debt to repay");

@@ -4,7 +4,17 @@ import { RainbowKitProvider, getDefaultConfig } from "@rainbow-me/rainbowkit";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useCallback, useMemo } from "react";
 import type { ReactNode } from "react";
-import { WagmiProvider, http, useAccount, useChainId, useConnect, useDisconnect, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
+import {
+  WagmiProvider,
+  http,
+  useAccount,
+  useChainId,
+  useConnect,
+  useDisconnect,
+  usePublicClient,
+  useSwitchChain,
+  useWalletClient,
+} from "wagmi";
 
 import { getActiveNetworkConfig } from "../../config/networks";
 import type { WalletAddress } from "../../shared/lib/wallet";
@@ -20,7 +30,9 @@ const RPC_OVERRIDE_BY_NETWORK: Record<string, string | undefined> = {
   "arbitrum-sepolia": import.meta.env.VITE_ARBITRUM_SEPOLIA_RPC_URL?.trim() || undefined,
 };
 const ACTIVE_RPC_URL =
-  RPC_OVERRIDE_BY_NETWORK[activeNetwork.key] || activeNetwork.rpcUrl || ACTIVE_CHAIN.rpcUrls.default.http[0];
+  RPC_OVERRIDE_BY_NETWORK[activeNetwork.key] ||
+  activeNetwork.rpcUrl ||
+  ACTIVE_CHAIN.rpcUrls.default.http[0];
 
 if (ACTIVE_CHAIN.id !== activeNetwork.chainId) {
   throw new Error(`Unsupported wallet chainId ${activeNetwork.chainId}.`);

@@ -28,10 +28,42 @@ export function MarketsNavIcon() {
 export function DashboardNavIcon() {
   return (
     <Icon size={20} viewBox="0 0 20 20">
-      <rect x="2.8" y="3.2" width="6.6" height="5.8" rx="1.4" fill="currentColor" fillOpacity="0.85" />
-      <rect x="10.6" y="3.2" width="6.6" height="8.8" rx="1.4" fill="currentColor" fillOpacity="0.34" />
-      <rect x="2.8" y="10.4" width="6.6" height="6.4" rx="1.4" fill="currentColor" fillOpacity="0.34" />
-      <rect x="10.6" y="13.4" width="6.6" height="3.4" rx="1.4" fill="currentColor" fillOpacity="0.85" />
+      <rect
+        x="2.8"
+        y="3.2"
+        width="6.6"
+        height="5.8"
+        rx="1.4"
+        fill="currentColor"
+        fillOpacity="0.85"
+      />
+      <rect
+        x="10.6"
+        y="3.2"
+        width="6.6"
+        height="8.8"
+        rx="1.4"
+        fill="currentColor"
+        fillOpacity="0.34"
+      />
+      <rect
+        x="2.8"
+        y="10.4"
+        width="6.6"
+        height="6.4"
+        rx="1.4"
+        fill="currentColor"
+        fillOpacity="0.34"
+      />
+      <rect
+        x="10.6"
+        y="13.4"
+        width="6.6"
+        height="3.4"
+        rx="1.4"
+        fill="currentColor"
+        fillOpacity="0.85"
+      />
     </Icon>
   );
 }
@@ -46,7 +78,15 @@ export function StakingNavIcon() {
         strokeWidth="1.5"
         strokeLinejoin="round"
       />
-      <rect x="7.2" y="8.7" width="5.6" height="4.4" rx="1.2" fill="currentColor" fillOpacity="0.78" />
+      <rect
+        x="7.2"
+        y="8.7"
+        width="5.6"
+        height="4.4"
+        rx="1.2"
+        fill="currentColor"
+        fillOpacity="0.78"
+      />
       <path
         d="M8.3 8.7V7.5c0-1 .8-1.8 1.8-1.8s1.8.8 1.8 1.8v1.2"
         fill="none"

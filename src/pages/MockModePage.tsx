@@ -41,7 +41,8 @@ const parseAmount = (value: string): number => {
 };
 
 const formatAmount = (value: number): string => formatNumber(value);
-const formatPercent = (value: number): string => `${formatNumber(value, { decimals: 2, compact: false })}%`;
+const formatPercent = (value: number): string =>
+  `${formatNumber(value, { decimals: 2, compact: false })}%`;
 const MAX_MOCK_APPROVE_AMOUNT = Number.MAX_SAFE_INTEGER;
 
 type ToastTone = "success" | "error" | "info";
@@ -96,7 +97,9 @@ export function MockModePage() {
         exitQueue: [],
       };
   const queueEntries = user
-    ? engine.selectors.getExitQueueEntries(user).filter((item) => item.status === "queued" || item.status === "ready")
+    ? engine.selectors
+        .getExitQueueEntries(user)
+        .filter((item) => item.status === "queued" || item.status === "ready")
     : [];
 
   useEffect(() => {
@@ -176,7 +179,12 @@ export function MockModePage() {
         actions={wallet.isConnected ? <WalletMenu /> : <WalletConnectButton />}
       />
       {toast ? (
-        <ToastPopup tone={toast.tone} title={toast.title} durationMs={5000} onClose={() => setToast(null)}>
+        <ToastPopup
+          tone={toast.tone}
+          title={toast.title}
+          durationMs={5000}
+          onClose={() => setToast(null)}
+        >
           {toast.message}
         </ToastPopup>
       ) : null}
@@ -223,11 +231,17 @@ export function MockModePage() {
               value={selectedAsset}
               onChange={(event) => setSelectedAsset(event.target.value)}
             />
-            <Input label="Amount" value={amount} onChange={(event) => setAmount(event.target.value)} />
+            <Input
+              label="Amount"
+              value={amount}
+              onChange={(event) => setAmount(event.target.value)}
+            />
             <Switch
               variant="collateral"
               label="Use as collateral"
-              checked={supplies.find((item) => item.assetId === selectedAsset)?.isCollateral ?? false}
+              checked={
+                supplies.find((item) => item.assetId === selectedAsset)?.isCollateral ?? false
+              }
               disabled={busyOp !== null || !wallet.isConnected}
               onChange={(event) =>
                 runOperation("setCollateral", () =>
@@ -252,7 +266,9 @@ export function MockModePage() {
               isLoading={busyOp === "supply"}
               disabled={busyOp !== null || !wallet.isConnected}
               onClick={() =>
-                runOperation("supply", () => engine.lending.supply(user as Address, selectedAsset, numericAmount))
+                runOperation("supply", () =>
+                  engine.lending.supply(user as Address, selectedAsset, numericAmount)
+                )
               }
             />
             <ActionButton
@@ -260,7 +276,9 @@ export function MockModePage() {
               isLoading={busyOp === "withdraw"}
               disabled={busyOp !== null || !wallet.isConnected}
               onClick={() =>
-                runOperation("withdraw", () => engine.lending.withdraw(user as Address, selectedAsset, numericAmount))
+                runOperation("withdraw", () =>
+                  engine.lending.withdraw(user as Address, selectedAsset, numericAmount)
+                )
               }
             />
             <ActionButton
@@ -268,7 +286,9 @@ export function MockModePage() {
               isLoading={busyOp === "borrow"}
               disabled={busyOp !== null || !wallet.isConnected}
               onClick={() =>
-                runOperation("borrow", () => engine.lending.borrow(user as Address, selectedAsset, numericAmount))
+                runOperation("borrow", () =>
+                  engine.lending.borrow(user as Address, selectedAsset, numericAmount)
+                )
               }
             />
             <ActionButton
@@ -276,7 +296,9 @@ export function MockModePage() {
               isLoading={busyOp === "repay"}
               disabled={busyOp !== null || !wallet.isConnected}
               onClick={() =>
-                runOperation("repay", () => engine.lending.repay(user as Address, selectedAsset, numericAmount))
+                runOperation("repay", () =>
+                  engine.lending.repay(user as Address, selectedAsset, numericAmount)
+                )
               }
             />
           </div>
@@ -312,7 +334,9 @@ export function MockModePage() {
               isLoading={busyOp === "claimLendingRewards"}
               disabled={busyOp !== null || !wallet.isConnected}
               onClick={() =>
-                runOperation("claimLendingRewards", () => engine.lending.claimLendingRewards(user as Address))
+                runOperation("claimLendingRewards", () =>
+                  engine.lending.claimLendingRewards(user as Address)
+                )
               }
             />
           </Card>
@@ -322,22 +346,28 @@ export function MockModePage() {
       <Section title="Staking (Convert / Stake / Rewards / Exit)">
         <Card>
           <Typography>
-            Staked: {formatAmount(stakingState.staked)} | Rewards: {formatAmount(stakingState.rewards)} | APR:{" "}
-            {formatPercent(stakingState.apr)}
+            Staked: {formatAmount(stakingState.staked)} | Rewards:{" "}
+            {formatAmount(stakingState.rewards)} | APR: {formatPercent(stakingState.apr)}
           </Typography>
           <div className={styles.actions}>
             <ActionButton
               label="Convert"
               isLoading={busyOp === "convert"}
               disabled={busyOp !== null || !wallet.isConnected}
-              onClick={() => runOperation("convert", () => engine.staking.convert(user as Address, numericAmount))}
+              onClick={() =>
+                runOperation("convert", () =>
+                  engine.staking.convert(user as Address, numericAmount)
+                )
+              }
             />
             <ActionButton
               label="Stake To Rewards"
               isLoading={busyOp === "stakeToRewards"}
               disabled={busyOp !== null || !wallet.isConnected}
               onClick={() =>
-                runOperation("stakeToRewards", () => engine.staking.stakeToRewards(user as Address, numericAmount))
+                runOperation("stakeToRewards", () =>
+                  engine.staking.stakeToRewards(user as Address, numericAmount)
+                )
               }
             />
             <ActionButton
@@ -354,26 +384,38 @@ export function MockModePage() {
               isLoading={busyOp === "claimStakingRewards"}
               disabled={busyOp !== null || !wallet.isConnected}
               onClick={() =>
-                runOperation("claimStakingRewards", () => engine.staking.claimStakingRewards(user as Address))
+                runOperation("claimStakingRewards", () =>
+                  engine.staking.claimStakingRewards(user as Address)
+                )
               }
             />
             <ActionButton
               label="Instant Exit"
               isLoading={busyOp === "instantExit"}
               disabled={busyOp !== null || !wallet.isConnected}
-              onClick={() => runOperation("instantExit", () => engine.staking.instantExit(user as Address, numericAmount))}
+              onClick={() =>
+                runOperation("instantExit", () =>
+                  engine.staking.instantExit(user as Address, numericAmount)
+                )
+              }
             />
             <ActionButton
               label="Vesting Exit"
               isLoading={busyOp === "vestingExit"}
               disabled={busyOp !== null || !wallet.isConnected}
-              onClick={() => runOperation("vestingExit", () => engine.staking.vestingExit(user as Address))}
+              onClick={() =>
+                runOperation("vestingExit", () => engine.staking.vestingExit(user as Address))
+              }
             />
             <ActionButton
               label="Request Exit"
               isLoading={busyOp === "requestExit"}
               disabled={busyOp !== null || !wallet.isConnected}
-              onClick={() => runOperation("requestExit", () => engine.staking.requestExit(user as Address, numericAmount))}
+              onClick={() =>
+                runOperation("requestExit", () =>
+                  engine.staking.requestExit(user as Address, numericAmount)
+                )
+              }
             />
             <ActionButton
               label="Execute Exit"
@@ -400,7 +442,9 @@ export function MockModePage() {
               }
             />
           </div>
-          <Typography muted>Queue items ready: {stakingState.exitQueue.filter((item) => item.canExit).length}</Typography>
+          <Typography muted>
+            Queue items ready: {stakingState.exitQueue.filter((item) => item.canExit).length}
+          </Typography>
         </Card>
       </Section>
 

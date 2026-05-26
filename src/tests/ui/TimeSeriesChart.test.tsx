@@ -63,7 +63,10 @@ describe("TimeSeriesChart", () => {
     );
 
     mockChartAreaBounds();
-    fireEvent.mouseMove(screen.getByRole("img", { name: "Time series chart" }), { clientX: 220, clientY: 120 });
+    fireEvent.mouseMove(screen.getByRole("img", { name: "Time series chart" }), {
+      clientX: 220,
+      clientY: 120,
+    });
 
     const tooltip = screen.getByRole("status");
     expect(tooltip).toBeInTheDocument();

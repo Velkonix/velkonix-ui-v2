@@ -13,7 +13,13 @@ type HeaderNavItemProps = {
   onClick?: MouseEventHandler<HTMLAnchorElement>;
 };
 
-export function HeaderNavItem({ href, label, icon, isActive = false, onClick }: HeaderNavItemProps) {
+export function HeaderNavItem({
+  href,
+  label,
+  icon,
+  isActive = false,
+  onClick,
+}: HeaderNavItemProps) {
   return (
     <Link
       href={href}

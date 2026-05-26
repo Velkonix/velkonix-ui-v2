@@ -17,10 +17,7 @@ const ROUTES = [
 ] as const;
 
 async function setTheme(page: Page, theme: string): Promise<void> {
-  await page.evaluate(
-    (t) => document.documentElement.setAttribute("data-theme", t),
-    theme
-  );
+  await page.evaluate((t) => document.documentElement.setAttribute("data-theme", t), theme);
 }
 
 async function gotoWithMock(page: Page, path: string) {
@@ -51,7 +48,10 @@ test.describe("theme smoke check", () => {
         await setTheme(page, theme);
         await expect(page.locator("body")).toBeVisible();
         const heading = page.getByRole("heading", { name: route.heading });
-        const anyVisible = await heading.first().isVisible().catch(() => false);
+        const anyVisible = await heading
+          .first()
+          .isVisible()
+          .catch(() => false);
         if (!anyVisible) {
           const fallback = page.getByText(route.heading).first();
           const fallbackVisible = await fallback.isVisible().catch(() => false);
@@ -78,7 +78,9 @@ test.describe("theme deep check (blue)", () => {
     const dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
     const overlay = page.locator("[data-modal-overlay], [role='presentation']").first();
-    await expect(overlay).toBeVisible({ timeout: 2000 }).catch(() => {});
+    await expect(overlay)
+      .toBeVisible({ timeout: 2000 })
+      .catch(() => {});
   });
 
   test("blue: staking and modal flow visible", async ({ page }, testInfo) => {

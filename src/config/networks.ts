@@ -188,7 +188,9 @@ export const getActiveNetworkConfig = (): NetworkConfig => ACTIVE_NETWORK_CONFIG
 
 export const getAssetConfigByAddress = (address: Address): AssetConfig | null => {
   const normalized = address.toLowerCase();
-  const match = ACTIVE_NETWORK_CONFIG.assets.find((asset) => asset.address.toLowerCase() === normalized);
+  const match = ACTIVE_NETWORK_CONFIG.assets.find(
+    (asset) => asset.address.toLowerCase() === normalized
+  );
   return match ?? null;
 };
 

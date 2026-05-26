@@ -1,7 +1,9 @@
 .link {
   color: var(--accent-primary);
   text-decoration: none;
-  transition: color 0.12s ease, text-shadow 0.12s ease;
+  transition:
+    color 0.12s ease,
+    text-shadow 0.12s ease;
 }
 
 .link:hover {

@@ -4,7 +4,9 @@
   border-radius: 10px;
   background: var(--gradient-surface);
   color: var(--text-secondary);
-  box-shadow: inset 0 0 0 1px var(--border-subtle), var(--glow-soft);
+  box-shadow:
+    inset 0 0 0 1px var(--border-subtle),
+    var(--glow-soft);
   font-size: var(--font-size-sm);
   display: inline-flex;
   align-items: center;

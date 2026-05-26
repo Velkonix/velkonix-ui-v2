@@ -10,10 +10,6 @@ type SkeletonProps = HTMLAttributes<HTMLDivElement> & {
 
 export function Skeleton({ width = "100%", height = 16, className, ...props }: SkeletonProps) {
   return (
-    <div
-      className={classNames(styles.skeleton, className)}
-      style={{ width, height }}
-      {...props}
-    />
+    <div className={classNames(styles.skeleton, className)} style={{ width, height }} {...props} />
   );
 }

@@ -27,7 +27,11 @@
       rgba(190, 226, 244, 0.03) 45%,
       rgba(180, 214, 236, 0.1)
     ),
-    linear-gradient(120deg, rgba(var(--accent-glow-rgb), 0.09), rgba(var(--accent-active-rgb), 0.05));
+    linear-gradient(
+      120deg,
+      rgba(var(--accent-glow-rgb), 0.09),
+      rgba(var(--accent-active-rgb), 0.05)
+    );
   color: var(--text-on-accent);
   box-shadow:
     0 0 0 1px rgba(230, 246, 255, 0.12) inset,
@@ -170,7 +174,11 @@
       rgba(190, 226, 244, 0.03) 45%,
       rgba(180, 214, 236, 0.1)
     ),
-    linear-gradient(120deg, rgba(var(--accent-glow-rgb), 0.11), rgba(var(--accent-active-rgb), 0.08));
+    linear-gradient(
+      120deg,
+      rgba(var(--accent-glow-rgb), 0.11),
+      rgba(var(--accent-active-rgb), 0.08)
+    );
   color: var(--text-on-accent);
   border-color: rgba(228, 243, 255, 0.42);
 }
@@ -200,8 +208,16 @@
 
 .secondary {
   background:
-    linear-gradient(180deg, rgba(var(--bg-secondary-rgb), 0.95), rgba(var(--bg-tertiary-rgb), 0.82)),
-    linear-gradient(120deg, rgba(var(--accent-glow-rgb), 0.07), rgba(var(--accent-active-rgb), 0.04));
+    linear-gradient(
+      180deg,
+      rgba(var(--bg-secondary-rgb), 0.95),
+      rgba(var(--bg-tertiary-rgb), 0.82)
+    ),
+    linear-gradient(
+      120deg,
+      rgba(var(--accent-glow-rgb), 0.07),
+      rgba(var(--accent-active-rgb), 0.04)
+    );
   color: var(--text-primary);
   border-color: rgba(var(--border-accent-rgb), 0.52);
   box-shadow:
@@ -221,8 +237,16 @@
 
 .ghost {
   background:
-    linear-gradient(180deg, rgba(var(--accent-primary-rgb), 0.09), rgba(var(--accent-primary-rgb), 0.03)),
-    linear-gradient(120deg, rgba(var(--accent-glow-rgb), 0.07), rgba(var(--accent-active-rgb), 0.03));
+    linear-gradient(
+      180deg,
+      rgba(var(--accent-primary-rgb), 0.09),
+      rgba(var(--accent-primary-rgb), 0.03)
+    ),
+    linear-gradient(
+      120deg,
+      rgba(var(--accent-glow-rgb), 0.07),
+      rgba(var(--accent-active-rgb), 0.03)
+    );
   color: var(--text-primary);
   border-color: rgba(var(--accent-primary-rgb), 0.44);
   box-shadow:
@@ -278,4 +302,3 @@
     min-height: 40px;
   }
 }
-

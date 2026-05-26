@@ -41,7 +41,9 @@ async function connectWallet(page: Page) {
   await closeMobileMenuIfNeeded(page);
 }
 
-test("mock mode flow shows markets and mock address in connect button", async ({ page }, testInfo) => {
+test("mock mode flow shows markets and mock address in connect button", async ({
+  page,
+}, testInfo) => {
   test.skip(testInfo.project.name === "mobile", "Mobile layout differs in markets flow.");
   await page.goto("/markets?mock=1");
 

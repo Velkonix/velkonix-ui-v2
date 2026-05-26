@@ -52,7 +52,11 @@
   width: 100%;
   height: 100%;
   transform-origin: left center;
-  background: linear-gradient(90deg, rgba(var(--accent-glow-rgb), 0.72), rgba(var(--accent-active-rgb), 0.6));
+  background: linear-gradient(
+    90deg,
+    rgba(var(--accent-glow-rgb), 0.72),
+    rgba(var(--accent-active-rgb), 0.6)
+  );
   box-shadow:
     0 0 6px rgba(var(--accent-glow-rgb), 0.48),
     0 0 10px rgba(var(--accent-active-rgb), 0.32);

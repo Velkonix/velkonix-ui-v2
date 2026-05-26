@@ -39,11 +39,21 @@ export function ToastPopup({
   }, [durationMs]);
 
   const popup = (
-    <div className={classNames(styles.container, className)} role="status" aria-live="polite" {...props}>
+    <div
+      className={classNames(styles.container, className)}
+      role="status"
+      aria-live="polite"
+      {...props}
+    >
       <Toast tone={tone} title={title} className={styles.toast}>
         {children}
       </Toast>
-      <button type="button" className={styles.closeButton} onClick={onClose} aria-label="Close notification">
+      <button
+        type="button"
+        className={styles.closeButton}
+        onClick={onClose}
+        aria-label="Close notification"
+      >
         ×
       </button>
       <div className={styles.progressTrack} aria-hidden="true">

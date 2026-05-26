@@ -227,7 +227,9 @@
   visibility: hidden;
   pointer-events: none;
   z-index: var(--z-modal);
-  transition: opacity 180ms ease, visibility 180ms ease;
+  transition:
+    opacity 180ms ease,
+    visibility 180ms ease;
 }
 
 .mobileDrawerOverlayOpen {
@@ -241,7 +243,11 @@
   max-height: 100vh;
   width: min(344px, 90vw);
   margin-left: auto;
-  background: linear-gradient(180deg, rgba(var(--bg-secondary-rgb), 0.98), rgba(var(--bg-primary-rgb), 0.98));
+  background: linear-gradient(
+    180deg,
+    rgba(var(--bg-secondary-rgb), 0.98),
+    rgba(var(--bg-primary-rgb), 0.98)
+  );
   border-left: 1px solid rgba(var(--border-accent-rgb), 0.45);
   box-shadow: var(--shadow-drawer);
   padding: calc(var(--space-6) + env(safe-area-inset-top, 0px)) var(--space-5)

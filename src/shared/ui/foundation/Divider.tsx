@@ -8,10 +8,5 @@ type DividerProps = HTMLAttributes<HTMLHRElement> & {
 };
 
 export function Divider({ tone = "default", className, ...props }: DividerProps) {
-  return (
-    <hr
-      className={classNames(styles.divider, styles[tone], className)}
-      {...props}
-    />
-  );
+  return <hr className={classNames(styles.divider, styles[tone], className)} {...props} />;
 }

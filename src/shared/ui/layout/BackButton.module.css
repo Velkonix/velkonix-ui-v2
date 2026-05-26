@@ -4,7 +4,9 @@
   color: var(--text-secondary);
   font-size: var(--font-size-sm);
   cursor: pointer;
-  transition: color 0.12s ease, text-shadow 0.12s ease;
+  transition:
+    color 0.12s ease,
+    text-shadow 0.12s ease;
 }
 
 .button:hover {
