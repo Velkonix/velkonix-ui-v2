@@ -9,11 +9,11 @@ importers:
   .:
     dependencies:
       '@aave/contract-helpers':
-        specifier: 1.32.1
-        version: 1.32.1(bignumber.js@9.3.1)(ethers@5.8.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(reflect-metadata@0.1.14)(tslib@2.8.1)
+        specifier: 1.21.1
+        version: 1.21.1(bignumber.js@9.3.1)(ethers@5.8.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(reflect-metadata@0.1.14)(tslib@2.8.1)
       '@aave/math-utils':
-        specifier: 1.32.1
-        version: 1.32.1(bignumber.js@9.3.1)(tslib@2.8.1)
+        specifier: 1.21.1
+        version: 1.21.1(bignumber.js@9.3.1)(tslib@2.8.1)
       '@rainbow-me/rainbowkit':
         specifier: 2.2.10
         version: 2.2.10(@tanstack/react-query@5.90.20(react@19.2.4))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)(viem@2.45.2(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.3))(wagmi@2.19.5(@tanstack/query-core@5.90.20)(@tanstack/react-query@5.90.20(react@19.2.4))(@types/react@19.2.13)(bufferutil@4.1.0)(immer@11.1.8)(react@19.2.4)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.45.2(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.3))(zod@4.4.3))
@@ -120,16 +120,16 @@ importers:
 
 packages:
 
-  '@aave/contract-helpers@1.32.1':
-    resolution: {integrity: sha512-iYkopRnzbfnW7Pxa/qNmqVJVSCWKqF14FNK9SKpmLAkndH8P0UZqSkIdcnvW/ekNx6cyGIc506gKc00j5OnegQ==}
+  '@aave/contract-helpers@1.21.1':
+    resolution: {integrity: sha512-sp5m0KZ0lInlBfTfZnbR7yh0jG1Q+5wvM42H7JBMOdjxb1jWKWkAWg0DFQJzXlDsBo+bk6BS/sBHa4Eql0IA8A==}
     peerDependencies:
       bignumber.js: ^9.x
       ethers: ^5.x
       reflect-metadata: ^0.1.x
       tslib: ^2.4.x
 
-  '@aave/math-utils@1.32.1':
-    resolution: {integrity: sha512-uLjwGNEOilWWguW7CX6Dwsk9uP4aT9HmOCzXpHqDrPbR2oGSLV8BlvHWx/8wzY9Cdt5Jr4ofP0vm/Xs4lrgDNg==}
+  '@aave/math-utils@1.21.1':
+    resolution: {integrity: sha512-oFZafJ5MeNtiqgJBEsmvvGlFtdFauWX0wI9B+wikqT//LVc0PYS0IX49UItv6yoTcd0I7IDq3Zv8V47e3lhBOw==}
     peerDependencies:
       bignumber.js: ^9.x
       tslib: ^2.4.x
@@ -4945,7 +4945,7 @@ packages:
 
 snapshots:
 
-  '@aave/contract-helpers@1.32.1(bignumber.js@9.3.1)(ethers@5.8.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(reflect-metadata@0.1.14)(tslib@2.8.1)':
+  '@aave/contract-helpers@1.21.1(bignumber.js@9.3.1)(ethers@5.8.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(reflect-metadata@0.1.14)(tslib@2.8.1)':
     dependencies:
       bignumber.js: 9.3.1
       ethers: 5.8.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
@@ -4955,7 +4955,7 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  '@aave/math-utils@1.32.1(bignumber.js@9.3.1)(tslib@2.8.1)':
+  '@aave/math-utils@1.21.1(bignumber.js@9.3.1)(tslib@2.8.1)':
     dependencies:
       bignumber.js: 9.3.1
       tslib: 2.8.1
