@@ -314,10 +314,24 @@ export function MarketsPage() {
                         <ApyWithDetails {...getApyDetails(row, "borrow")} stopPropagation />
                       ),
                     },
+                    {
+                      key: "details",
+                      title: "",
+                      align: "right",
+                      render: (row) => (
+                        <ActionButton
+                          label="Details"
+                          size="sm"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            navigate(`/asset/${row.id}`);
+                          }}
+                        />
+                      ),
+                    },
                   ]}
                   rows={marketRows}
                   getRowKey={(row) => row.id}
-                  onRowClick={(row) => navigate(`/asset/${row.id}`)}
                 />
               </Card>
             )}
