@@ -20,6 +20,7 @@ type ApyWithDetailsProps = {
   baseApy: number;
   rewardApyTotal: number;
   rewards?: ApyRewardDetailsItem[];
+  side?: "supply" | "borrow";
   stopPropagation?: boolean;
   className?: string;
   valueClassName?: string;
@@ -27,8 +28,8 @@ type ApyWithDetailsProps = {
 
 const formatPercent = (value: number): string =>
   `${formatNumber(value, { decimals: 2, compact: false })}%`;
-const formatSignedPercent = (value: number): string =>
-  `${value >= 0 ? "+" : ""}${formatNumber(value, { decimals: 2, compact: false })}%`;
+const formatPositivePercent = (value: number): string =>
+  `+${formatNumber(Math.abs(value), { decimals: 2, compact: false })}%`;
 
 export function ApyWithDetails({
   title,
@@ -36,6 +37,7 @@ export function ApyWithDetails({
   baseApy,
   rewardApyTotal,
   rewards,
+  side = "supply",
   stopPropagation = false,
   className,
   valueClassName,
@@ -49,6 +51,10 @@ export function ApyWithDetails({
     setIsOpen(true);
   };
 
+  const baseLabel = side === "borrow" ? "Net Borrow APY" : "Net Supply APY";
+  const effectiveLabel = side === "borrow" ? "Effective Borrow APY" : "Effective Supply APY";
+  const totalLabel = "Net APY";
+
   return (
     <>
       <button type="button" className={classNames(styles.trigger, className)} onClick={onClick}>
@@ -61,21 +67,17 @@ export function ApyWithDetails({
         <div className={styles.content}>
           <div className={styles.summaryCard}>
             <div className={styles.summaryRow}>
-              <ValueCell className={styles.summaryLabel}>Base APY</ValueCell>
+              <ValueCell className={styles.summaryLabel}>{baseLabel}</ValueCell>
               <ApyCell>{formatPercent(baseApy)}</ApyCell>
             </div>
             <div className={styles.summaryRow}>
-              <ValueCell className={styles.summaryLabel}>Rewards APY</ValueCell>
-              <ValueCell
-                className={
-                  rewardApyTotal >= 0 ? styles.rewardTotalPositive : styles.rewardTotalNegative
-                }
-              >
-                {formatSignedPercent(rewardApyTotal)}
+              <ValueCell className={styles.summaryLabel}>{effectiveLabel}</ValueCell>
+              <ValueCell className={styles.rewardTotalPositive}>
+                {formatPositivePercent(rewardApyTotal)}
               </ValueCell>
             </div>
             <div className={styles.summaryRow}>
-              <ValueCell className={styles.summaryLabel}>Total APY</ValueCell>
+              <ValueCell className={styles.summaryLabel}>{totalLabel}</ValueCell>
               <ApyCell>{formatPercent(totalApy)}</ApyCell>
             </div>
           </div>
@@ -96,12 +98,8 @@ export function ApyWithDetails({
                         {reward.source}
                       </Typography>
                     </div>
-                    <ValueCell
-                      className={
-                        reward.apy >= 0 ? styles.rewardTotalPositive : styles.rewardTotalNegative
-                      }
-                    >
-                      {formatSignedPercent(reward.apy)}
+                    <ValueCell className={styles.rewardTotalPositive}>
+                      {formatPositivePercent(reward.apy)}
                     </ValueCell>
                   </div>
                 ))}

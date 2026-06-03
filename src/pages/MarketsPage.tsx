@@ -100,10 +100,11 @@ export function MarketsPage() {
 
   const getApyDetails = (row: MarketRow, metric: "supply" | "borrow") => {
     const totalApy = metric === "supply" ? row.supplyApy : row.borrowApy;
-    const rewardApyTotal = metric === "supply" ? SUPPLY_MOCK_REWARD_APY : -BORROW_MOCK_REWARD_APY;
-    const baseApy = totalApy - rewardApyTotal;
+    const rewardApyTotal = metric === "supply" ? SUPPLY_MOCK_REWARD_APY : BORROW_MOCK_REWARD_APY;
+    const baseApy = metric === "supply" ? totalApy - rewardApyTotal : totalApy + rewardApyTotal;
     return {
       title: `${row.symbol} ${metric === "supply" ? "Supply" : "Borrow"} APY`,
+      side: metric,
       totalApy,
       baseApy,
       rewardApyTotal,

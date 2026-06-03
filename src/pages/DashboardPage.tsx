@@ -1,7 +1,11 @@
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { useLendingController } from "../features/lending";
+import {
+  useLendingController,
+  type DashboardBorrowRow,
+  type DashboardSupplyRow,
+} from "../features/lending";
 import {
   ActionButton,
   AmountInput,
@@ -117,6 +121,7 @@ export function DashboardPage() {
     lastError,
     toast,
     isLoading,
+    marketRows,
     dashboardSupplies,
     dashboardBorrows,
     dashboardSummary,
@@ -131,6 +136,144 @@ export function DashboardPage() {
     claimLendingRewards,
     clearToast,
   } = useLendingController();
+
+  type SuppliesSortKey = "asset" | "balance" | "apy";
+  type BorrowsSortKey = "asset" | "debt" | "apy";
+  type SortDir = "asc" | "desc";
+
+  const [suppliesSort, setSuppliesSort] = useState<{ key: SuppliesSortKey; dir: SortDir }>({
+    key: "balance",
+    dir: "desc",
+  });
+  const [borrowsSort, setBorrowsSort] = useState<{ key: BorrowsSortKey; dir: SortDir }>({
+    key: "debt",
+    dir: "desc",
+  });
+  const [hideZeroSupplies, setHideZeroSupplies] = useState(true);
+  const [hideZeroBorrows, setHideZeroBorrows] = useState(true);
+
+  const supplyRows = useMemo<DashboardSupplyRow[]>(() => {
+    return marketRows.map((market) => {
+      const existing = dashboardSupplies.find((s) => s.assetId === market.id);
+      if (existing) return existing;
+      return {
+        assetId: market.id,
+        symbol: market.symbol,
+        name: market.name,
+        icon: market.icon,
+        balance: 0,
+        balanceUsd: null,
+        apy: market.supplyApy,
+        apyBreakdown: {
+          side: "supply",
+          baseApy: market.supplyApy,
+          rewardApyTotal: 0,
+          totalApy: market.supplyApy,
+          rewards: [],
+        },
+        isCollateral: false,
+      };
+    });
+  }, [marketRows, dashboardSupplies]);
+
+  const borrowRows = useMemo<DashboardBorrowRow[]>(() => {
+    return marketRows.map((market) => {
+      const existing = dashboardBorrows.find((b) => b.assetId === market.id);
+      if (existing) return existing;
+      return {
+        assetId: market.id,
+        symbol: market.symbol,
+        name: market.name,
+        icon: market.icon,
+        debt: 0,
+        debtUsd: null,
+        apy: market.borrowApy,
+        apyBreakdown: {
+          side: "borrow",
+          baseApy: market.borrowApy,
+          rewardApyTotal: 0,
+          totalApy: market.borrowApy,
+          rewards: [],
+        },
+      };
+    });
+  }, [marketRows, dashboardBorrows]);
+
+  const visibleSupplies = useMemo<DashboardSupplyRow[]>(() => {
+    const filtered = hideZeroSupplies ? supplyRows.filter((r) => r.balance > 0) : supplyRows;
+    const factor = suppliesSort.dir === "asc" ? 1 : -1;
+    return [...filtered].sort((a, b) => {
+      switch (suppliesSort.key) {
+        case "asset":
+          return factor * a.symbol.localeCompare(b.symbol);
+        case "balance":
+          return factor * (a.balance - b.balance);
+        case "apy":
+          return factor * (a.apy - b.apy);
+        default:
+          return 0;
+      }
+    });
+  }, [supplyRows, suppliesSort, hideZeroSupplies]);
+
+  const visibleBorrows = useMemo<DashboardBorrowRow[]>(() => {
+    const filtered = hideZeroBorrows ? borrowRows.filter((r) => r.debt > 0) : borrowRows;
+    const factor = borrowsSort.dir === "asc" ? 1 : -1;
+    return [...filtered].sort((a, b) => {
+      switch (borrowsSort.key) {
+        case "asset":
+          return factor * a.symbol.localeCompare(b.symbol);
+        case "debt":
+          return factor * (a.debt - b.debt);
+        case "apy":
+          return factor * (a.apy - b.apy);
+        default:
+          return 0;
+      }
+    });
+  }, [borrowRows, borrowsSort, hideZeroBorrows]);
+
+  const supplyTitleButton = (label: string, key: SuppliesSortKey) => (
+    <button
+      type="button"
+      className={styles.sortButton}
+      onClick={() =>
+        setSuppliesSort((prev) => ({
+          key,
+          dir: prev.key === key && prev.dir === "asc" ? "desc" : "asc",
+        }))
+      }
+      aria-pressed={suppliesSort.key === key}
+    >
+      <span>{label}</span>
+      {suppliesSort.key === key ? (
+        <span className={styles.sortArrow} aria-hidden="true">
+          {suppliesSort.dir === "asc" ? "▲" : "▼"}
+        </span>
+      ) : null}
+    </button>
+  );
+
+  const borrowTitleButton = (label: string, key: BorrowsSortKey) => (
+    <button
+      type="button"
+      className={styles.sortButton}
+      onClick={() =>
+        setBorrowsSort((prev) => ({
+          key,
+          dir: prev.key === key && prev.dir === "asc" ? "desc" : "asc",
+        }))
+      }
+      aria-pressed={borrowsSort.key === key}
+    >
+      <span>{label}</span>
+      {borrowsSort.key === key ? (
+        <span className={styles.sortArrow} aria-hidden="true">
+          {borrowsSort.dir === "asc" ? "▲" : "▼"}
+        </span>
+      ) : null}
+    </button>
+  );
 
   const [withdrawModal, setWithdrawModal] = useState<WithdrawModalState>(null);
   const [repayModal, setRepayModal] = useState<RepayModalState>(null);
@@ -591,202 +734,242 @@ export function DashboardPage() {
         </div>
       </Section>
 
-      <div className={styles.positionsColumns}>
-        <Section className={styles.positionsColumn}>
+      {!wallet.isConnected ? (
+        <Section>
           <Card>
-            <PanelHeader
-              title="Your supplies"
-              details={
-                <>
-                  <PanelHeaderStat label="Balance" value={formatAmount(suppliesBalance)} />
-                  <PanelHeaderStat label="APY" value={formatPercent(suppliesWeightedApy)} />
-                </>
-              }
-            />
-            {dashboardSupplies.length === 0 ? (
+            <div className={styles.connectCard}>
               <EmptyState
-                title="No supplied positions"
-                description="Supply assets from Markets or Asset page to see them here."
+                title="Wallet not connected"
+                description="Please connect your wallet to see your supplies, borrowings, and open positions."
               />
-            ) : (
-              <Table
-                columns={[
-                  {
-                    key: "asset",
-                    title: "Asset",
-                    render: (row) => <AssetCell symbol={row.symbol} name={row.name} />,
-                  },
-                  {
-                    key: "balance",
-                    title: "Balance",
-                    align: "right",
-                    render: (row) => <ValueCell>{formatAmount(row.balance)}</ValueCell>,
-                  },
-                  {
-                    key: "apy",
-                    title: "APY",
-                    align: "right",
-                    render: (row) => (
-                      <ApyWithDetails
-                        title={`${row.symbol} supply APY`}
-                        totalApy={row.apyBreakdown.totalApy}
-                        baseApy={row.apyBreakdown.baseApy}
-                        rewardApyTotal={row.apyBreakdown.rewardApyTotal}
-                        rewards={row.apyBreakdown.rewards}
-                        stopPropagation
-                      />
-                    ),
-                  },
-                  {
-                    key: "collateral",
-                    title: "Collateral",
-                    align: "center",
-                    render: (row) => (
-                      <div
-                        className={styles.switchCell}
-                        onClick={(event) => event.stopPropagation()}
-                      >
-                        <Switch
-                          variant="collateral"
-                          checked={row.isCollateral}
-                          disabled={!wallet.isConnected || busyOp !== null}
-                          onChange={(event) => {
+              <div className={styles.connectActions}>
+                <ActionButton label="Connect wallet" onClick={() => void wallet.connect()} />
+              </div>
+            </div>
+          </Card>
+        </Section>
+      ) : (
+        <div className={styles.positionsColumns}>
+          <Section className={styles.positionsColumn}>
+            <Card>
+              <PanelHeader
+                title="Your supplies"
+                details={
+                  <>
+                    <PanelHeaderStat label="Balance" value={formatAmount(suppliesBalance)} />
+                    <PanelHeaderStat label="APY" value={formatPercent(suppliesWeightedApy)} />
+                  </>
+                }
+              />
+              <div className={styles.panelToolbar}>
+                <Switch
+                  checked={hideZeroSupplies}
+                  onChange={(event) => setHideZeroSupplies(event.currentTarget.checked)}
+                  label="Hide zero balances"
+                />
+              </div>
+              {visibleSupplies.length === 0 ? (
+                <EmptyState
+                  title={hideZeroSupplies ? "No supplied positions" : "No assets available"}
+                  description={
+                    hideZeroSupplies
+                      ? "Supply assets from Markets or Asset page to see them here."
+                      : "Markets list is empty."
+                  }
+                />
+              ) : (
+                <Table
+                  columns={[
+                    {
+                      key: "asset",
+                      title: supplyTitleButton("Asset", "asset"),
+                      render: (row) => <AssetCell symbol={row.symbol} name={row.name} />,
+                    },
+                    {
+                      key: "balance",
+                      title: supplyTitleButton("Balance", "balance"),
+                      align: "right",
+                      render: (row) => <ValueCell>{formatAmount(row.balance)}</ValueCell>,
+                    },
+                    {
+                      key: "apy",
+                      title: supplyTitleButton("APY", "apy"),
+                      align: "right",
+                      render: (row) => (
+                        <ApyWithDetails
+                          title={`${row.symbol} Supply APY`}
+                          side="supply"
+                          totalApy={row.apyBreakdown.totalApy}
+                          baseApy={row.apyBreakdown.baseApy}
+                          rewardApyTotal={row.apyBreakdown.rewardApyTotal}
+                          rewards={row.apyBreakdown.rewards}
+                          stopPropagation
+                        />
+                      ),
+                    },
+                    {
+                      key: "collateral",
+                      title: "Collateral",
+                      align: "center",
+                      render: (row) => (
+                        <div
+                          className={styles.switchCell}
+                          onClick={(event) => event.stopPropagation()}
+                        >
+                          <Switch
+                            variant="collateral"
+                            checked={row.isCollateral}
+                            disabled={!wallet.isConnected || busyOp !== null || row.balance <= 0}
+                            onChange={(event) => {
+                              event.stopPropagation();
+                              setCollateralModal({
+                                assetId: row.assetId,
+                                symbol: row.symbol,
+                                supplyBalance: row.balance,
+                                isCurrentlyEnabled: row.isCollateral,
+                                nextEnabled: event.target.checked,
+                              });
+                              setIsCollateralRiskAccepted(false);
+                            }}
+                            aria-label={`Use ${row.symbol} as collateral`}
+                          />
+                        </div>
+                      ),
+                    },
+                    {
+                      key: "withdraw",
+                      title: "",
+                      align: "right",
+                      render: (row) => (
+                        <ActionButton
+                          label="Withdraw"
+                          size="sm"
+                          disabled={!wallet.isConnected || busyOp !== null || row.balance <= 0}
+                          onClick={(event) => {
                             event.stopPropagation();
-                            setCollateralModal({
+                            const asset = getAssetById(row.assetId);
+                            const liquidityLimit = asset
+                              ? getAvailableLiquidity(asset.totalSupplied, asset.totalBorrowed)
+                              : row.balance;
+                            const operationalLimit = Math.min(row.balance, liquidityLimit);
+                            const healthFactorLimit = getMaxWithdrawByHealthFactor(
+                              row.assetId,
+                              row.isCollateral,
+                              operationalLimit
+                            );
+                            setWithdrawModal({
                               assetId: row.assetId,
                               symbol: row.symbol,
                               supplyBalance: row.balance,
-                              isCurrentlyEnabled: row.isCollateral,
-                              nextEnabled: event.target.checked,
+                              maxAmount: Math.min(operationalLimit, healthFactorLimit),
+                              maxAmountByLiquidity: liquidityLimit,
+                              maxAmountByHealthFactor: healthFactorLimit,
+                              isCollateral: row.isCollateral,
                             });
-                            setIsCollateralRiskAccepted(false);
+                            setWithdrawAmount("");
+                            setIsWithdrawRiskAccepted(false);
                           }}
-                          aria-label={`Use ${row.symbol} as collateral`}
                         />
-                      </div>
-                    ),
-                  },
-                  {
-                    key: "withdraw",
-                    title: "",
-                    align: "right",
-                    render: (row) => (
-                      <ActionButton
-                        label="Withdraw"
-                        size="sm"
-                        disabled={!wallet.isConnected || busyOp !== null}
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          const asset = getAssetById(row.assetId);
-                          const liquidityLimit = asset
-                            ? getAvailableLiquidity(asset.totalSupplied, asset.totalBorrowed)
-                            : row.balance;
-                          const operationalLimit = Math.min(row.balance, liquidityLimit);
-                          const healthFactorLimit = getMaxWithdrawByHealthFactor(
-                            row.assetId,
-                            row.isCollateral,
-                            operationalLimit
-                          );
-                          setWithdrawModal({
-                            assetId: row.assetId,
-                            symbol: row.symbol,
-                            supplyBalance: row.balance,
-                            maxAmount: Math.min(operationalLimit, healthFactorLimit),
-                            maxAmountByLiquidity: liquidityLimit,
-                            maxAmountByHealthFactor: healthFactorLimit,
-                            isCollateral: row.isCollateral,
-                          });
-                          setWithdrawAmount("");
-                          setIsWithdrawRiskAccepted(false);
-                        }}
-                      />
-                    ),
-                  },
-                ]}
-                rows={dashboardSupplies}
-                getRowKey={(row) => row.assetId}
-                onRowClick={(row) => navigate(`/asset/${row.assetId}`)}
-              />
-            )}
-          </Card>
-        </Section>
+                      ),
+                    },
+                  ]}
+                  rows={visibleSupplies}
+                  getRowKey={(row) => row.assetId}
+                  onRowClick={(row) => navigate(`/asset/${row.assetId}`)}
+                />
+              )}
+            </Card>
+          </Section>
 
-        <Section className={styles.positionsColumn}>
-          <Card>
-            <PanelHeader
-              title="Your borrows"
-              details={
-                <>
-                  <PanelHeaderStat label="Balance" value={formatAmount(borrowsBalance)} />
-                  <PanelHeaderStat label="APY" value={formatPercent(borrowsWeightedApy)} />
-                </>
-              }
-            />
-            {dashboardBorrows.length === 0 ? (
-              <EmptyState
-                title="No borrow positions"
-                description="Borrow assets on the Asset page to manage debt here."
+          <Section className={styles.positionsColumn}>
+            <Card>
+              <PanelHeader
+                title="Your borrows"
+                details={
+                  <>
+                    <PanelHeaderStat label="Balance" value={formatAmount(borrowsBalance)} />
+                    <PanelHeaderStat label="APY" value={formatPercent(borrowsWeightedApy)} />
+                  </>
+                }
               />
-            ) : (
-              <Table
-                columns={[
-                  {
-                    key: "asset",
-                    title: "Asset",
-                    render: (row) => <AssetCell symbol={row.symbol} name={row.name} />,
-                  },
-                  {
-                    key: "debt",
-                    title: "Debt",
-                    align: "right",
-                    render: (row) => <ValueCell>{formatAmount(row.debt)}</ValueCell>,
-                  },
-                  {
-                    key: "apy",
-                    title: "APY",
-                    align: "right",
-                    render: (row) => (
-                      <ApyWithDetails
-                        title={`${row.symbol} borrow APY`}
-                        totalApy={row.apyBreakdown.totalApy}
-                        baseApy={row.apyBreakdown.baseApy}
-                        rewardApyTotal={row.apyBreakdown.rewardApyTotal}
-                        rewards={row.apyBreakdown.rewards}
-                        stopPropagation
-                      />
-                    ),
-                  },
-                  {
-                    key: "repay",
-                    title: "",
-                    align: "right",
-                    render: (row) => (
-                      <ActionButton
-                        label="Repay"
-                        size="sm"
-                        disabled={!wallet.isConnected || busyOp !== null}
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          setRepayModal({
-                            assetId: row.assetId,
-                            symbol: row.symbol,
-                            maxDebt: row.debt,
-                          });
-                          setRepayAmount("");
-                          setIsRepayRiskAccepted(false);
-                        }}
-                      />
-                    ),
-                  },
-                ]}
-                rows={dashboardBorrows}
-                getRowKey={(row) => row.assetId}
-                onRowClick={(row) => navigate(`/asset/${row.assetId}`)}
-              />
-            )}
-          </Card>
-        </Section>
-      </div>
+              <div className={styles.panelToolbar}>
+                <Switch
+                  checked={hideZeroBorrows}
+                  onChange={(event) => setHideZeroBorrows(event.currentTarget.checked)}
+                  label="Hide zero balances"
+                />
+              </div>
+              {visibleBorrows.length === 0 ? (
+                <EmptyState
+                  title={hideZeroBorrows ? "No borrow positions" : "No assets available"}
+                  description={
+                    hideZeroBorrows
+                      ? "Borrow assets on the Asset page to manage debt here."
+                      : "Markets list is empty."
+                  }
+                />
+              ) : (
+                <Table
+                  columns={[
+                    {
+                      key: "asset",
+                      title: borrowTitleButton("Asset", "asset"),
+                      render: (row) => <AssetCell symbol={row.symbol} name={row.name} />,
+                    },
+                    {
+                      key: "debt",
+                      title: borrowTitleButton("Debt", "debt"),
+                      align: "right",
+                      render: (row) => <ValueCell>{formatAmount(row.debt)}</ValueCell>,
+                    },
+                    {
+                      key: "apy",
+                      title: borrowTitleButton("APY", "apy"),
+                      align: "right",
+                      render: (row) => (
+                        <ApyWithDetails
+                          title={`${row.symbol} Borrow APY`}
+                          side="borrow"
+                          totalApy={row.apyBreakdown.totalApy}
+                          baseApy={row.apyBreakdown.baseApy}
+                          rewardApyTotal={row.apyBreakdown.rewardApyTotal}
+                          rewards={row.apyBreakdown.rewards}
+                          stopPropagation
+                        />
+                      ),
+                    },
+                    {
+                      key: "repay",
+                      title: "",
+                      align: "right",
+                      render: (row) => (
+                        <ActionButton
+                          label="Repay"
+                          size="sm"
+                          disabled={!wallet.isConnected || busyOp !== null || row.debt <= 0}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            setRepayModal({
+                              assetId: row.assetId,
+                              symbol: row.symbol,
+                              maxDebt: row.debt,
+                            });
+                            setRepayAmount("");
+                            setIsRepayRiskAccepted(false);
+                          }}
+                        />
+                      ),
+                    },
+                  ]}
+                  rows={visibleBorrows}
+                  getRowKey={(row) => row.assetId}
+                  onRowClick={(row) => navigate(`/asset/${row.assetId}`)}
+                />
+              )}
+            </Card>
+          </Section>
+        </div>
+      )}
 
       <Modal
         isOpen={collateralModal !== null}
