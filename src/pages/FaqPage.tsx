@@ -120,62 +120,47 @@ export function FaqPage() {
         className={styles.pageHeader}
       />
 
-      <div className={styles.layout}>
-        <aside className={styles.sidebar} aria-label="FAQ categories">
-          <nav className={styles.sidebarNav}>
-            {FAQ_CATEGORIES.map((category) => {
-              const anchor = category.title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-              return (
-                <a key={anchor} href={`#${anchor}`} className={styles.sidebarLink}>
-                  {category.title}
-                </a>
-              );
-            })}
-          </nav>
-        </aside>
-
-        <div className={styles.content}>
-          {FAQ_CATEGORIES.map((category) => {
-            const anchor = category.title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-            return (
-              <Section key={anchor}>
-                <Typography as="h3" id={anchor} className={styles.categoryTitle}>
-                  {category.title}
-                </Typography>
-                <Card className={styles.categoryCard}>
-                  <ul className={styles.itemList}>
-                    {category.items.map((item) => (
-                      <li key={item.question} className={styles.item}>
-                        <details className={styles.details}>
-                          <summary className={styles.summary}>
-                            <span className={styles.question}>{item.question}</span>
-                            <span className={styles.chevron} aria-hidden="true" />
-                          </summary>
-                          <div className={styles.answer}>
-                            <Typography as="p" variant="body" muted>
-                              {Array.isArray(item.answer) ? item.answer.join(" ") : item.answer}
-                            </Typography>
-                            {item.bullets ? (
-                              <ul className={styles.bullets}>
-                                {item.bullets.map((bullet) => (
-                                  <li key={bullet}>
-                                    <Typography as="span" variant="body" muted>
-                                      {bullet}
-                                    </Typography>
-                                  </li>
-                                ))}
-                              </ul>
-                            ) : null}
-                          </div>
-                        </details>
-                      </li>
-                    ))}
-                  </ul>
-                </Card>
-              </Section>
-            );
-          })}
-        </div>
+      <div className={styles.content}>
+        {FAQ_CATEGORIES.map((category) => {
+          const anchor = category.title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+          return (
+            <Section key={anchor}>
+              <Typography as="h3" id={anchor} className={styles.categoryTitle}>
+                {category.title}
+              </Typography>
+              <Card className={styles.categoryCard}>
+                <ul className={styles.itemList}>
+                  {category.items.map((item) => (
+                    <li key={item.question} className={styles.item}>
+                      <details className={styles.details}>
+                        <summary className={styles.summary}>
+                          <span className={styles.question}>{item.question}</span>
+                          <span className={styles.chevron} aria-hidden="true" />
+                        </summary>
+                        <div className={styles.answer}>
+                          <Typography as="p" variant="body" muted>
+                            {Array.isArray(item.answer) ? item.answer.join(" ") : item.answer}
+                          </Typography>
+                          {item.bullets ? (
+                            <ul className={styles.bullets}>
+                              {item.bullets.map((bullet) => (
+                                <li key={bullet}>
+                                  <Typography as="span" variant="body" muted>
+                                    {bullet}
+                                  </Typography>
+                                </li>
+                              ))}
+                            </ul>
+                          ) : null}
+                        </div>
+                      </details>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            </Section>
+          );
+        })}
       </div>
     </PageContainer>
   );
