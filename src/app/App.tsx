@@ -8,6 +8,7 @@ import xLogo from "../assets/x-logo.svg";
 
 import { AssetPage } from "../pages/AssetPage";
 import { DashboardPage } from "../pages/DashboardPage";
+import { FaqPage } from "../pages/FaqPage";
 import { HomePage } from "../pages/HomePage";
 import { MarketsPage } from "../pages/MarketsPage";
 import { StakingPage } from "../pages/StakingPage";
@@ -16,6 +17,7 @@ import { useWallet } from "./providers/WalletProvider";
 import {
   AppLayout,
   DashboardNavIcon,
+  FaqNavIcon,
   Footer,
   Header,
   HeaderNavItem,
@@ -62,6 +64,7 @@ function AppShell() {
                 {navItem("/markets", "Markets", <MarketsNavIcon />)}
                 {navItem("/dashboard", "Dashboard", <DashboardNavIcon />)}
                 {navItem("/staking", "Staking", <StakingNavIcon />)}
+                {navItem("/faq", "FAQ", <FaqNavIcon />)}
               </div>
             }
             actions={<WalletConnectButton />}
@@ -95,6 +98,7 @@ function AppShell() {
         <Route path="/markets" element={<MarketsPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/staking" element={<StakingPage />} />
+        <Route path="/faq" element={<FaqPage />} />
         <Route path="/asset/:assetId" element={<AssetPage />} />
         {isDev ? <Route path="/ui-kit" element={<UiKitPage />} /> : null}
         {wallet.mode === "real" && wallet.isConnected && wallet.isWrongNetwork ? (

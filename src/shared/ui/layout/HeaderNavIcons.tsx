@@ -68,6 +68,31 @@ export function DashboardNavIcon() {
   );
 }
 
+export function FaqNavIcon() {
+  return (
+    <Icon size={20} viewBox="0 0 20 20">
+      <circle
+        cx="10"
+        cy="10"
+        r="7.6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeOpacity="0.85"
+      />
+      <path
+        d="M7.6 8.1c0-1.4 1.1-2.4 2.5-2.4s2.4 1 2.4 2.3c0 1.2-.7 1.7-1.6 2.3-.7.5-1 .9-1 1.8"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="10" cy="14.5" r="0.95" fill="currentColor" />
+    </Icon>
+  );
+}
+
 export function StakingNavIcon() {
   return (
     <Icon size={20} viewBox="0 0 20 20">
