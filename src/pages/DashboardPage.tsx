@@ -26,10 +26,12 @@ import {
   Section,
   Switch,
   Table,
+  TimeSeriesChart,
   ToastPopup,
   Typography,
   ValueCell,
 } from "../shared/ui";
+import { useAggregatedHistory } from "../features/subgraph";
 import { formatNumber } from "../shared/lib/numberFormat";
 import styles from "./DashboardPage.module.css";
 
@@ -151,6 +153,18 @@ export function DashboardPage() {
   });
   const [hideZeroSupplies, setHideZeroSupplies] = useState(true);
   const [hideZeroBorrows, setHideZeroBorrows] = useState(true);
+  const [protocolChartMetric, setProtocolChartMetric] = useState<"supplied" | "borrowed">(
+    "supplied"
+  );
+  const protocolHistory = useAggregatedHistory(30);
+  const protocolChartSeries = useMemo(
+    () =>
+      (protocolHistory.data ?? []).map((p) => ({
+        date: p.date,
+        value: protocolChartMetric === "supplied" ? p.totalSuppliedUsd : p.totalBorrowedUsd,
+      })),
+    [protocolHistory.data, protocolChartMetric]
+  );
 
   const supplyRows = useMemo<DashboardSupplyRow[]>(() => {
     return marketRows.map((market) => {
@@ -732,6 +746,44 @@ export function DashboardPage() {
             }
           />
         </div>
+      </Section>
+
+      <Section>
+        <Card>
+          <div className={styles.chartHeader}>
+            <Typography as="h4" variant="label" className={styles.chartTitle}>
+              Protocol activity
+            </Typography>
+            <div className={styles.chartTabs}>
+              <button
+                type="button"
+                className={
+                  protocolChartMetric === "supplied" ? styles.chartTabActive : styles.chartTab
+                }
+                onClick={() => setProtocolChartMetric("supplied")}
+              >
+                Total Supplied
+              </button>
+              <button
+                type="button"
+                className={
+                  protocolChartMetric === "borrowed" ? styles.chartTabActive : styles.chartTab
+                }
+                onClick={() => setProtocolChartMetric("borrowed")}
+              >
+                Total Borrowed
+              </button>
+            </div>
+          </div>
+          <TimeSeriesChart
+            data={protocolChartSeries}
+            ariaLabel={`Protocol ${protocolChartMetric} over time`}
+            height={220}
+            valueFormatter={formatUsd}
+            loading={protocolHistory.loading}
+            error={protocolHistory.error ?? undefined}
+          />
+        </Card>
       </Section>
 
       {!wallet.isConnected ? (

@@ -7,6 +7,7 @@ import type { Address } from "../mock";
 declare global {
   interface Window {
     __VELKONIX_APP_NETWORK__?: string;
+    __VELKONIX_MEGAETH_SUBGRAPH_URL__?: string;
   }
 }
 
@@ -40,12 +41,31 @@ export type NetworkConfig = {
   explorerBaseUrl: string;
   viemChain: Chain;
   rpcUrl: string;
+  subgraphUrl?: string;
   deployments: AaveDeploymentConfig;
   assets: AssetConfig[];
 };
 
 const MEGAETH_DEFAULT_RPC_URL = "https://mainnet.megaeth.com/rpc";
 const MEGAETH_EXPLORER_URL = "https://megaeth.blockscout.com";
+
+const getMegaethSubgraphUrl = (): string | undefined => {
+  if (
+    typeof window !== "undefined" &&
+    typeof window.__VELKONIX_MEGAETH_SUBGRAPH_URL__ === "string"
+  ) {
+    const value = window.__VELKONIX_MEGAETH_SUBGRAPH_URL__.trim();
+    if (value.length > 0) return value;
+  }
+  if (
+    typeof process !== "undefined" &&
+    typeof process.env?.VITE_MEGAETH_SUBGRAPH_URL === "string"
+  ) {
+    const value = process.env.VITE_MEGAETH_SUBGRAPH_URL.trim();
+    if (value.length > 0) return value;
+  }
+  return undefined;
+};
 
 export const MEGAETH_MAINNET_CHAIN = defineChain({
   id: 4326,
@@ -71,6 +91,7 @@ const MEGAETH_MAINNET_CONFIG: NetworkConfig = {
   explorerBaseUrl: MEGAETH_EXPLORER_URL,
   viemChain: MEGAETH_MAINNET_CHAIN,
   rpcUrl: MEGAETH_DEFAULT_RPC_URL,
+  subgraphUrl: getMegaethSubgraphUrl(),
   deployments: {
     poolAddressesProvider: "0x4E293100F46889B21a12C5884551FF340AD8d7b9",
     poolProxy: "0x202FC1FEf70C8a7001f1579518e9288A547C12Ee",

@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { useLendingController } from "../features/lending";
+import { useReserveHistory } from "../features/subgraph";
+import { getActiveNetworkConfig } from "../config/networks";
 import {
   ActionButton,
   AmountInput,
@@ -287,13 +289,37 @@ export function AssetPage() {
         : [],
     [asset]
   );
+  const underlyingAsset = useMemo(() => {
+    if (!asset) return undefined;
+    const networkAsset = getActiveNetworkConfig().assets.find((a) => a.id === asset.id);
+    return networkAsset?.address;
+  }, [asset?.id]);
+  const reserveHistory = useReserveHistory(underlyingAsset, 30);
+  const subgraphSupplySeries = useMemo(
+    () => (reserveHistory.data ?? []).map((p) => ({ date: p.date, value: p.supplyApy })),
+    [reserveHistory.data]
+  );
+  const subgraphBorrowSeries = useMemo(
+    () => (reserveHistory.data ?? []).map((p) => ({ date: p.date, value: p.borrowApy })),
+    [reserveHistory.data]
+  );
   const supplyRateSeries = useMemo(
-    () => (asset ? buildSyntheticRateSeries(asset.supplyApy, `${asset.id}-supply`) : []),
-    [asset?.id, asset?.supplyApy]
+    () =>
+      subgraphSupplySeries.length > 0
+        ? subgraphSupplySeries
+        : asset
+          ? buildSyntheticRateSeries(asset.supplyApy, `${asset.id}-supply`)
+          : [],
+    [subgraphSupplySeries, asset?.id, asset?.supplyApy]
   );
   const borrowRateSeries = useMemo(
-    () => (asset ? buildSyntheticRateSeries(asset.borrowApy, `${asset.id}-borrow`) : []),
-    [asset?.id, asset?.borrowApy]
+    () =>
+      subgraphBorrowSeries.length > 0
+        ? subgraphBorrowSeries
+        : asset
+          ? buildSyntheticRateSeries(asset.borrowApy, `${asset.id}-borrow`)
+          : [],
+    [subgraphBorrowSeries, asset?.id, asset?.borrowApy]
   );
   const activeRows = activeInfoTab === "supply" ? supplyRows : borrowRows;
   const activeSeries = activeInfoTab === "supply" ? supplyRateSeries : borrowRateSeries;
