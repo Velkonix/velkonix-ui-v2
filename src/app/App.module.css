@@ -16,11 +16,24 @@
   align-items: flex-end;
 }
 
+.legalLink {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  transition: color 0.18s ease;
+}
+
+.legalLink:hover {
+  color: var(--accent-hover);
+}
+
 .footerLinks {
   display: inline-flex;
   gap: var(--space-3);
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
 }
 
 .iconOnlyFooter {

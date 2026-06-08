@@ -15,11 +15,9 @@ import {
   PageHeader,
   Section,
   Table,
-  TimeSeriesChart,
   ValueCell,
 } from "../shared/ui";
 import { formatNumber } from "../shared/lib/numberFormat";
-import { useAggregatedHistory } from "../features/subgraph";
 import styles from "./MarketsPage.module.css";
 
 type MobileMetricRow = {
@@ -39,16 +37,6 @@ export function MarketsPage() {
   const navigate = useNavigate();
   const { wallet, marketRows, setSort, sortDirection, sortKey, isLoading } = useLendingController();
   const [isMobile, setIsMobile] = useState(false);
-  const [chartMetric, setChartMetric] = useState<"supplied" | "borrowed">("supplied");
-  const aggregatedHistory = useAggregatedHistory(30);
-  const chartSeries = useMemo(
-    () =>
-      (aggregatedHistory.data ?? []).map((p) => ({
-        date: p.date,
-        value: chartMetric === "supplied" ? p.totalSuppliedUsd : p.totalBorrowedUsd,
-      })),
-    [aggregatedHistory.data, chartMetric]
-  );
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -242,35 +230,6 @@ export function MarketsPage() {
             }
           />
         </div>
-      </Section>
-
-      <Section>
-        <Card>
-          <div className={styles.chartHeader}>
-            <button
-              type="button"
-              className={chartMetric === "supplied" ? styles.chartTabActive : styles.chartTab}
-              onClick={() => setChartMetric("supplied")}
-            >
-              Total Supplied
-            </button>
-            <button
-              type="button"
-              className={chartMetric === "borrowed" ? styles.chartTabActive : styles.chartTab}
-              onClick={() => setChartMetric("borrowed")}
-            >
-              Total Borrowed
-            </button>
-          </div>
-          <TimeSeriesChart
-            data={chartSeries}
-            ariaLabel={`${chartMetric === "supplied" ? "Total supplied" : "Total borrowed"} over time`}
-            height={220}
-            valueFormatter={formatUsd}
-            loading={aggregatedHistory.loading}
-            error={aggregatedHistory.error ?? undefined}
-          />
-        </Card>
       </Section>
 
       <Section>

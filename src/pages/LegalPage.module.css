@@ -1,0 +1,51 @@
+.page {
+  display: grid;
+  gap: var(--layout-page-gap);
+}
+
+.pageHeader {
+  margin-bottom: var(--space-2);
+  text-align: center;
+  justify-items: center;
+}
+
+.pageHeader > div {
+  text-align: center;
+}
+
+.content {
+  display: grid;
+  gap: var(--layout-page-gap);
+  max-width: 880px;
+  width: 100%;
+  margin: 0 auto;
+  min-width: 0;
+}
+
+.contentCard {
+  display: grid;
+  gap: var(--space-5);
+  padding: var(--space-5);
+}
+
+.lastUpdated {
+  margin: 0;
+}
+
+.section {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.sectionTitle {
+  margin: 0 0 var(--space-1);
+}
+
+.sectionBody {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.sectionBody p {
+  margin: 0;
+}

@@ -11,7 +11,9 @@ import { DashboardPage } from "../pages/DashboardPage";
 import { FaqPage } from "../pages/FaqPage";
 import { HomePage } from "../pages/HomePage";
 import { MarketsPage } from "../pages/MarketsPage";
+import { PrivacyPage } from "../pages/PrivacyPage";
 import { StakingPage } from "../pages/StakingPage";
+import { TermsPage } from "../pages/TermsPage";
 import { UiKitPage } from "../pages/UiKitPage";
 import { useWallet } from "./providers/WalletProvider";
 import {
@@ -88,6 +90,26 @@ function AppShell() {
               <Link href="https://docs.github.com" target="_blank" rel="noreferrer">
                 <img src={gitbookLogo} alt="GitBook" className={styles.gitbookLogo} />
               </Link>
+              <Link
+                href="/terms"
+                className={styles.legalLink}
+                onClick={(event) => {
+                  event.preventDefault();
+                  navigate("/terms");
+                }}
+              >
+                TERMS
+              </Link>
+              <Link
+                href="/privacy"
+                className={styles.legalLink}
+                onClick={(event) => {
+                  event.preventDefault();
+                  navigate("/privacy");
+                }}
+              >
+                PRIVACY
+              </Link>
             </div>
           }
         />
@@ -99,6 +121,8 @@ function AppShell() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/staking" element={<StakingPage />} />
         <Route path="/faq" element={<FaqPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/asset/:assetId" element={<AssetPage />} />
         {isDev ? <Route path="/ui-kit" element={<UiKitPage />} /> : null}
         {wallet.mode === "real" && wallet.isConnected && wallet.isWrongNetwork ? (
