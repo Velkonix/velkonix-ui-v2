@@ -14,10 +14,9 @@ import {
   PanelHeader,
   PanelHeaderStat,
   Section,
-  Switch,
   Tabs,
-  ToastPopup,
   TxStatus,
+  TxToast,
   Typography,
   ValueCell,
 } from "../shared/ui";
@@ -27,12 +26,12 @@ import styles from "./StakingPage.module.css";
 type StakingTabId = "rewards" | "convert" | "stake" | "unstake" | "exit";
 
 type QueueRow = {
-  id: string;
+  index: number;
   amount: number;
   startDate: number;
   unlockDate: number;
   canExit: boolean;
-  status: "queued" | "ready" | "executed" | "cancelled";
+  status: "queued" | "ready";
 };
 
 const formatAmount = (value: number): string => formatNumber(value);
@@ -47,20 +46,8 @@ const formatDateTime = (value: number): string =>
     minute: "2-digit",
   });
 
-const isFinalQueueStatus = (status: QueueRow["status"]): boolean =>
-  status === "executed" || status === "cancelled";
-
-const getQueueStatusTone = (status: QueueRow["status"]): "pending" | "success" | "failed" => {
-  if (status === "cancelled") {
-    return "failed";
-  }
-
-  if (status === "executed") {
-    return "success";
-  }
-
-  return "pending";
-};
+const getQueueStatusTone = (status: QueueRow["status"]): "pending" | "success" =>
+  status === "ready" ? "success" : "pending";
 
 export function StakingPage() {
   const {
@@ -86,17 +73,14 @@ export function StakingPage() {
   const [stakeAmount, setStakeAmount] = useState("50");
   const [unstakeAmount, setUnstakeAmount] = useState("50");
   const [exitAmount, setExitAmount] = useState("40");
-  const [isInstantExit, setIsInstantExit] = useState(false);
 
-  const parsedExitAmount = Number(exitAmount);
-  const normalizedExitAmount =
-    Number.isFinite(parsedExitAmount) && parsedExitAmount > 0 ? parsedExitAmount : 0;
-  const instantExitLoss = (normalizedExitAmount * stakingState.instantExitPenaltyBps) / 10_000;
+  const penaltyBps = stakingState.instantExitPenaltyBps;
+  const computeInstantLoss = (amount: number): number => (amount * penaltyBps) / 10_000;
 
   const queueRows = useMemo<QueueRow[]>(
     () =>
       queueEntries.map((item) => ({
-        id: item.id,
+        index: item.index,
         amount: item.amount,
         startDate: item.startDate,
         unlockDate: item.unlockDate,
@@ -117,9 +101,13 @@ export function StakingPage() {
       />
 
       {toast ? (
-        <ToastPopup tone={toast.tone} title={toast.title} durationMs={5000} onClose={clearToast}>
-          {toast.message}
-        </ToastPopup>
+        <TxToast
+          tone={toast.tone}
+          title={toast.title}
+          message={toast.message}
+          txUrl={toast.txUrl}
+          onClose={clearToast}
+        />
       ) : null}
       {lastError ? (
         <Typography muted role="status">
@@ -369,32 +357,16 @@ export function StakingPage() {
                     assetLabel="xVELK"
                   />
                   <Typography variant="microcaption" muted>
-                    Queue normal exit or use instant exit with penalty.
+                    Queue an exit request. After the lock you execute it; before the lock you can
+                    instant-exit (−{formatPercent(penaltyBps / 100)} penalty) or cancel it from the
+                    queue below.
                   </Typography>
                   <div className={styles.exitActionRow}>
                     <ActionButton
-                      label={
-                        isInstantExit
-                          ? busyOp === "instantExit"
-                            ? "Exiting..."
-                            : `Loss ${formatAmount(instantExitLoss)} xVELK and Exit`
-                          : busyOp === "requestExit"
-                            ? "Requesting..."
-                            : "Request Exit"
-                      }
-                      variant={isInstantExit ? "danger" : "primary"}
-                      isLoading={
-                        isInstantExit ? busyOp === "instantExit" : busyOp === "requestExit"
-                      }
+                      label={busyOp === "requestExit" ? "Requesting..." : "Request Exit"}
+                      isLoading={busyOp === "requestExit"}
                       disabled={!wallet.isConnected || busyOp !== null}
-                      onClick={() =>
-                        void (isInstantExit ? instantExit(exitAmount) : requestExit(exitAmount))
-                      }
-                    />
-                    <Switch
-                      label="Instant"
-                      checked={isInstantExit}
-                      onChange={(event) => setIsInstantExit(event.target.checked)}
+                      onClick={() => void requestExit(exitAmount)}
                     />
                   </div>
 
@@ -421,11 +393,8 @@ export function StakingPage() {
                     ) : (
                       <ul className={styles.queueCards}>
                         {queueRows.map((row) => {
-                          const showExecuteAction = row.canExit && !isFinalQueueStatus(row.status);
-                          const showCancelAction = !showExecuteAction && row.status === "queued";
-
                           return (
-                            <li key={row.id} className={styles.queueCard}>
+                            <li key={row.index} className={styles.queueCard}>
                               <div className={styles.queueCardHeader}>
                                 <div className={styles.queueCardAmount}>
                                   <Typography as="span" variant="microcaption" muted>
@@ -455,25 +424,32 @@ export function StakingPage() {
                                 </div>
                               </div>
 
-                              {showExecuteAction ? (
+                              {row.canExit ? (
                                 <div className={styles.queueCardAction}>
                                   <ActionButton
                                     label="Execute Exit"
                                     disabled={!wallet.isConnected || busyOp !== null}
-                                    onClick={() => void executeExitFromQueue(row.id)}
+                                    onClick={() => void executeExitFromQueue(row.index)}
                                   />
                                 </div>
-                              ) : null}
-
-                              {showCancelAction ? (
+                              ) : (
                                 <div className={styles.queueCardAction}>
+                                  <ActionButton
+                                    label={`Instant Exit (−${formatAmount(
+                                      computeInstantLoss(row.amount)
+                                    )} xVELK)`}
+                                    variant="danger"
+                                    isLoading={busyOp === "instantExit"}
+                                    disabled={!wallet.isConnected || busyOp !== null}
+                                    onClick={() => void instantExit(row.index)}
+                                  />
                                   <ActionButton
                                     label="Cancel Exit"
                                     disabled={!wallet.isConnected || busyOp !== null}
-                                    onClick={() => void cancelExitRequest(row.id)}
+                                    onClick={() => void cancelExitRequest(row.index)}
                                   />
                                 </div>
-                              ) : null}
+                              )}
                             </li>
                           );
                         })}

@@ -1,4 +1,4 @@
-import type { ApyRewardEntry, UserBorrow, UserSupply } from "../../mock";
+import type { ApyRewardEntry, UserBorrow, UserSupply } from "../../domain/types";
 
 export type LendingPositionSide = "supply" | "borrow";
 

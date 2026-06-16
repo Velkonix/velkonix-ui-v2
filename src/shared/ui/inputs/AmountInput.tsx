@@ -79,6 +79,17 @@ export function AmountInput({
     onMaxClick?.();
   };
 
+  const numericMax = hasMax ? Number(maxValue) : Number.NaN;
+  const canUsePercent = Number.isFinite(numericMax) && numericMax > 0;
+
+  const applyPercent = (fraction: number) => {
+    if (!canUsePercent) {
+      return;
+    }
+    // Trim float noise; MAX stays exact via handleMax.
+    dispatchValueChange(String(Number((numericMax * fraction).toFixed(8))));
+  };
+
   return (
     <div className={classNames(styles.wrapper, className)}>
       {label && (
@@ -126,6 +137,28 @@ export function AmountInput({
           <div className={styles.bottomLeft}>
             <span className={styles.metaText}>{balanceLabel}</span>
             {balanceValue !== undefined && <span className={styles.metaValue}>{balanceValue}</span>}
+            {canUsePercent && (
+              <>
+                <button
+                  type="button"
+                  className={styles.maxButton}
+                  onClick={() => applyPercent(0.25)}
+                  disabled={disabled}
+                  aria-label="Use 25% of balance"
+                >
+                  25%
+                </button>
+                <button
+                  type="button"
+                  className={styles.maxButton}
+                  onClick={() => applyPercent(0.5)}
+                  disabled={disabled}
+                  aria-label="Use 50% of balance"
+                >
+                  50%
+                </button>
+              </>
+            )}
             <button
               type="button"
               className={styles.maxButton}

@@ -156,3 +156,49 @@
     gap: var(--space-1);
   }
 }
+
+.riskBanner {
+  border: 1px solid color-mix(in srgb, var(--error) 55%, transparent);
+  background: color-mix(in srgb, var(--error) 12%, var(--bg-secondary));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.riskBannerTitle {
+  color: var(--error);
+  font-weight: var(--font-weight-semibold);
+}
+
+.healthFactorValue {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+}
+
+.mobilePositionList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.mobilePositionCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  cursor: pointer;
+}
+
+.mobilePositionMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.mobilePositionMetaItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}

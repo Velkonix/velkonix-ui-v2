@@ -4,7 +4,7 @@ import { HomePage } from "../pages/HomePage";
 
 test("renders bootstrap heading", () => {
   render(
-    <WalletProvider mockMode>
+    <WalletProvider>
       <HomePage />
     </WalletProvider>
   );

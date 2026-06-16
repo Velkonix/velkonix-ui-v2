@@ -11,7 +11,8 @@
 .icon {
   width: 28px;
   height: 28px;
-  border-radius: 10px;
+  border-radius: 50%;
+  overflow: hidden;
   background: linear-gradient(180deg, var(--bg-tertiary), var(--bg-secondary));
   display: inline-flex;
   align-items: center;
@@ -19,22 +20,25 @@
   color: var(--text-primary);
   font-size: var(--font-size-sm);
   box-shadow: inset 0 0 0 1px var(--border-subtle);
+  flex-shrink: 0;
 }
 
 .heroIcon {
   width: 54px;
   height: 54px;
-  border-radius: 12px;
 }
 
 .icon img {
-  width: 18px;
-  height: 18px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .heroIcon img {
-  width: 34px;
-  height: 34px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .symbol {

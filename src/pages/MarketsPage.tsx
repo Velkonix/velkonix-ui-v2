@@ -9,11 +9,12 @@ import {
   Card,
   EmptyState,
   Icon,
-  Loader,
+  Input,
   MetricTile,
   PageContainer,
   PageHeader,
   Section,
+  Skeleton,
   Table,
   ValueCell,
 } from "../shared/ui";
@@ -37,6 +38,17 @@ export function MarketsPage() {
   const navigate = useNavigate();
   const { wallet, marketRows, setSort, sortDirection, sortKey, isLoading } = useLendingController();
   const [isMobile, setIsMobile] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const filteredRows = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) {
+      return marketRows;
+    }
+    return marketRows.filter(
+      (row) => row.symbol.toLowerCase().includes(query) || row.name.toLowerCase().includes(query)
+    );
+  }, [marketRows, search]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -233,7 +245,7 @@ export function MarketsPage() {
       </Section>
 
       <Section>
-        {wallet.mode === "real" && wallet.isConnected && wallet.isWrongNetwork ? (
+        {wallet.isConnected && wallet.isWrongNetwork ? (
           <Card>
             <EmptyState
               title="Wrong network"
@@ -242,7 +254,20 @@ export function MarketsPage() {
             <ActionButton label="Switch network" onClick={() => void wallet.switchNetwork()} />
           </Card>
         ) : null}
-        {isLoading ? <Loader fullPage label="Loading markets data..." /> : null}
+        {isLoading ? (
+          <Card>
+            <div className={styles.skeletonList}>
+              {Array.from({ length: 6 }).map((_, index) => (
+                <div key={index} className={styles.skeletonRow}>
+                  <Skeleton width={32} height={32} className={styles.skeletonAvatar} />
+                  <Skeleton width="40%" height={14} />
+                  <Skeleton width="20%" height={14} />
+                  <Skeleton width="20%" height={14} />
+                </div>
+              ))}
+            </div>
+          </Card>
+        ) : null}
         {!isLoading ? (
           <>
             {marketRows.length === 0 ? (
@@ -252,88 +277,128 @@ export function MarketsPage() {
                   description="Try again after data provider is ready."
                 />
               </Card>
-            ) : isMobile ? (
-              <div className={styles.mobileList}>
-                {marketRows.map((row) => (
-                  <Card
-                    key={row.id}
-                    className={styles.mobileAssetPanel}
-                    onClick={() => navigate(`/asset/${row.id}`)}
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter" || event.key === " ") {
-                        event.preventDefault();
-                        navigate(`/asset/${row.id}`);
-                      }
-                    }}
-                    role="button"
-                    tabIndex={0}
-                  >
-                    <div className={styles.mobileAssetHeader}>
-                      <AssetCell symbol={row.symbol} name={row.name} />
-                    </div>
-                    {renderMobileMetricsTable(row)}
-                  </Card>
-                ))}
-              </div>
             ) : (
-              <Card>
-                <Table
-                  columns={[
-                    {
-                      key: "asset",
-                      title: titleButton("Asset", "asset"),
-                      render: (row) => <AssetCell symbol={row.symbol} name={row.name} />,
-                    },
-                    {
-                      key: "totalSupplied",
-                      title: titleButton("Total Supplied", "totalSupplied"),
-                      align: "right",
-                      render: (row) =>
-                        renderDualAmount(row.totalSupplied, row.totalSuppliedUsd, row.symbol),
-                    },
-                    {
-                      key: "supplyApy",
-                      title: titleButton("Supply APY", "supplyApy"),
-                      align: "right",
-                      render: (row) => (
-                        <ApyWithDetails {...getApyDetails(row, "supply")} stopPropagation />
-                      ),
-                    },
-                    {
-                      key: "totalBorrowed",
-                      title: titleButton("Total Borrowed", "totalBorrowed"),
-                      align: "right",
-                      render: (row) =>
-                        renderDualAmount(row.totalBorrowed, row.totalBorrowedUsd, row.symbol),
-                    },
-                    {
-                      key: "borrowApy",
-                      title: titleButton("Borrow APY", "borrowApy"),
-                      align: "right",
-                      render: (row) => (
-                        <ApyWithDetails {...getApyDetails(row, "borrow")} stopPropagation />
-                      ),
-                    },
-                    {
-                      key: "details",
-                      title: "",
-                      align: "right",
-                      render: (row) => (
-                        <ActionButton
-                          label="Details"
-                          size="sm"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            navigate(`/asset/${row.id}`);
-                          }}
+              <>
+                <div className={styles.searchToolbar}>
+                  <Input
+                    value={search}
+                    onChange={(event) => setSearch(event.target.value)}
+                    placeholder="Search by symbol or name"
+                    aria-label="Search assets"
+                    suffix={
+                      <Icon size={16} aria-hidden="true">
+                        <circle
+                          cx="9"
+                          cy="9"
+                          r="6"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.6"
                         />
-                      ),
-                    },
-                  ]}
-                  rows={marketRows}
-                  getRowKey={(row) => row.id}
-                />
-              </Card>
+                        <line
+                          x1="13.5"
+                          y1="13.5"
+                          x2="17"
+                          y2="17"
+                          stroke="currentColor"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                        />
+                      </Icon>
+                    }
+                  />
+                </div>
+                {filteredRows.length === 0 ? (
+                  <Card>
+                    <EmptyState
+                      title="No assets match"
+                      description={`Nothing found for "${search}".`}
+                    />
+                  </Card>
+                ) : isMobile ? (
+                  <div className={styles.mobileList}>
+                    {filteredRows.map((row) => (
+                      <Card
+                        key={row.id}
+                        className={styles.mobileAssetPanel}
+                        onClick={() => navigate(`/asset/${row.id}`)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            navigate(`/asset/${row.id}`);
+                          }
+                        }}
+                        role="button"
+                        tabIndex={0}
+                      >
+                        <div className={styles.mobileAssetHeader}>
+                          <AssetCell symbol={row.symbol} name={row.name} />
+                        </div>
+                        {renderMobileMetricsTable(row)}
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <Card>
+                    <Table
+                      columns={[
+                        {
+                          key: "asset",
+                          title: titleButton("Asset", "asset"),
+                          render: (row) => <AssetCell symbol={row.symbol} name={row.name} />,
+                        },
+                        {
+                          key: "totalSupplied",
+                          title: titleButton("Total Supplied", "totalSupplied"),
+                          align: "right",
+                          render: (row) =>
+                            renderDualAmount(row.totalSupplied, row.totalSuppliedUsd, row.symbol),
+                        },
+                        {
+                          key: "supplyApy",
+                          title: titleButton("Supply APY", "supplyApy"),
+                          align: "right",
+                          render: (row) => (
+                            <ApyWithDetails {...getApyDetails(row, "supply")} stopPropagation />
+                          ),
+                        },
+                        {
+                          key: "totalBorrowed",
+                          title: titleButton("Total Borrowed", "totalBorrowed"),
+                          align: "right",
+                          render: (row) =>
+                            renderDualAmount(row.totalBorrowed, row.totalBorrowedUsd, row.symbol),
+                        },
+                        {
+                          key: "borrowApy",
+                          title: titleButton("Borrow APY", "borrowApy"),
+                          align: "right",
+                          render: (row) => (
+                            <ApyWithDetails {...getApyDetails(row, "borrow")} stopPropagation />
+                          ),
+                        },
+                        {
+                          key: "details",
+                          title: "",
+                          align: "right",
+                          render: (row) => (
+                            <ActionButton
+                              label="Details"
+                              size="sm"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                navigate(`/asset/${row.id}`);
+                              }}
+                            />
+                          ),
+                        },
+                      ]}
+                      rows={filteredRows}
+                      getRowKey={(row) => row.id}
+                    />
+                  </Card>
+                )}
+              </>
             )}
           </>
         ) : null}

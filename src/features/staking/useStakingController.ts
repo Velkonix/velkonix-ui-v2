@@ -1,14 +1,39 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPublicClient, http, maxUint256, parseUnits } from "viem";
+import type { Address, PublicClient } from "viem";
 
-import { useMockEngine } from "../../app/providers/MockEngineProvider";
+import { getActiveNetworkConfig, isStakingConfigured } from "../../config/networks";
 import { useWallet } from "../../app/providers/WalletProvider";
-import type { Address, MockExitQueueItem, MockTxResult, StakingState, Tx } from "../../mock";
+import type { ExitQueueItem, StakingState } from "../../domain/types";
+import { loadStakingState, type StakingSnapshot } from "./loadStakingState";
+import { REWARDS_DISTRIBUTOR_ABI, STAKING_ABI, STAKING_TOKEN_ABI } from "./stakingAbis";
 
-const POLL_INTERVAL_MS = 250;
+const ONCHAIN_POLL_INTERVAL_MS = 15_000;
+const USER_REJECTED_REQUEST_MESSAGE = "User rejected the request.";
 
-const parseAmount = (value: string): number => {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : 0;
+const networkConfig = getActiveNetworkConfig();
+const readClient: PublicClient = createPublicClient({
+  chain: networkConfig.viemChain,
+  transport: http(networkConfig.rpcUrl),
+});
+
+const EMPTY_STAKING_STATE: StakingState = {
+  velkBalance: 0,
+  staked: 0,
+  rewards: 0,
+  apr: 0,
+  pendingRebase: 0,
+  instantExitPenaltyBps: 0,
+  exitQueue: [],
+};
+
+export type StakingQueueEntry = {
+  index: number;
+  amount: number;
+  startDate: number; // ms
+  unlockDate: number; // ms
+  canExit: boolean;
+  status: "queued" | "ready";
 };
 
 type OperationName =
@@ -17,7 +42,6 @@ type OperationName =
   | "unstakeFromRewards"
   | "claimStakingRewards"
   | "instantExit"
-  | "vestingExit"
   | "requestExit"
   | "executeExitFromQueue"
   | "cancelExitRequest";
@@ -28,67 +52,112 @@ type ToastState = {
   tone: ToastTone;
   title: string;
   message: string;
+  txUrl?: string;
+};
+
+const parseAmount = (value: string): number => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+};
+
+const isUserRejectedRequestError = (message: string): boolean =>
+  message.toLowerCase().includes(USER_REJECTED_REQUEST_MESSAGE.toLowerCase()) ||
+  message.toLowerCase().includes("user rejected") ||
+  message.toLowerCase().includes("user denied");
+
+const toStakingError = (error: unknown): string => {
+  if (error instanceof Error) {
+    const shortMessage = (error as { shortMessage?: string }).shortMessage;
+    return shortMessage ?? error.message;
+  }
+  return typeof error === "string" ? error : "UNKNOWN_ERROR";
 };
 
 export function useStakingController() {
-  const engine = useMockEngine();
   const wallet = useWallet();
   const user = (wallet.address as Address | null) ?? null;
 
-  const [renderTick, setRenderTick] = useState(0);
+  const [snapshot, setSnapshot] = useState<StakingSnapshot | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [busyOp, setBusyOp] = useState<OperationName | null>(null);
   const [lastError, setLastError] = useState<string | null>(null);
   const [toast, setToast] = useState<ToastState | null>(null);
-  const [txIds, setTxIds] = useState<string[]>([]);
+  const [, setTxIds] = useState<string[]>([]);
+
+  const configured = isStakingConfigured();
+  const loadSeq = useRef(0);
+
+  const loadState = useCallback(async () => {
+    if (!configured) {
+      setSnapshot(null);
+      setLoadError("STAKING_NOT_CONFIGURED");
+      return;
+    }
+    const seq = ++loadSeq.current;
+    try {
+      const next = await loadStakingState({
+        publicClient: readClient,
+        network: networkConfig,
+        user,
+      });
+      if (seq === loadSeq.current) {
+        setSnapshot(next);
+        setLoadError(null);
+      }
+    } catch (error) {
+      if (seq === loadSeq.current) {
+        setLoadError(toStakingError(error));
+      }
+    }
+  }, [configured, user]);
 
   useEffect(() => {
+    void loadState();
+    if (!configured) {
+      return;
+    }
     const timer = setInterval(() => {
-      setRenderTick((value) => value + 1);
-    }, POLL_INTERVAL_MS);
+      void loadState();
+    }, ONCHAIN_POLL_INTERVAL_MS);
     return () => clearInterval(timer);
-  }, []);
+  }, [configured, loadState]);
 
-  const stakingState = useMemo<StakingState>(
-    () =>
-      user
-        ? engine.selectors.getStakingState(user)
-        : {
-            velkBalance: 0,
-            staked: 0,
-            rewards: 0,
-            apr: 0,
-            pendingRebase: 0,
-            instantExitPenaltyBps: 0,
-            exitQueue: [],
-          },
-    [engine, renderTick, user]
-  );
+  const stakingState = useMemo<StakingState>(() => {
+    if (!snapshot) {
+      return EMPTY_STAKING_STATE;
+    }
+    const exitQueue: ExitQueueItem[] = snapshot.exitQueue.map((entry) => ({
+      startDate: entry.exitInitiatedAt * 1000,
+      amount: entry.amount,
+      canExit: entry.canExit,
+    }));
+    return {
+      velkBalance: snapshot.velkBalance,
+      staked: snapshot.stakedAmount,
+      rewards: snapshot.pendingRewards,
+      apr: snapshot.aprEstimate,
+      pendingRebase: 0,
+      instantExitPenaltyBps: snapshot.instantExitPenaltyBps,
+      exitQueue,
+    };
+  }, [snapshot]);
 
-  const queueEntries = useMemo<MockExitQueueItem[]>(
-    () =>
-      user
-        ? engine.selectors
-            .getExitQueueEntries(user)
-            .filter((item) => item.status === "queued" || item.status === "ready")
-            .map((item) => ({
-              ...item,
-              canExit: item.status === "ready" || Date.now() >= item.unlockDate,
-            }))
-        : [],
-    [engine, renderTick, user]
-  );
-
-  const recentTxs = useMemo<Tx[]>(
-    () =>
-      txIds
-        .map((id) => engine.selectors.getTx(id))
-        .filter((tx): tx is NonNullable<typeof tx> => tx !== null)
-        .slice(0, 8),
-    [engine, txIds, renderTick]
-  );
+  const queueEntries = useMemo<StakingQueueEntry[]>(() => {
+    if (!snapshot) {
+      return [];
+    }
+    return snapshot.exitQueue.map((entry) => ({
+      index: entry.index,
+      amount: entry.amount,
+      startDate: entry.exitInitiatedAt * 1000,
+      unlockDate: entry.unlockAt * 1000,
+      canExit: entry.canExit,
+      status: entry.canExit ? "ready" : "queued",
+    }));
+  }, [snapshot]);
 
   const runOperation = useCallback(
-    async (opName: OperationName, operation: () => Promise<MockTxResult>) => {
+    async (opName: OperationName, operation: () => Promise<`0x${string}`>) => {
       if (!user) {
         setLastError("WALLET_NOT_CONNECTED");
         setToast({
@@ -98,110 +167,233 @@ export function useStakingController() {
         });
         return;
       }
+      if (!configured) {
+        setLastError("STAKING_NOT_CONFIGURED");
+        setToast({
+          tone: "error",
+          title: "Staking unavailable",
+          message: "Staking contracts are not configured for this network yet.",
+        });
+        return;
+      }
+      if (wallet.isWrongNetwork) {
+        setLastError("WRONG_NETWORK");
+        setToast({
+          tone: "error",
+          title: "Wrong network",
+          message: `Switch to ${networkConfig.label} to continue.`,
+        });
+        return;
+      }
+      if (!wallet.publicClient || !wallet.walletClient) {
+        setLastError("WALLET_CLIENT_UNAVAILABLE");
+        setToast({
+          tone: "error",
+          title: "Wallet unavailable",
+          message: "Reconnect wallet and try again.",
+        });
+        return;
+      }
 
       setBusyOp(opName);
       setLastError(null);
       setToast(null);
-      const before = new Set(engine.selectors.getTxPool().map((tx) => tx.id));
-      const operationPromise = operation();
-      const createdTx = engine.selectors.getTxPool().find((tx) => !before.has(tx.id));
-      if (createdTx) {
-        setTxIds((prev) => [createdTx.id, ...prev.filter((id) => id !== createdTx.id)]);
-      }
-
-      const result = await operationPromise;
-      setTxIds((prev) => [result.txId, ...prev.filter((id) => id !== result.txId)]);
-      if (result.status === "failed") {
-        const errorCode = result.error ?? "UNKNOWN_ERROR";
+      try {
+        const hash = await operation();
+        setTxIds((prev) => [hash, ...prev.filter((id) => id !== hash)]);
+        const txUrl = `${networkConfig.explorerBaseUrl}/tx/${hash}`;
+        setToast({
+          tone: "info",
+          title: `${opName.toUpperCase()} pending`,
+          message: "Transaction submitted — confirming on-chain…",
+          txUrl,
+        });
+        await wallet.publicClient.waitForTransactionReceipt({ hash });
+        setToast({
+          tone: "success",
+          title: `${opName.toUpperCase()} success`,
+          message: "Transaction confirmed.",
+          txUrl,
+        });
+        void loadState();
+      } catch (error) {
+        const errorCode = toStakingError(error);
+        if (isUserRejectedRequestError(errorCode)) {
+          setLastError(null);
+          setToast(null);
+          return;
+        }
         setLastError(errorCode);
         setToast({
           tone: "error",
           title: `${opName.toUpperCase()} failed`,
           message: errorCode,
         });
-      } else {
-        setToast({
-          tone: "success",
-          title: `${opName.toUpperCase()} success`,
-          message: `Transaction ${result.txId} completed successfully.`,
-        });
+      } finally {
+        setBusyOp(null);
       }
-      setBusyOp(null);
     },
-    [engine, user]
+    [configured, loadState, user, wallet]
+  );
+
+  const writeTx = useCallback(
+    async (
+      address: Address,
+      abi: typeof STAKING_ABI | typeof REWARDS_DISTRIBUTOR_ABI | typeof STAKING_TOKEN_ABI,
+      functionName: string,
+      args: readonly unknown[]
+    ): Promise<`0x${string}`> => {
+      if (!wallet.walletClient || !wallet.publicClient || !user) {
+        throw new Error("WALLET_NOT_READY");
+      }
+      const { request } = await wallet.publicClient.simulateContract({
+        account: user,
+        address,
+        abi,
+        functionName,
+        args,
+      } as never);
+      return wallet.walletClient.writeContract(request as never);
+    },
+    [user, wallet.publicClient, wallet.walletClient]
+  );
+
+  const ensureAllowance = useCallback(
+    async (
+      token: Address,
+      spender: Address,
+      currentAllowance: number,
+      neededAmount: number
+    ): Promise<void> => {
+      if (currentAllowance >= neededAmount) {
+        return;
+      }
+      if (!wallet.walletClient || !wallet.publicClient || !user) {
+        throw new Error("WALLET_NOT_READY");
+      }
+      const { request } = await wallet.publicClient.simulateContract({
+        account: user,
+        address: token,
+        abi: STAKING_TOKEN_ABI,
+        functionName: "approve",
+        args: [spender, maxUint256],
+      });
+      const hash = await wallet.walletClient.writeContract(request);
+      await wallet.publicClient.waitForTransactionReceipt({ hash });
+    },
+    [user, wallet.publicClient, wallet.walletClient]
   );
 
   const convert = useCallback(
     async (amountText: string) => {
-      await runOperation("convert", () =>
-        engine.staking.convert(user as Address, parseAmount(amountText))
-      );
+      const amount = parseAmount(amountText);
+      if (amount <= 0 || !snapshot) return;
+      await runOperation("convert", async () => {
+        const value = parseUnits(amountText, snapshot.velkDecimals);
+        await ensureAllowance(
+          networkConfig.staking.velk as Address,
+          networkConfig.staking.staking as Address,
+          snapshot.velkAllowanceToStaking,
+          amount
+        );
+        return writeTx(networkConfig.staking.staking as Address, STAKING_ABI, "stake", [value]);
+      });
     },
-    [engine.staking, runOperation, user]
+    [ensureAllowance, runOperation, snapshot, writeTx]
   );
 
   const stakeToRewards = useCallback(
     async (amountText: string) => {
-      await runOperation("stakeToRewards", () =>
-        engine.staking.stakeToRewards(user as Address, parseAmount(amountText))
-      );
+      const amount = parseAmount(amountText);
+      if (amount <= 0 || !snapshot) return;
+      await runOperation("stakeToRewards", async () => {
+        const value = parseUnits(amountText, snapshot.xvelkDecimals);
+        await ensureAllowance(
+          networkConfig.staking.xvelk as Address,
+          networkConfig.staking.rewardsDistributor as Address,
+          snapshot.xvelkAllowanceToRewards,
+          amount
+        );
+        return writeTx(
+          networkConfig.staking.rewardsDistributor as Address,
+          REWARDS_DISTRIBUTOR_ABI,
+          "deposit",
+          [value]
+        );
+      });
     },
-    [engine.staking, runOperation, user]
+    [ensureAllowance, runOperation, snapshot, writeTx]
   );
 
   const unstakeFromRewards = useCallback(
     async (amountText: string) => {
-      await runOperation("unstakeFromRewards", () =>
-        engine.staking.unstakeFromRewards(user as Address, parseAmount(amountText))
-      );
+      if (parseAmount(amountText) <= 0 || !snapshot) return;
+      await runOperation("unstakeFromRewards", () => {
+        const value = parseUnits(amountText, snapshot.xvelkDecimals);
+        return writeTx(
+          networkConfig.staking.rewardsDistributor as Address,
+          REWARDS_DISTRIBUTOR_ABI,
+          "withdraw",
+          [value]
+        );
+      });
     },
-    [engine.staking, runOperation, user]
+    [runOperation, snapshot, writeTx]
   );
 
   const claimStakingRewards = useCallback(async () => {
     await runOperation("claimStakingRewards", () =>
-      engine.staking.claimStakingRewards(user as Address)
+      writeTx(
+        networkConfig.staking.rewardsDistributor as Address,
+        REWARDS_DISTRIBUTOR_ABI,
+        "claim",
+        []
+      )
     );
-  }, [engine.staking, runOperation, user]);
-
-  const instantExit = useCallback(
-    async (amountText: string) => {
-      await runOperation("instantExit", () =>
-        engine.staking.instantExit(user as Address, parseAmount(amountText))
-      );
-    },
-    [engine.staking, runOperation, user]
-  );
-
-  const vestingExit = useCallback(async () => {
-    await runOperation("vestingExit", () => engine.staking.vestingExit(user as Address));
-  }, [engine.staking, runOperation, user]);
+  }, [runOperation, writeTx]);
 
   const requestExit = useCallback(
     async (amountText: string) => {
-      await runOperation("requestExit", () =>
-        engine.staking.requestExit(user as Address, parseAmount(amountText))
-      );
+      if (parseAmount(amountText) <= 0 || !snapshot) return;
+      await runOperation("requestExit", () => {
+        const value = parseUnits(amountText, snapshot.xvelkDecimals);
+        return writeTx(networkConfig.staking.staking as Address, STAKING_ABI, "initiateExit", [
+          value,
+        ]);
+      });
     },
-    [engine.staking, runOperation, user]
+    [runOperation, snapshot, writeTx]
   );
 
   const executeExitFromQueue = useCallback(
-    async (queueItemId: string) => {
+    async (index: number) => {
       await runOperation("executeExitFromQueue", () =>
-        engine.staking.executeExitFromQueue(user as Address, queueItemId)
+        writeTx(networkConfig.staking.staking as Address, STAKING_ABI, "exit", [BigInt(index)])
       );
     },
-    [engine.staking, runOperation, user]
+    [runOperation, writeTx]
+  );
+
+  const instantExit = useCallback(
+    async (index: number) => {
+      await runOperation("instantExit", () =>
+        writeTx(networkConfig.staking.staking as Address, STAKING_ABI, "instantExit", [
+          BigInt(index),
+        ])
+      );
+    },
+    [runOperation, writeTx]
   );
 
   const cancelExitRequest = useCallback(
-    async (queueItemId: string) => {
+    async (index: number) => {
       await runOperation("cancelExitRequest", () =>
-        engine.staking.cancelExitRequest(user as Address, queueItemId)
+        writeTx(networkConfig.staking.staking as Address, STAKING_ABI, "cancelExit", [
+          BigInt(index),
+        ])
       );
     },
-    [engine.staking, runOperation, user]
+    [runOperation, writeTx]
   );
 
   return {
@@ -209,16 +401,17 @@ export function useStakingController() {
     user,
     busyOp,
     lastError,
+    loadError,
     toast,
+    configured,
+    snapshot,
     stakingState,
     queueEntries,
-    recentTxs,
     convert,
     stakeToRewards,
     unstakeFromRewards,
     claimStakingRewards,
     instantExit,
-    vestingExit,
     requestExit,
     executeExitFromQueue,
     cancelExitRequest,

@@ -3,10 +3,7 @@ import type { PublicClient, WalletClient } from "viem";
 
 import { formatWalletAddress, type WalletAddress } from "../../shared/lib/wallet";
 
-export type WalletMode = "mock" | "real";
-
 export type WalletContextValue = {
-  mode: WalletMode;
   address: WalletAddress | null;
   shortAddress: string | null;
   isConnected: boolean;
@@ -19,10 +16,10 @@ export type WalletContextValue = {
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
   switchNetwork: () => Promise<void>;
+  openAccountModal?: () => void;
 };
 
 export const createWalletContextValue = (
-  mode: WalletMode,
   address: WalletAddress | null,
   isConnecting: boolean,
   chainId: number | null,
@@ -32,9 +29,9 @@ export const createWalletContextValue = (
   walletClient: WalletClient | null,
   connect: () => Promise<void>,
   disconnect: () => Promise<void>,
-  switchNetwork: () => Promise<void>
+  switchNetwork: () => Promise<void>,
+  openAccountModal?: () => void
 ): WalletContextValue => ({
-  mode,
   address,
   shortAddress: formatWalletAddress(address),
   isConnected: address !== null,
@@ -47,6 +44,7 @@ export const createWalletContextValue = (
   connect,
   disconnect,
   switchNetwork,
+  openAccountModal,
 });
 
 export const WalletContext = createContext<WalletContextValue | null>(null);

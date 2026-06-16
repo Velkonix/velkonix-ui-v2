@@ -120,6 +120,47 @@ export const POOL_ABI = [
   },
 ] as const;
 
+export const LENDING_ERROR_ABI = [
+  {
+    type: "error",
+    name: "ERC20InsufficientBalance",
+    inputs: [
+      { name: "sender", type: "address" },
+      { name: "balance", type: "uint256" },
+      { name: "needed", type: "uint256" },
+    ],
+  },
+  {
+    type: "error",
+    name: "ERC20InsufficientAllowance",
+    inputs: [
+      { name: "spender", type: "address" },
+      { name: "allowance", type: "uint256" },
+      { name: "needed", type: "uint256" },
+    ],
+  },
+  {
+    type: "error",
+    name: "ERC20InvalidApprover",
+    inputs: [{ name: "approver", type: "address" }],
+  },
+  {
+    type: "error",
+    name: "ERC20InvalidSpender",
+    inputs: [{ name: "spender", type: "address" }],
+  },
+  {
+    type: "error",
+    name: "ERC20InvalidReceiver",
+    inputs: [{ name: "receiver", type: "address" }],
+  },
+  {
+    type: "error",
+    name: "ERC20InvalidSender",
+    inputs: [{ name: "sender", type: "address" }],
+  },
+] as const;
+
 export const AAVE_DATA_PROVIDER_ABI = [
   {
     type: "function",

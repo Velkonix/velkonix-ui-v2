@@ -36,7 +36,17 @@ export function WalletConnectButton({
       <Button
         className={`${styles.button} ${className ?? ""}`}
         variant="secondary"
-        disabled
+        disabled={disabled || wallet.isConnecting}
+        isLoading={wallet.isConnecting}
+        title={wallet.openAccountModal ? "Account" : "Disconnect wallet"}
+        aria-label={`${wallet.shortAddress ?? "Wallet"} — account options`}
+        onClick={async () => {
+          if (wallet.openAccountModal) {
+            wallet.openAccountModal();
+            return;
+          }
+          await wallet.disconnect();
+        }}
         {...props}
       >
         {wallet.shortAddress ?? wallet.address ?? "Wallet connected"}

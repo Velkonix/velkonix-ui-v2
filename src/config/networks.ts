@@ -2,7 +2,7 @@ import { defineChain } from "viem";
 import { arbitrumSepolia } from "viem/chains";
 import type { Chain } from "viem";
 
-import type { Address } from "../mock";
+import type { Address } from "../domain/types";
 
 declare global {
   interface Window {
@@ -34,6 +34,15 @@ export type AaveDeploymentConfig = {
   factoryCommit?: string;
 };
 
+// Velkonix staking stack. Fill in once the contracts are deployed; empty string
+// means "not configured" and is reported by validateActiveStakingConfig().
+export type StakingDeploymentConfig = {
+  staking: Address | "";
+  rewardsDistributor: Address | "";
+  velk: Address | "";
+  xvelk: Address | "";
+};
+
 export type NetworkConfig = {
   key: SupportedNetwork;
   label: string;
@@ -43,11 +52,14 @@ export type NetworkConfig = {
   rpcUrl: string;
   subgraphUrl?: string;
   deployments: AaveDeploymentConfig;
+  staking: StakingDeploymentConfig;
   assets: AssetConfig[];
 };
 
 const MEGAETH_DEFAULT_RPC_URL = "https://mainnet.megaeth.com/rpc";
 const MEGAETH_EXPLORER_URL = "https://megaeth.blockscout.com";
+const MEGAETH_DEFAULT_SUBGRAPH_URL =
+  "https://api.goldsky.com/api/public/project_cmq51h6qmx8qq01rehav1eu2o/subgraphs/velkonix-v3-megaeth/1.0.0/gn";
 
 const getMegaethSubgraphUrl = (): string | undefined => {
   if (
@@ -64,7 +76,7 @@ const getMegaethSubgraphUrl = (): string | undefined => {
     const value = process.env.VITE_MEGAETH_SUBGRAPH_URL.trim();
     if (value.length > 0) return value;
   }
-  return undefined;
+  return MEGAETH_DEFAULT_SUBGRAPH_URL;
 };
 
 export const MEGAETH_MAINNET_CHAIN = defineChain({
@@ -101,6 +113,13 @@ const MEGAETH_MAINNET_CONFIG: NetworkConfig = {
     uiPoolDataProvider: "0x4f9ba5CaE0e3F651821283EC4e303fE8D1dA542a",
     uiIncentiveDataProvider: "0x80Efb6394E142F778cdD7F59b6Ee484B5a6299EB",
     walletBalanceProvider: "0xE53969561603a9052E3F579b2992C12F3C783496",
+  },
+  staking: {
+    // TODO: fill in after deploying the Velkonix staking stack on MegaETH.
+    staking: "",
+    rewardsDistributor: "",
+    velk: "",
+    xvelk: "",
   },
   assets: [
     {
@@ -171,6 +190,12 @@ const ARBITRUM_SEPOLIA_CONFIG: NetworkConfig = {
     walletBalanceProvider: "0x6283343DAba7e0d967116888849d62c50570F810",
     factoryCommit: "5c2eb37f39959dd491ba97fdc2af94bb4ee88f41",
   },
+  staking: {
+    staking: "",
+    rewardsDistributor: "",
+    velk: "",
+    xvelk: "",
+  },
   assets: [],
 };
 
@@ -235,3 +260,15 @@ export const validateActiveNetworkConfig = (): string[] => {
   }
   return missing;
 };
+
+export const validateActiveStakingConfig = (): string[] => {
+  const missing: string[] = [];
+  const { staking } = ACTIVE_NETWORK_CONFIG;
+  if (!staking.staking) missing.push("staking");
+  if (!staking.rewardsDistributor) missing.push("rewardsDistributor");
+  if (!staking.velk) missing.push("velk");
+  if (!staking.xvelk) missing.push("xvelk");
+  return missing;
+};
+
+export const isStakingConfigured = (): boolean => validateActiveStakingConfig().length === 0;

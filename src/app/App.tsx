@@ -125,7 +125,7 @@ function AppShell() {
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/asset/:assetId" element={<AssetPage />} />
         {isDev ? <Route path="/ui-kit" element={<UiKitPage />} /> : null}
-        {wallet.mode === "real" && wallet.isConnected && wallet.isWrongNetwork ? (
+        {wallet.isConnected && wallet.isWrongNetwork ? (
           <Route path="*" element={<Navigate to="/markets" replace />} />
         ) : null}
         <Route path="*" element={<Navigate to="/" replace />} />

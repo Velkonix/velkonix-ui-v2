@@ -12,12 +12,14 @@ export { Skeleton } from "./feedback/Skeleton";
 export { Spinner } from "./feedback/Spinner";
 export { Toast } from "./feedback/Toast";
 export { ToastPopup } from "./feedback/ToastPopup";
+export { TxToast } from "./feedback/TxToast";
 export { Tooltip } from "./feedback/Tooltip";
 
 export { ApyCell } from "./data-display/ApyCell";
 export { ApyWithDetails } from "./data-display/ApyWithDetails";
 export { AssetCell } from "./data-display/AssetCell";
 export { Card } from "./data-display/Card";
+export { HealthFactorBar } from "./data-display/HealthFactorBar";
 export { InfoTableCard } from "./data-display/InfoTableCard";
 export { MetricText } from "./data-display/MetricText";
 export { MetricTile } from "./data-display/MetricTile";

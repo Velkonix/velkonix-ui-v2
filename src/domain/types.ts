@@ -79,37 +79,8 @@ export interface Tx {
   status: "pending" | "success" | "failed";
 }
 
-export interface MockTxOptions {
-  op: string;
-  user: Address;
-  assetId?: AssetId;
-  amount?: number;
-}
-
-export interface MockTxResult {
+export interface TxResult {
   txId: string;
   status: "pending" | "success" | "failed";
   error?: string;
-}
-
-export interface LendingMockApi {
-  approve(user: Address, assetId: AssetId, amount: number): Promise<MockTxResult>;
-  supply(user: Address, assetId: AssetId, amount: number): Promise<MockTxResult>;
-  withdraw(user: Address, assetId: AssetId, amount: number): Promise<MockTxResult>;
-  borrow(user: Address, assetId: AssetId, amount: number): Promise<MockTxResult>;
-  repay(user: Address, assetId: AssetId, amount: number): Promise<MockTxResult>;
-  setCollateral(user: Address, assetId: AssetId, enabled: boolean): Promise<MockTxResult>;
-  claimLendingRewards(user: Address): Promise<MockTxResult>;
-}
-
-export interface StakingMockApi {
-  convert(user: Address, amount: number): Promise<MockTxResult>;
-  stakeToRewards(user: Address, amount: number): Promise<MockTxResult>;
-  unstakeFromRewards(user: Address, amount: number): Promise<MockTxResult>;
-  claimStakingRewards(user: Address): Promise<MockTxResult>;
-  instantExit(user: Address, amount: number): Promise<MockTxResult>;
-  vestingExit(user: Address): Promise<MockTxResult>;
-  requestExit(user: Address, amount: number): Promise<MockTxResult>;
-  executeExitFromQueue(user: Address, queueItemId: string): Promise<MockTxResult>;
-  cancelExitRequest(user: Address, queueItemId: string): Promise<MockTxResult>;
 }

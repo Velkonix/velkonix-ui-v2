@@ -10,6 +10,7 @@ import {
   BackButton,
   Card,
   Divider,
+  EmptyState,
   ErrorState,
   Loader,
   Modal,
@@ -20,7 +21,7 @@ import {
   Table,
   Tabs,
   TimeSeriesChart,
-  ToastPopup,
+  TxToast,
   Typography,
   ValueCell,
   WideSwitch,
@@ -49,17 +50,9 @@ const formatPercent = (value: number): string =>
   `${formatNumber(value, { decimals: 2, compact: false })}%`;
 const formatInputAmount = (value: number): string =>
   formatNumber(value, { compact: false, useGrouping: false });
-const RATE_SERIES_LENGTH = 120;
-const DAY_MS = 24 * 60 * 60 * 1000;
 const HEALTH_FACTOR_SAFE_THRESHOLD = 3;
 const HEALTH_FACTOR_RISK_CONFIRMATION_THRESHOLD = 1.5;
 const HEALTH_FACTOR_LIQUIDATION_THRESHOLD = 1;
-
-const seedFromString = (value: string): number =>
-  Array.from(value).reduce(
-    (accumulator, char, index) => accumulator + char.charCodeAt(0) * (index + 1),
-    0
-  );
 
 const clamp = (value: number, min: number, max: number): number =>
   Math.min(max, Math.max(min, value));
@@ -82,25 +75,6 @@ const getHealthFactorTextStyle = (value: number): CSSProperties => {
   );
   const hue = Math.round(normalized * 120);
   return { color: `hsl(${hue} 78% 58%)` };
-};
-
-const buildSyntheticRateSeries = (
-  baseRate: number,
-  seedKey: string
-): Array<{ date: number; value: number }> => {
-  const seed = seedFromString(seedKey);
-  const now = Date.now();
-  return Array.from({ length: RATE_SERIES_LENGTH }, (_, index) => {
-    const progress = index / Math.max(1, RATE_SERIES_LENGTH - 1);
-    const waveA = Math.sin(index / 11 + seed * 0.01) * 0.28;
-    const waveB = Math.cos(index / 23 + seed * 0.03) * 0.16;
-    const trend = (progress - 0.5) * 0.2;
-    const value = Math.max(0, baseRate + waveA + waveB + trend);
-    return {
-      date: now - (RATE_SERIES_LENGTH - 1 - index) * DAY_MS,
-      value,
-    };
-  });
 };
 
 export function AssetPage() {
@@ -167,10 +141,7 @@ export function AssetPage() {
       : Number.POSITIVE_INFINITY;
   const protocolBorrowLimit = Math.min(reserveAvailableLiquidity, borrowCapRemaining);
   const userBorrowLimitByAccountData =
-    wallet.mode === "real" &&
-    userAccountMetrics !== null &&
-    userAccountMetrics.baseCurrencyUnit > 0 &&
-    hasOraclePrice
+    userAccountMetrics !== null && userAccountMetrics.baseCurrencyUnit > 0 && hasOraclePrice
       ? Math.max(
           0,
           userAccountMetrics.availableBorrowsBase /
@@ -205,9 +176,7 @@ export function AssetPage() {
       : Number.POSITIVE_INFINITY;
 
   const canUseRealHealthFactor =
-    wallet.mode === "real" &&
-    userAccountMetrics !== null &&
-    userAccountMetrics.baseCurrencyUnit > 0;
+    userAccountMetrics !== null && userAccountMetrics.baseCurrencyUnit > 0;
   const toBaseAmount = (usdAmount: number | null): number =>
     canUseRealHealthFactor && usdAmount !== null
       ? usdAmount * userAccountMetrics.baseCurrencyUnit
@@ -303,24 +272,10 @@ export function AssetPage() {
     () => (reserveHistory.data ?? []).map((p) => ({ date: p.date, value: p.borrowApy })),
     [reserveHistory.data]
   );
-  const supplyRateSeries = useMemo(
-    () =>
-      subgraphSupplySeries.length > 0
-        ? subgraphSupplySeries
-        : asset
-          ? buildSyntheticRateSeries(asset.supplyApy, `${asset.id}-supply`)
-          : [],
-    [subgraphSupplySeries, asset?.id, asset?.supplyApy]
-  );
-  const borrowRateSeries = useMemo(
-    () =>
-      subgraphBorrowSeries.length > 0
-        ? subgraphBorrowSeries
-        : asset
-          ? buildSyntheticRateSeries(asset.borrowApy, `${asset.id}-borrow`)
-          : [],
-    [subgraphBorrowSeries, asset?.id, asset?.borrowApy]
-  );
+  // Real subgraph data only — no synthetic fallback. Empty until a subgraph
+  // (VITE_MEGAETH_SUBGRAPH_URL) is configured for the active network.
+  const supplyRateSeries = subgraphSupplySeries;
+  const borrowRateSeries = subgraphBorrowSeries;
   const activeRows = activeInfoTab === "supply" ? supplyRows : borrowRows;
   const activeSeries = activeInfoTab === "supply" ? supplyRateSeries : borrowRateSeries;
   const activeTabLabel = activeInfoTab === "supply" ? "Supply" : "Borrow";
@@ -348,7 +303,7 @@ export function AssetPage() {
     );
   }
 
-  if (wallet.mode === "real" && wallet.isConnected && wallet.isWrongNetwork) {
+  if (wallet.isConnected && wallet.isWrongNetwork) {
     return (
       <PageContainer>
         <ErrorState
@@ -409,9 +364,13 @@ export function AssetPage() {
       </div>
 
       {toast ? (
-        <ToastPopup tone={toast.tone} title={toast.title} durationMs={5000} onClose={clearToast}>
-          {toast.message}
-        </ToastPopup>
+        <TxToast
+          tone={toast.tone}
+          title={toast.title}
+          message={toast.message}
+          txUrl={toast.txUrl}
+          onClose={clearToast}
+        />
       ) : null}
       {lastError ? (
         <Typography muted role="status">
@@ -433,13 +392,20 @@ export function AssetPage() {
                 onChange={(id) => setActiveInfoTab(id as InfoTabId)}
               />
               <div className={styles.rateChart}>
-                <TimeSeriesChart
-                  data={activeSeries}
-                  title={activeRateTitle}
-                  ariaLabel={`${asset.symbol} ${activeTabLabel} Rate chart`}
-                  height={200}
-                  valueFormatter={formatPercent}
-                />
+                {activeSeries.length > 0 ? (
+                  <TimeSeriesChart
+                    data={activeSeries}
+                    title={activeRateTitle}
+                    ariaLabel={`${asset.symbol} ${activeTabLabel} Rate chart`}
+                    height={200}
+                    valueFormatter={formatPercent}
+                  />
+                ) : (
+                  <EmptyState
+                    title="No rate history yet"
+                    description="Historical rates appear once the subgraph is configured for this network."
+                  />
+                )}
               </div>
               <Table
                 className={styles.infoTable}

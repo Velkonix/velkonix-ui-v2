@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "@rainbow-me/rainbowkit/styles.css";
 import { RainbowKitProvider, getDefaultConfig } from "@rainbow-me/rainbowkit";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useAccountModal, useConnectModal } from "@rainbow-me/rainbowkit";
 import { useCallback, useMemo } from "react";
 import type { ReactNode } from "react";
 import {
@@ -57,6 +57,7 @@ function RealWalletContextProvider({ children }: { children: ReactNode }) {
   const { data: walletClient } = useWalletClient({ chainId: activeNetwork.chainId });
   const { switchChainAsync } = useSwitchChain();
   const { openConnectModal, connectModalOpen } = useConnectModal();
+  const { openAccountModal } = useAccountModal();
 
   const connect = useCallback(async () => {
     if (!openConnectModal) {
@@ -80,7 +81,6 @@ function RealWalletContextProvider({ children }: { children: ReactNode }) {
   const value = useMemo(
     () =>
       createWalletContextValue(
-        "real",
         normalizedAddress,
         isPending || connectModalOpen,
         normalizedChainId,
@@ -90,7 +90,8 @@ function RealWalletContextProvider({ children }: { children: ReactNode }) {
         walletClient ?? null,
         connect,
         disconnect,
-        switchNetwork
+        switchNetwork,
+        openAccountModal ?? undefined
       ),
     [
       connect,
@@ -103,6 +104,7 @@ function RealWalletContextProvider({ children }: { children: ReactNode }) {
       publicClient,
       walletClient,
       switchNetwork,
+      openAccountModal,
     ]
   );
 

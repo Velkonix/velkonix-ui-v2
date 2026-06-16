@@ -142,6 +142,89 @@ export async function fetchReserveHistory(
   return data.reserveParamsHistoryItems.map(toReserveHistoryPoint);
 }
 
+export type UserTransactionItem = {
+  id: string;
+  txHash: string;
+  action: string;
+  timestamp: number;
+  amount: number | null;
+  symbol: string | null;
+};
+
+type RawUserTransaction = {
+  id: string;
+  txHash: string;
+  action: string;
+  timestamp: number;
+  amount?: string;
+  reserve?: { symbol: string; decimals: number };
+};
+
+const USER_TRANSACTIONS_QUERY = /* GraphQL */ `
+  query UserTransactions($user: String!, $first: Int!) {
+    userTransactions(
+      where: { user: $user }
+      orderBy: timestamp
+      orderDirection: desc
+      first: $first
+    ) {
+      id
+      txHash
+      action
+      timestamp
+      ... on Supply {
+        amount
+        reserve {
+          symbol
+          decimals
+        }
+      }
+      ... on RedeemUnderlying {
+        amount
+        reserve {
+          symbol
+          decimals
+        }
+      }
+      ... on Borrow {
+        amount
+        reserve {
+          symbol
+          decimals
+        }
+      }
+      ... on Repay {
+        amount
+        reserve {
+          symbol
+          decimals
+        }
+      }
+    }
+  }
+`;
+
+export async function fetchUserTransactions(
+  user: string,
+  first = 25
+): Promise<UserTransactionItem[]> {
+  const url = getActiveNetworkConfig().subgraphUrl;
+  if (!url) throw new Error("SUBGRAPH_URL_NOT_CONFIGURED");
+  const data = await gqlFetch<{ userTransactions: RawUserTransaction[] }>(
+    url,
+    USER_TRANSACTIONS_QUERY,
+    { user: user.toLowerCase(), first }
+  );
+  return data.userTransactions.map((tx) => ({
+    id: tx.id,
+    txHash: tx.txHash,
+    action: tx.action,
+    timestamp: tx.timestamp,
+    amount: tx.amount && tx.reserve ? formatTokenUnits(tx.amount, tx.reserve.decimals) : null,
+    symbol: tx.reserve?.symbol ?? null,
+  }));
+}
+
 const initialState = <T>(): FetchState<T> => ({ data: null, loading: true, error: null });
 
 export function useReserveHistory(
@@ -173,5 +256,37 @@ export function useReserveHistory(
       cancelled = true;
     };
   }, [underlyingAsset, days]);
+  return state;
+}
+
+export function useUserTransactions(
+  user: string | undefined,
+  first: number = 25
+): FetchState<UserTransactionItem[]> {
+  const [state, setState] = useState<FetchState<UserTransactionItem[]>>(initialState);
+  useEffect(() => {
+    if (!user) {
+      setState({ data: null, loading: false, error: null });
+      return;
+    }
+    let cancelled = false;
+    setState({ data: null, loading: true, error: null });
+    fetchUserTransactions(user, first)
+      .then((data) => {
+        if (!cancelled) setState({ data, loading: false, error: null });
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) {
+          setState({
+            data: null,
+            loading: false,
+            error: error instanceof Error ? error.message : "UNKNOWN_ERROR",
+          });
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [user, first]);
   return state;
 }

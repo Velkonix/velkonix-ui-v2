@@ -11,7 +11,13 @@ import type { Address, PublicClient } from "viem";
 
 import type { NetworkConfig } from "../../config/networks";
 import { getAssetConfigByAddress } from "../../config/networks";
-import type { ApyBreakdown, ApyRewardEntry, Asset, UserBorrow, UserSupply } from "../../mock";
+import type {
+  ApyBreakdown,
+  ApyRewardEntry,
+  Asset,
+  UserBorrow,
+  UserSupply,
+} from "../../domain/types";
 import { ERC20_ABI, POOL_ABI } from "./aaveAbis";
 
 const HEALTH_FACTOR_SCALE = 1e18;
