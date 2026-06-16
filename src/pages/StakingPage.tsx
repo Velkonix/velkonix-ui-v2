@@ -39,7 +39,7 @@ const formatPercent = (value: number): string =>
   `${formatNumber(value, { decimals: 2, compact: false })}%`;
 
 const formatDateTime = (value: number): string =>
-  new Date(value).toLocaleString(undefined, {
+  new Date(value).toLocaleString("en-US", {
     month: "short",
     day: "numeric",
     hour: "2-digit",

@@ -63,7 +63,7 @@ export const formatNumber = (value: number, options: FormatNumberOptions = {}): 
   }
 
   const decimals = normalizedDecimals ?? resolveAutoDecimals(scaledValue);
-  const formatted = scaledValue.toLocaleString(options.locale, {
+  const formatted = scaledValue.toLocaleString(options.locale ?? "en-US", {
     useGrouping,
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,

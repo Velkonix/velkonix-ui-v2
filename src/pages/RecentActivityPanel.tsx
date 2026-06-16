@@ -17,7 +17,7 @@ const ACTION_LABELS: Record<string, string> = {
 const formatAction = (action: string): string => ACTION_LABELS[action] ?? action;
 
 const formatTimestamp = (timestamp: number): string =>
-  new Date(timestamp * 1000).toLocaleString(undefined, {
+  new Date(timestamp * 1000).toLocaleString("en-US", {
     month: "short",
     day: "numeric",
     hour: "2-digit",

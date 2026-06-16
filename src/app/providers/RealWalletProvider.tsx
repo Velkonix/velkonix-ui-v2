@@ -115,7 +115,7 @@ export function RealWalletProvider({ children }: { children: ReactNode }) {
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={walletQueryClient}>
-        <RainbowKitProvider>
+        <RainbowKitProvider locale="en-US">
           <RealWalletContextProvider>{children}</RealWalletContextProvider>
         </RainbowKitProvider>
       </QueryClientProvider>

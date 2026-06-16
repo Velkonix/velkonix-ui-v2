@@ -59,7 +59,7 @@ export function filterByPeriod(
 }
 
 export function formatCompactNumber(value: number): string {
-  return new Intl.NumberFormat(undefined, {
+  return new Intl.NumberFormat("en-US", {
     notation: "compact",
     maximumFractionDigits: 1,
   }).format(value);
@@ -67,12 +67,12 @@ export function formatCompactNumber(value: number): string {
 
 export function formatDateLabel(date: Date, period: ChartPeriod): string {
   if (period === "week" || period === "month") {
-    return new Intl.DateTimeFormat(undefined, {
+    return new Intl.DateTimeFormat("en-US", {
       month: "short",
       day: "numeric",
     }).format(date);
   }
-  return new Intl.DateTimeFormat(undefined, {
+  return new Intl.DateTimeFormat("en-US", {
     year: "numeric",
     month: "short",
   }).format(date);
