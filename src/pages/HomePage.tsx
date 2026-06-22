@@ -70,7 +70,7 @@ export function HomePage() {
 
           <div className={styles.pitch}>
             <Typography as="p" variant="label" align="center" className={styles.pitchPrimary}>
-              battle-tested defi mechanics - back on <strong>ethereum</strong>
+              battle-tested defi mechanics - built on <strong>megaeth</strong>
             </Typography>
             <Typography as="p" variant="label" align="center" className={styles.pitchSecondary}>
               vanilla lending. real tokenomics. no experiments
