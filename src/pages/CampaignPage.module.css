@@ -231,10 +231,6 @@
   justify-self: start;
 }
 
-.connectButton {
-  margin-top: var(--space-3);
-}
-
 .errorBanner {
   margin-top: var(--space-3);
   padding: var(--space-3);

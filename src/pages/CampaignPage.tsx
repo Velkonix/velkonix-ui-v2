@@ -475,21 +475,7 @@ export function CampaignPage() {
               ) : (
                 <EmptyState
                   title="Connect wallet"
-                  description={
-                    <>
-                      <span>
-                        Leaderboard is public. Connect wallet to see your {REWARD_TOKEN} overview
-                        for the selected week.
-                      </span>
-                      <Button
-                        className={styles.connectButton}
-                        variant="primary"
-                        onClick={() => void wallet.connect()}
-                      >
-                        Connect wallet
-                      </Button>
-                    </>
-                  }
+                  description={`Leaderboard is public. Connect your wallet to see your ${REWARD_TOKEN} overview for the selected week.`}
                 />
               )}
             </Card>
