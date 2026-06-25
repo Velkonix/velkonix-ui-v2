@@ -30,6 +30,7 @@ export { ValueCell } from "./data-display/ValueCell";
 
 export { Button } from "./inputs/Button";
 export { Checkbox } from "./inputs/Checkbox";
+export { Dropdown } from "./inputs/Dropdown";
 export { IconButton } from "./inputs/IconButton";
 export { AmountInput } from "./inputs/AmountInput";
 export { Input } from "./inputs/Input";

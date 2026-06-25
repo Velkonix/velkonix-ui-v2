@@ -129,12 +129,15 @@ const MEGAETH_MAINNET_CONFIG: NetworkConfig = {
     xvelk: "",
   },
   campaign: {
-    // TODO: replace with the real K613S1-style reward token + merkle distributor
-    // once deployed on MegaETH. distributor "" keeps the Claim section hidden.
-    rewardToken: "",
-    distributor: "",
+    // PREVIEW: pointed at the live K613 mainnet snapshots so the leaderboard /
+    // overview render real data. Swap rewardToken + distributor + snapshotsBaseUrl
+    // for the Velkonix MegaETH deployment when ready. NOTE: the distributor below
+    // lives on the K613 chain, not MegaETH — claim reads will no-op here, so the
+    // Claim card stays hidden until a MegaETH distributor is set.
+    rewardToken: "0x4f9ba5CaE0e3F651821283EC4e303fE8D1dA542a",
+    distributor: "0x94F71Da72c6CE71c570CF7F8e076F3097E411063",
     snapshotsBaseUrl:
-      "https://raw.githubusercontent.com/Velkonix/velkonix-points/main/snapshots-mainnet",
+      "https://raw.githubusercontent.com/K613-Official/K613-points/main/snapshots-mainnet",
     campaignStartTs: 1779321600,
     campaignWeeks: 4,
   },

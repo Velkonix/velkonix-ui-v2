@@ -24,13 +24,13 @@ import {
   Badge,
   Button,
   Card,
+  Dropdown,
   EmptyState,
   ErrorState,
   MetricTile,
   Modal,
   PageContainer,
   PageHeader,
-  Select,
   Table,
   Tabs,
   Typography,
@@ -156,7 +156,6 @@ export function CampaignPage() {
   const [howItWorksOpen, setHowItWorksOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
-  const tabsShellRef = useRef<HTMLDivElement | null>(null);
   const toastTimer = useRef<number | null>(null);
 
   const leaderboard = useLeaderboard(week);
@@ -180,7 +179,6 @@ export function CampaignPage() {
 
   const handleSetTab = (tab: CampaignTab) => {
     setActiveTab(tab);
-    tabsShellRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   const handleWeekChange = (value: string) => {
@@ -350,17 +348,18 @@ export function CampaignPage() {
             Choose the campaign week you want to view.
           </Typography>
         </div>
-        <Select
+        <Dropdown
           className={styles.weekSelect}
+          ariaLabel="Campaign week"
           value={String(week)}
-          onChange={(event) => handleWeekChange(event.target.value)}
+          onChange={handleWeekChange}
           options={availableWeeks.map((w) => ({ value: String(w), label: `Week ${w}` }))}
         />
       </Card>
 
       <Tabs items={TABS} activeId={activeTab} onChange={(id) => handleSetTab(id as CampaignTab)} />
 
-      <div ref={tabsShellRef} className={styles.tabPanel}>
+      <div className={styles.tabPanel}>
         {activeTab === "leaderboard" && (
           <Card
             title="Leaderboard"
