@@ -34,13 +34,19 @@ export type AaveDeploymentConfig = {
   factoryCommit?: string;
 };
 
-// Velkonix staking stack. Fill in once the contracts are deployed; empty string
-// means "not configured" and is reported by validateActiveStakingConfig().
 export type StakingDeploymentConfig = {
   staking: Address | "";
   rewardsDistributor: Address | "";
   velk: Address | "";
   xvelk: Address | "";
+};
+
+export type CampaignDeploymentConfig = {
+  rewardToken: Address | "";
+  distributor: Address | "";
+  snapshotsBaseUrl: string;
+  campaignStartTs: number;
+  campaignWeeks: number;
 };
 
 export type NetworkConfig = {
@@ -53,6 +59,7 @@ export type NetworkConfig = {
   subgraphUrl?: string;
   deployments: AaveDeploymentConfig;
   staking: StakingDeploymentConfig;
+  campaign: CampaignDeploymentConfig;
   assets: AssetConfig[];
 };
 
@@ -120,6 +127,16 @@ const MEGAETH_MAINNET_CONFIG: NetworkConfig = {
     rewardsDistributor: "",
     velk: "",
     xvelk: "",
+  },
+  campaign: {
+    // TODO: replace with the real K613S1-style reward token + merkle distributor
+    // once deployed on MegaETH. distributor "" keeps the Claim section hidden.
+    rewardToken: "",
+    distributor: "",
+    snapshotsBaseUrl:
+      "https://raw.githubusercontent.com/Velkonix/velkonix-points/main/snapshots-mainnet",
+    campaignStartTs: 1779321600,
+    campaignWeeks: 4,
   },
   assets: [
     {
@@ -195,6 +212,14 @@ const ARBITRUM_SEPOLIA_CONFIG: NetworkConfig = {
     rewardsDistributor: "",
     velk: "",
     xvelk: "",
+  },
+  campaign: {
+    rewardToken: "",
+    distributor: "",
+    snapshotsBaseUrl:
+      "https://raw.githubusercontent.com/Velkonix/velkonix-points/main/snapshots-testnet",
+    campaignStartTs: 1778963398,
+    campaignWeeks: 4,
   },
   assets: [],
 };
@@ -272,3 +297,11 @@ export const validateActiveStakingConfig = (): string[] => {
 };
 
 export const isStakingConfigured = (): boolean => validateActiveStakingConfig().length === 0;
+
+export const getActiveCampaignConfig = (): CampaignDeploymentConfig =>
+  ACTIVE_NETWORK_CONFIG.campaign;
+
+// The leaderboard/overview tabs only need a snapshots URL; claiming additionally
+// needs the on-chain merkle distributor. Use this to gate the Claim section.
+export const isCampaignClaimConfigured = (): boolean =>
+  Boolean(ACTIVE_NETWORK_CONFIG.campaign.distributor);

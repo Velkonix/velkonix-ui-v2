@@ -7,6 +7,7 @@ import githubLogo from "../assets/github-icon-1.svg";
 import xLogo from "../assets/x-logo.svg";
 
 import { AssetPage } from "../pages/AssetPage";
+import { CampaignPage } from "../pages/CampaignPage";
 import { DashboardPage } from "../pages/DashboardPage";
 import { FaqPage } from "../pages/FaqPage";
 import { HomePage } from "../pages/HomePage";
@@ -18,6 +19,7 @@ import { UiKitPage } from "../pages/UiKitPage";
 import { useWallet } from "./providers/WalletProvider";
 import {
   AppLayout,
+  CampaignNavIcon,
   DashboardNavIcon,
   FaqNavIcon,
   Footer,
@@ -66,6 +68,7 @@ function AppShell() {
                 {navItem("/markets", "Markets", <MarketsNavIcon />)}
                 {navItem("/dashboard", "Dashboard", <DashboardNavIcon />)}
                 {navItem("/staking", "Staking", <StakingNavIcon />)}
+                {navItem("/campaign", "Campaign", <CampaignNavIcon />)}
                 {navItem("/faq", "FAQ", <FaqNavIcon />)}
               </div>
             }
@@ -120,6 +123,7 @@ function AppShell() {
         <Route path="/markets" element={<MarketsPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/staking" element={<StakingPage />} />
+        <Route path="/campaign" element={<CampaignPage />} />
         <Route path="/faq" element={<FaqPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />

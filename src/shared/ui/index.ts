@@ -49,6 +49,7 @@ export { Footer } from "./layout/Footer";
 export { Header } from "./layout/Header";
 export { HeaderNavItem } from "./layout/HeaderNavItem";
 export {
+  CampaignNavIcon,
   DashboardNavIcon,
   FaqNavIcon,
   MarketsNavIcon,

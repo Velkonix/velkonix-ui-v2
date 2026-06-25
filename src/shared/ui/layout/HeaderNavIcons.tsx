@@ -122,3 +122,33 @@ export function StakingNavIcon() {
     </Icon>
   );
 }
+
+export function CampaignNavIcon() {
+  return (
+    <Icon size={20} viewBox="0 0 20 20">
+      <path
+        d="M4.2 7.6h2.3l5.2-2.9c.5-.3 1.1.1 1.1.7v9.2c0 .6-.6 1-1.1.7l-5.2-2.9H4.2c-.7 0-1.2-.5-1.2-1.2V8.8c0-.7.5-1.2 1.2-1.2z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M5.6 12.4v2.1c0 .7.5 1.2 1.2 1.2h.7c.7 0 1.2-.5 1.2-1.2v-1.3"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M15.4 8.2c.9.5 1.5 1.1 1.5 1.8s-.6 1.3-1.5 1.8"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeOpacity="0.7"
+      />
+    </Icon>
+  );
+}

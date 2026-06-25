@@ -1,0 +1,282 @@
+.page {
+  display: grid;
+  gap: var(--space-5);
+  width: 100%;
+}
+
+/* Hero ---------------------------------------------------------------- */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.heroMain {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: rgba(var(--text-muted-rgb), 0.8);
+}
+
+.statusDot[data-tone="success"] {
+  background: var(--success);
+  box-shadow: 0 0 0 4px rgba(var(--success-rgb), 0.18);
+}
+
+.statusDot[data-tone="warning"] {
+  background: var(--accent-primary);
+  box-shadow: 0 0 0 4px rgba(var(--accent-primary-rgb), 0.18);
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.heroSide {
+  display: grid;
+  gap: var(--space-3);
+}
+
+/* Week selector ------------------------------------------------------- */
+.weekRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.weekHint {
+  margin-top: var(--space-1);
+}
+
+.weekSelect {
+  min-width: 180px;
+}
+
+/* Tabs ---------------------------------------------------------------- */
+.tabPanel {
+  margin-top: var(--space-2);
+  scroll-margin-top: var(--space-6);
+}
+
+.tabContent {
+  display: grid;
+  gap: var(--space-4);
+}
+
+/* Metrics ------------------------------------------------------------- */
+.metricGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+/* Leaderboard --------------------------------------------------------- */
+.leaderboardTable {
+  width: 100%;
+}
+
+.rank {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.addressCell {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(
+    135deg,
+    rgba(var(--accent-primary-rgb), 0.85),
+    rgba(var(--accent-glow-rgb), 0.4)
+  );
+  flex-shrink: 0;
+}
+
+.pointsBreakdown {
+  display: grid;
+  gap: 2px;
+  justify-items: end;
+}
+
+.pointsTotal {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.pointsRow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.pointsLabel {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.8;
+}
+
+/* Pagination ---------------------------------------------------------- */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-top: var(--space-4);
+}
+
+.pageGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.pageInput {
+  width: 64px;
+  padding: var(--space-2);
+  text-align: center;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(var(--border-subtle-rgb), 0.6);
+  background: rgba(var(--bg-tertiary-rgb), 0.6);
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.pageInput:focus-visible {
+  outline: none;
+  border-color: rgba(var(--accent-primary-rgb), 0.6);
+}
+
+/* Rules accordion ----------------------------------------------------- */
+.rules {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.rule {
+  border: 1px solid rgba(var(--border-subtle-rgb), 0.5);
+  border-radius: var(--radius-md);
+  background: rgba(var(--surface-highlight-rgb), 0.03);
+  overflow: hidden;
+}
+
+.ruleSummary {
+  cursor: pointer;
+  list-style: none;
+  padding: var(--space-3) var(--space-4);
+  font-weight: 500;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.ruleSummary::-webkit-details-marker {
+  display: none;
+}
+
+.ruleSummary::after {
+  content: "+";
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.rule[open] .ruleSummary::after {
+  content: "−";
+}
+
+.ruleText {
+  margin: 0;
+  padding: 0 var(--space-4) var(--space-4);
+  color: var(--text-secondary);
+  line-height: 1.55;
+  white-space: pre-line;
+}
+
+/* Claim --------------------------------------------------------------- */
+.claimCard {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.claimButton {
+  margin-top: var(--space-3);
+  justify-self: start;
+}
+
+.connectButton {
+  margin-top: var(--space-3);
+}
+
+.errorBanner {
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(var(--error-rgb), 0.4);
+  background: rgba(var(--error-rgb), 0.1);
+  color: var(--error);
+  font-size: 0.85rem;
+}
+
+/* Toast --------------------------------------------------------------- */
+.toast {
+  position: fixed;
+  right: var(--space-5);
+  bottom: var(--space-5);
+  z-index: 50;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: rgba(var(--bg-overlay-rgb), 0.95);
+  border: 1px solid rgba(var(--border-subtle-rgb), 0.6);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-md);
+  font-size: 0.85rem;
+}
+
+/* Responsive ---------------------------------------------------------- */
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .metricGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .metricGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pagination {
+    justify-content: center;
+  }
+}
