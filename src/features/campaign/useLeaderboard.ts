@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { getActiveCampaignConfig } from "../../config/networks";
+import { getCampaignConfig } from "../../config/networks";
 import { fetchLeaderboard } from "./snapshotsClient";
 import type { LeaderboardSnapshot } from "./types";
 
@@ -11,12 +11,10 @@ type LeaderboardState = {
   error: unknown;
 };
 
-// Snapshots are immutable per (baseUrl, week) once finalized, so an in-memory
-// cache keeps tab/week switches instant without re-fetching.
 const cache = new Map<string, LeaderboardSnapshot | null>();
 
 export function useLeaderboard(week: number) {
-  const baseUrl = getActiveCampaignConfig().snapshotsBaseUrl;
+  const baseUrl = getCampaignConfig().snapshotsBaseUrl;
   const cacheKey = `${baseUrl}::${week}`;
 
   const [state, setState] = useState<LeaderboardState>(() => ({

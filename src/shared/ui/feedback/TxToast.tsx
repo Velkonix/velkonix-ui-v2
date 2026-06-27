@@ -14,8 +14,6 @@ type TxToastProps = {
   onClose: () => void;
 };
 
-// Toast wrapper that appends an explorer link when a tx hash is present.
-// Pending ("info") toasts stay longer so they survive until confirmation.
 export function TxToast({ tone, title, message, txUrl, onClose }: TxToastProps) {
   return (
     <ToastPopup

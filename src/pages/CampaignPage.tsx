@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useWallet } from "../app/providers/WalletProvider";
-import { getActiveCampaignConfig } from "../config/networks";
+import { getCampaignConfig } from "../config/networks";
 import {
   formatPoints,
   formatShare,
@@ -142,7 +142,7 @@ export function CampaignPage() {
   const wallet = useWallet();
   const address = wallet.address ?? undefined;
   const connected = wallet.isConnected;
-  const campaign = getActiveCampaignConfig();
+  const campaign = getCampaignConfig();
 
   const [status, setStatus] = useState(() => getCampaignStatus(campaign));
   const [week, setWeek] = useState<number>(() => getUnlockedWeek(campaign));

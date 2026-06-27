@@ -4,8 +4,6 @@ const USD_DECIMALS = 18n;
 const POINTS_DECIMALS = 18n;
 const TOKEN_DECIMALS = 18n;
 
-// Build 10^n as a BigInt without the `**` operator: some bundlers transpile
-// exponentiation to Math.pow, which throws on BigInt args in the browser.
 const pow10 = (decimals: bigint): bigint => BigInt("1" + "0".repeat(Number(decimals)));
 
 const formatBaseUnits = (value: bigint, decimals: bigint, fractionDigits = 2): string => {
@@ -34,7 +32,6 @@ export const shortenAddress = (address: string): string => {
   return `${address.slice(0, 6)}…${address.slice(-4)}`;
 };
 
-// Token amounts are shown with up to 4 trimmed decimals (claim section).
 export const formatTokens = (value: bigint): string => {
   if (value === 0n) return "0";
   const divisor = pow10(TOKEN_DECIMALS);

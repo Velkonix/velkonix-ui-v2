@@ -56,7 +56,6 @@ export async function loadStakingState({
   const velkAddress = staking.velk as Address;
   const xvelkAddress = staking.xvelk as Address;
 
-  // Protocol-level reads (independent of the connected user).
   const [
     velkDecimalsRaw,
     xvelkDecimalsRaw,
@@ -83,9 +82,6 @@ export async function loadStakingState({
   const lockDurationSec = Number(lockDurationRaw);
   const instantExitPenaltyBps = Number(penaltyBpsRaw);
 
-  // Best-effort APR: treat the current epoch's pending rewards as the per-epoch
-  // rate and annualise it over the pool's total deposits. Rough until a subgraph
-  // feed exists. TODO: replace with subgraph-backed historical APR.
   const totalDeposits = toNumber(totalDepositsRaw, xvelkDecimals);
   const pendingRewardsPool = toNumber(pendingRewardsPoolRaw, velkDecimals);
   const epochDurationSec = Number(epochDurationRaw);

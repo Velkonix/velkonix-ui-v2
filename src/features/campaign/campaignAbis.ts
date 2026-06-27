@@ -1,5 +1,3 @@
-// Merkle distributor for the points campaign. Users claim a cumulative amount
-// proven against the active merkleRoot; `claimed` tracks per-address payouts.
 export const CAMPAIGN_DISTRIBUTOR_ABI = [
   {
     type: "function",

@@ -1,6 +1,3 @@
-// Minimal ABIs for the Velkonix staking stack, typed `as const` for viem.
-// Source artifacts: Staking.json, RewardsDistributor.json, VELK.json, xVELK.json.
-
 export const STAKING_TOKEN_ABI = [
   {
     type: "function",

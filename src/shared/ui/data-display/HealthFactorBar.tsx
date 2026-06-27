@@ -4,8 +4,6 @@ import styles from "./HealthFactorBar.module.css";
 const clamp = (value: number, min: number, max: number): number =>
   Math.min(max, Math.max(min, value));
 
-// Position of the thumb along a red→green track. HF 1.0 sits near the danger
-// (left) end, HF >= 3 is fully safe (right end).
 const thumbPercent = (healthFactor: number): number => {
   if (!Number.isFinite(healthFactor)) {
     return 100;

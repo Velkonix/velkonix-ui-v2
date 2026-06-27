@@ -272,8 +272,6 @@ export function AssetPage() {
     () => (reserveHistory.data ?? []).map((p) => ({ date: p.date, value: p.borrowApy })),
     [reserveHistory.data]
   );
-  // Real subgraph data only — no synthetic fallback. Empty until a subgraph
-  // (VITE_MEGAETH_SUBGRAPH_URL) is configured for the active network.
   const supplyRateSeries = subgraphSupplySeries;
   const borrowRateSeries = subgraphBorrowSeries;
   const activeRows = activeInfoTab === "supply" ? supplyRows : borrowRows;

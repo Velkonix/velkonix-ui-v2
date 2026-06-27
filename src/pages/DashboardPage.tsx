@@ -71,7 +71,6 @@ const getHealthPercent = (healthFactor: number): number => {
   if (healthFactor <= 1) {
     return 0;
   }
-  // Maps HF in [1..+inf] to [0..100], where HF=1 is liquidation edge.
   const normalized = (1 - 1 / healthFactor) * 100;
   return Math.max(0, Math.min(100, normalized));
 };
@@ -170,8 +169,6 @@ export function DashboardPage() {
     return marketRows.map((market) => {
       const existing = dashboardSupplies.find((s) => s.assetId === market.id);
       if (existing) return existing;
-      // Not supplied yet: surface the wallet balance so the asset shows up as
-      // available to supply (otherwise it's hidden as a zero-balance row).
       const walletBalance = getWalletBalanceForAsset(market.id);
       const price = getAssetById(market.id)?.oraclePrice;
       const walletBalanceUsd =
@@ -198,8 +195,6 @@ export function DashboardPage() {
     });
   }, [marketRows, dashboardSupplies, getWalletBalanceForAsset, getAssetById]);
 
-  // Asset ids the user actually has a supplied position in (vs. merely holds in
-  // wallet). Drives whether a row shows Withdraw/Collateral or a Supply action.
   const suppliedAssetIds = useMemo(
     () => new Set(dashboardSupplies.map((s) => s.assetId)),
     [dashboardSupplies]

@@ -123,6 +123,35 @@ export function StakingNavIcon() {
   );
 }
 
+export function TokenSaleNavIcon() {
+  return (
+    <Icon size={20} viewBox="0 0 20 20">
+      <circle
+        cx="10"
+        cy="10"
+        r="7.3"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeOpacity="0.85"
+      />
+      <path
+        d="M12.2 7.4c-.4-.9-1.3-1.4-2.3-1.4-1.3 0-2.3.8-2.3 1.9 0 2.6 4.8 1.3 4.8 4 0 1.2-1.1 2-2.5 2-1.1 0-2-.5-2.4-1.4"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M10 4.6v1.3M10 14.1v1.3"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </Icon>
+  );
+}
+
 export function CampaignNavIcon() {
   return (
     <Icon size={20} viewBox="0 0 20 20">

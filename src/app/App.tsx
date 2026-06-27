@@ -15,6 +15,7 @@ import { MarketsPage } from "../pages/MarketsPage";
 import { PrivacyPage } from "../pages/PrivacyPage";
 import { StakingPage } from "../pages/StakingPage";
 import { TermsPage } from "../pages/TermsPage";
+import { TokenSalePage } from "../pages/TokenSalePage";
 import { UiKitPage } from "../pages/UiKitPage";
 import { useWallet } from "./providers/WalletProvider";
 import {
@@ -28,6 +29,7 @@ import {
   Link,
   MarketsNavIcon,
   StakingNavIcon,
+  TokenSaleNavIcon,
   WalletConnectButton,
 } from "../shared/ui";
 import styles from "./App.module.css";
@@ -69,6 +71,7 @@ function AppShell() {
                 {navItem("/dashboard", "Dashboard", <DashboardNavIcon />)}
                 {navItem("/staking", "Staking", <StakingNavIcon />)}
                 {navItem("/campaign", "Campaign", <CampaignNavIcon />)}
+                {navItem("/token-sale", "Token Sale", <TokenSaleNavIcon />)}
                 {navItem("/faq", "FAQ", <FaqNavIcon />)}
               </div>
             }
@@ -124,6 +127,7 @@ function AppShell() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/staking" element={<StakingPage />} />
         <Route path="/campaign" element={<CampaignPage />} />
+        <Route path="/token-sale" element={<TokenSalePage />} />
         <Route path="/faq" element={<FaqPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />

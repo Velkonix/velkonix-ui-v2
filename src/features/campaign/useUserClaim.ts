@@ -1,23 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { createPublicClient, http } from "viem";
-import type { Address, PublicClient } from "viem";
+import type { Address } from "viem";
 
 import { useWallet } from "../../app/providers/WalletProvider";
-import {
-  getActiveCampaignConfig,
-  getActiveNetworkConfig,
-  isCampaignClaimConfigured,
-} from "../../config/networks";
+import { getCampaignConfig, isCampaignClaimConfigured } from "../../config/networks";
+import { getPreviewWalletClient, previewPublicClient } from "../../shared/lib/previewChain";
 import { CAMPAIGN_DISTRIBUTOR_ABI } from "./campaignAbis";
 import { getUnlockedWeek } from "./campaignWeeks";
 import { fetchUserProof } from "./snapshotsClient";
 import type { UserProof } from "./types";
 
-const networkConfig = getActiveNetworkConfig();
-const readClient: PublicClient = createPublicClient({
-  chain: networkConfig.viemChain,
-  transport: http(networkConfig.rpcUrl),
-});
+const readClient = previewPublicClient;
 
 type ClaimProof = UserProof & { week: number };
 
@@ -40,7 +32,7 @@ export function useUserClaim() {
   const wallet = useWallet();
   const address = (wallet.address as Address | null) ?? null;
 
-  const campaign = getActiveCampaignConfig();
+  const campaign = getCampaignConfig();
   const distributor = (campaign.distributor || "") as Address | "";
   const baseUrl = campaign.snapshotsBaseUrl;
   const isClaimAvailable = isCampaignClaimConfigured();
@@ -78,9 +70,6 @@ export function useUserClaim() {
       const onChainRoot = (onChainRootRaw as `0x${string}`).toLowerCase();
       const alreadyClaimed = (claimedRaw as bigint) ?? 0n;
 
-      // The distributor stores a single active merkleRoot — only the snapshot
-      // whose root matches it will pass MerkleProof.verify. Walk weeks
-      // newest-to-oldest and pick the first match.
       let matched: ClaimProof | null = null;
       const unlockedWeek = getUnlockedWeek(campaign);
       for (let w = unlockedWeek; w >= 1; w -= 1) {
@@ -117,26 +106,27 @@ export function useUserClaim() {
 
   const claim = useCallback(async () => {
     if (!state.proof || claimable === 0n || !distributor) return;
-    if (!wallet.walletClient || !wallet.publicClient || !address) {
+    if (!address) {
       throw new Error("WALLET_NOT_READY");
     }
     setIsPending(true);
     try {
-      const { request } = await wallet.publicClient.simulateContract({
+      const { request } = await readClient.simulateContract({
         account: address,
         address: distributor,
         abi: CAMPAIGN_DISTRIBUTOR_ABI,
         functionName: "claim",
         args: [state.proof.amount, state.proof.proof],
       });
-      const hash = await wallet.walletClient.writeContract(request);
-      await wallet.publicClient.waitForTransactionReceipt({ hash });
+      const walletClient = getPreviewWalletClient(address);
+      const hash = await walletClient.writeContract(request);
+      await readClient.waitForTransactionReceipt({ hash });
       await load();
       return hash;
     } finally {
       setIsPending(false);
     }
-  }, [state.proof, claimable, distributor, wallet, address, load]);
+  }, [state.proof, claimable, distributor, address, load]);
 
   return {
     claim,

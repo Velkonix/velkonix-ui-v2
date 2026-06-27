@@ -19,9 +19,6 @@ type DropdownProps = {
   disabled?: boolean;
 };
 
-// Themed replacement for a native <select>: the browser renders <option> lists
-// with un-styleable OS chrome (a white box on Windows), so we draw the popover
-// ourselves to match the design system.
 export function Dropdown({
   value,
   options,

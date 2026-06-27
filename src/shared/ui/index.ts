@@ -55,6 +55,7 @@ export {
   FaqNavIcon,
   MarketsNavIcon,
   StakingNavIcon,
+  TokenSaleNavIcon,
 } from "./layout/HeaderNavIcons";
 export { NavMenu } from "./layout/NavMenu";
 export { PageContainer } from "./layout/PageContainer";

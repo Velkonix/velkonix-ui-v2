@@ -49,6 +49,14 @@ export type CampaignDeploymentConfig = {
   campaignWeeks: number;
 };
 
+export type TokenSaleDeploymentConfig = {
+  saleContract: Address | "";
+  usdc: Address | "";
+  contributionStartTs: number;
+  contributionEndTs: number;
+  claimStartTs: number;
+};
+
 export type NetworkConfig = {
   key: SupportedNetwork;
   label: string;
@@ -60,6 +68,7 @@ export type NetworkConfig = {
   deployments: AaveDeploymentConfig;
   staking: StakingDeploymentConfig;
   campaign: CampaignDeploymentConfig;
+  tokenSale: TokenSaleDeploymentConfig;
   assets: AssetConfig[];
 };
 
@@ -122,24 +131,24 @@ const MEGAETH_MAINNET_CONFIG: NetworkConfig = {
     walletBalanceProvider: "0xE53969561603a9052E3F579b2992C12F3C783496",
   },
   staking: {
-    // TODO: fill in after deploying the Velkonix staking stack on MegaETH.
     staking: "",
     rewardsDistributor: "",
     velk: "",
     xvelk: "",
   },
   campaign: {
-    // PREVIEW: pointed at the live K613 mainnet snapshots so the leaderboard /
-    // overview render real data. Swap rewardToken + distributor + snapshotsBaseUrl
-    // for the Velkonix MegaETH deployment when ready. NOTE: the distributor below
-    // lives on the K613 chain, not MegaETH — claim reads will no-op here, so the
-    // Claim card stays hidden until a MegaETH distributor is set.
-    rewardToken: "0x4f9ba5CaE0e3F651821283EC4e303fE8D1dA542a",
-    distributor: "0x94F71Da72c6CE71c570CF7F8e076F3097E411063",
-    snapshotsBaseUrl:
-      "https://raw.githubusercontent.com/K613-Official/K613-points/main/snapshots-mainnet",
-    campaignStartTs: 1779321600,
+    rewardToken: "",
+    distributor: "",
+    snapshotsBaseUrl: "",
+    campaignStartTs: 0,
     campaignWeeks: 4,
+  },
+  tokenSale: {
+    saleContract: "",
+    usdc: "",
+    contributionStartTs: 0,
+    contributionEndTs: 0,
+    claimStartTs: 0,
   },
   assets: [
     {
@@ -217,12 +226,19 @@ const ARBITRUM_SEPOLIA_CONFIG: NetworkConfig = {
     xvelk: "",
   },
   campaign: {
-    rewardToken: "",
-    distributor: "",
+    rewardToken: "0x71fa5FdDD1022D139aF454F3D34ce30Ad7421655",
+    distributor: "0xFcb469076ce409F933037E29d611c96CcDa558c7",
     snapshotsBaseUrl:
-      "https://raw.githubusercontent.com/Velkonix/velkonix-points/main/snapshots-testnet",
+      "https://raw.githubusercontent.com/K613-Official/K613-points/main/snapshots-testnet",
     campaignStartTs: 1778963398,
     campaignWeeks: 4,
+  },
+  tokenSale: {
+    saleContract: "0x86E5d0ac1c9abb5c92DA37971675cAf1B7de6fcd",
+    usdc: "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d",
+    contributionStartTs: 1781688779,
+    contributionEndTs: 1781775179,
+    claimStartTs: 1781775179,
   },
   assets: [],
 };
@@ -301,10 +317,14 @@ export const validateActiveStakingConfig = (): string[] => {
 
 export const isStakingConfigured = (): boolean => validateActiveStakingConfig().length === 0;
 
-export const getActiveCampaignConfig = (): CampaignDeploymentConfig =>
-  ACTIVE_NETWORK_CONFIG.campaign;
+export const PREVIEW_NETWORK_CONFIG = ARBITRUM_SEPOLIA_CONFIG;
 
-// The leaderboard/overview tabs only need a snapshots URL; claiming additionally
-// needs the on-chain merkle distributor. Use this to gate the Claim section.
+export const getCampaignConfig = (): CampaignDeploymentConfig => PREVIEW_NETWORK_CONFIG.campaign;
+
+export const getTokenSaleConfig = (): TokenSaleDeploymentConfig => PREVIEW_NETWORK_CONFIG.tokenSale;
+
 export const isCampaignClaimConfigured = (): boolean =>
-  Boolean(ACTIVE_NETWORK_CONFIG.campaign.distributor);
+  Boolean(PREVIEW_NETWORK_CONFIG.campaign.distributor);
+
+export const isTokenSaleConfigured = (): boolean =>
+  Boolean(PREVIEW_NETWORK_CONFIG.tokenSale.saleContract);

@@ -4,7 +4,6 @@
   width: 100%;
 }
 
-/* Hero ---------------------------------------------------------------- */
 .hero {
   display: grid;
   grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
@@ -51,7 +50,6 @@
   gap: var(--space-3);
 }
 
-/* Week selector ------------------------------------------------------- */
 .weekRow {
   display: flex;
   align-items: center;
@@ -68,7 +66,6 @@
   min-width: 180px;
 }
 
-/* Tabs ---------------------------------------------------------------- */
 .tabPanel {
   margin-top: var(--space-2);
   scroll-margin-top: var(--space-6);
@@ -79,14 +76,12 @@
   gap: var(--space-4);
 }
 
-/* Metrics ------------------------------------------------------------- */
 .metricGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-3);
 }
 
-/* Leaderboard --------------------------------------------------------- */
 .leaderboardTable {
   width: 100%;
 }
@@ -140,7 +135,6 @@
   opacity: 0.8;
 }
 
-/* Pagination ---------------------------------------------------------- */
 .pagination {
   display: flex;
   align-items: center;
@@ -172,7 +166,6 @@
   border-color: rgba(var(--accent-primary-rgb), 0.6);
 }
 
-/* Rules accordion ----------------------------------------------------- */
 .rules {
   display: grid;
   gap: var(--space-2);
@@ -220,7 +213,6 @@
   white-space: pre-line;
 }
 
-/* Claim --------------------------------------------------------------- */
 .claimCard {
   display: grid;
   gap: var(--space-3);
@@ -241,7 +233,6 @@
   font-size: 0.85rem;
 }
 
-/* Toast --------------------------------------------------------------- */
 .toast {
   position: fixed;
   right: var(--space-5);
@@ -256,7 +247,6 @@
   font-size: 0.85rem;
 }
 
-/* Responsive ---------------------------------------------------------- */
 @media (max-width: 900px) {
   .hero {
     grid-template-columns: minmax(0, 1fr);

@@ -951,23 +951,17 @@ export function useLendingController() {
         return;
       }
       let units = parseAmountToUnits(parseAmount(amountText), decimals);
-      // Clamp to the exact on-chain balance. walletBalances are stored as lossy
-      // JS numbers, so a "max" supply can reconstruct a few wei ABOVE the real
-      // balance and revert with ERC20InsufficientBalance (0xe450d38c). Reading
-      // the raw bigint balance and clamping avoids that.
       if (wallet.publicClient) {
-        try {
-          const rawBalance = (await wallet.publicClient.readContract({
+        const rawBalance = (await wallet.publicClient
+          .readContract({
             address: assetAddress,
             abi: ERC20_ABI,
             functionName: "balanceOf",
             args: [user],
-          })) as bigint;
-          if (units > rawBalance) {
-            units = rawBalance;
-          }
-        } catch {
-          // Balance read failed — fall back to the parsed amount.
+          })
+          .catch(() => null)) as bigint | null;
+        if (rawBalance !== null && units > rawBalance) {
+          units = rawBalance;
         }
       }
       if (units <= 0n) {

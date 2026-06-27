@@ -86,7 +86,6 @@ export function AmountInput({
     if (!canUsePercent) {
       return;
     }
-    // Trim float noise; MAX stays exact via handleMax.
     dispatchValueChange(String(Number((numericMax * fraction).toFixed(8))));
   };
 
